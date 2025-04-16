@@ -58,6 +58,6 @@ class PasswordCategory(models.Model):
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_default_category(self):
-        main_category = self.env.ref("passwords.password_category_all", raise_if_not_found=False)
+        main_category = self.env.ref("password_manager.password_category_all", raise_if_not_found=False)
         if main_category and main_category in self:
             raise UserError(_("You cannot delete this password category, it is the default generic category."))

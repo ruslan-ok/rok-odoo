@@ -1,7 +1,7 @@
 import { Component } from "@odoo/owl";
 
 export class ShowHideButton extends Component {
-    static template = "passwords.ShowHideButton";
+    static template = "password_manager.ShowHideButton";
     static props = {
         className: { type: String, optional: true },
         showHideText: { type: String, optional: true },

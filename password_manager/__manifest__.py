@@ -19,7 +19,7 @@ Password Manager
     "application": True,
     "assets": {
         "web.assets_backend": [
-            "passwords/static/src/views/**/*",
+            "password_manager/static/src/views/**/*",
         ],
     },
     "license": "LGPL-3",

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <template>
 
-    <t t-name="passwords.CheckboxGroup">
+    <t t-name="password_manager.CheckboxGroup">
         <div aria-atomic="true">
             <t t-foreach="checkboxes" t-as="checkbox" t-key="checkbox.id">
                 <span class="d-inline-block me-3" t-att-title="checkbox.question_circle">

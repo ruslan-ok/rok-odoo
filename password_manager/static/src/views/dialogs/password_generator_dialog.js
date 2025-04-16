@@ -6,7 +6,7 @@ import { CheckboxGroup } from "../fields/checkbox_group/checkbox_group";
 import { Component, useState, useRef } from "@odoo/owl";
 
 class RadioSelection extends Component {
-    static template = "passwords.RadioSelection";
+    static template = "password_manager.RadioSelection";
     static props = {
         choices: Array,
         onChange: Function,
@@ -22,7 +22,7 @@ const PASSPHRASE_CHOICES = [
 ];
 
 export class PasswordGeneratorDialog extends Component {
-    static template = "passwords.PasswordGeneratorDialog";
+    static template = "password_manager.PasswordGeneratorDialog";
     static components = { Dialog, CopyButton, RadioSelection, CheckboxGroup };
     static props = {
         value: { type: String },

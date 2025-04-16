@@ -4,7 +4,7 @@ import {debounce} from "@web/core/utils/timing";
 
 
 export class CheckboxGroup extends Component {
-    static template = "passwords.CheckboxGroup";
+    static template = "password_manager.CheckboxGroup";
     static components = { CheckBox };
     static props = {
         values: { type: Array },

@@ -10,7 +10,7 @@ import { GeneratePasswordButton } from "../../buttons/generate_password_button/g
 import { useState, useRef, Component } from "@odoo/owl";
 
 export class PasswordField extends Component {
-    static template = "passwords.ListPasswordField";
+    static template = "password_manager.ListPasswordField";
     static components = { Field: CharField, CopyButton };
     static props = {
         ...standardFieldProps,
@@ -99,7 +99,7 @@ registry.category("fields").add("list_password", passwordField);
 
 class FormPasswordField extends PasswordField {
     static components = { CopyButton, ShowHideButton, GeneratePasswordButton };
-    static template = "passwords.FormPasswordField";
+    static template = "password_manager.FormPasswordField";
 }
 
 export const formPasswordField = {

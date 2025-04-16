@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
-    <t t-name="passwords.ShowHideButton">
+    <t t-name="password_manager.ShowHideButton">
         <button
             class="text-nowrap"
             t-ref="button"

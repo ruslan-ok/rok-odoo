@@ -9,11 +9,11 @@ class Passwords(models.Model):
 
     @tools.ormcache()
     def _get_default_login(self):
-        return self.env.user.work_email
+        return self.env.user.login
     
     @tools.ormcache()
     def _get_default_category_id(self):
-        return self.env.ref("passwords.password_category_all")
+        return self.env.ref("password_manager.password_category_all")
 
     title = fields.Char()
     login = fields.Char(default=_get_default_login, tracking=True)

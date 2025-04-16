@@ -4,7 +4,7 @@ import { useService } from "@web/core/utils/hooks";
 import { Component } from "@odoo/owl";
 
 export class GeneratePasswordButton extends Component {
-    static template = "passwords.GeneratePasswordButton";
+    static template = "password_manager.GeneratePasswordButton";
     static props = {
         className: { type: String, optional: true },
         disabled: { type: Boolean, optional: true },
