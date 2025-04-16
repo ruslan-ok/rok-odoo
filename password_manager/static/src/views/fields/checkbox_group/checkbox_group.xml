@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template>
+
+    <t t-name="passwords.CheckboxGroup">
+        <div aria-atomic="true">
+            <t t-foreach="checkboxes" t-as="checkbox" t-key="checkbox.id">
+                <span class="d-inline-block me-3" t-att-title="checkbox.question_circle">
+                    <div class="o-checkbox form-check"
+                        t-on-click="onClick"
+                        t-ref="root">
+                        <input
+                            t-att-id="checkbox.id"
+                            type="checkbox"
+                            class="form-check-input"
+                            t-att-disabled="checkbox.disabled"
+                            t-att-checked="checkbox.checked"
+                            t-att-name="checkbox.name"
+                            t-on-change="onChange"
+                        />
+                        <label t-att-for="checkbox.id" class="form-check-label">
+                            <t t-out="checkbox.label"/>
+                        </label>
+                    </div>
+                </span>
+            </t>
+        </div>
+    </t>
+
+</template>
