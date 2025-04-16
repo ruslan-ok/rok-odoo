@@ -24,12 +24,6 @@ export class PasswordField extends Component {
         this.sensitiveValue = this.props.name === "value";
         this.state = useState({ hideSensitive: true });
         this.input = useRef("input");
-        this.useGeneratedValue = this._useGeneratedValue.bind(this);
-    }
-
-    toggleSensitive() {
-        this.state.hideSensitive = !this.state.hideSensitive;
-        this.input.type = "text";
     }
 
     get inputType() {
@@ -57,6 +51,23 @@ export class PasswordField extends Component {
     get copyButtonClassName() {
         return `o_btn_copy btn-sm`;
     }
+}
+
+export const passwordField = {
+    component: PasswordField,
+    displayName: _t("Password"),
+};
+
+registry.category("fields").add("list_password", passwordField);
+
+class FormPasswordField extends PasswordField {
+    static components = { CopyButton, ShowHideButton, GeneratePasswordButton };
+    static template = "password_manager.FormPasswordField";
+
+    toggleSensitive() {
+        this.state.hideSensitive = !this.state.hideSensitive;
+        this.input.type = "text";
+    }
 
     get showHideButtonIcon() {
         if (this.state.hideSensitive)
@@ -72,34 +83,9 @@ export class PasswordField extends Component {
         return "fa-rotate-right";
     }
 
-    _useGeneratedValue(
-        value,
-        isPassphrase, 
-        len, 
-        useCapitalLetters, 
-        useLowercaseLetters, 
-        useDigits, 
-        useSpecials, 
-        minimumNumbers, 
-        minimumSpecials, 
-        avoidAmbiguous, 
-        wordSeparator
-    ) {
+    useGeneratedValue(value) {
         this.props.record.data[this.props.name] = value;
-        console.log(this.props.record.data[this.props.name]);
     }
-}
-
-export const passwordField = {
-    component: PasswordField,
-    displayName: _t("Password"),
-};
-
-registry.category("fields").add("list_password", passwordField);
-
-class FormPasswordField extends PasswordField {
-    static components = { CopyButton, ShowHideButton, GeneratePasswordButton };
-    static template = "password_manager.FormPasswordField";
 }
 
 export const formPasswordField = {

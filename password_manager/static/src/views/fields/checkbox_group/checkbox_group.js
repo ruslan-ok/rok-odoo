@@ -14,16 +14,18 @@ export class CheckboxGroup extends Component {
     setup() {
         super.setup();
         this.checkboxes = useState(this.props.values);
-        this.debouncedCommitChanges = debounce(this.commitChanges.bind(this), 100);
+        // this.debouncedCommitChanges = debounce(this.commitChanges.bind(this), 100);
     }
 
-    commitChanges() {
-        this.props.update(this.checkboxes);
-    }
+    // commitChanges() {
+    //     this.props.update(this.checkboxes);
+    // }
 
     onChange(key, checked) {
-        this.checkboxes[key]['checked'] = checked;
-        this.debouncedCommitChanges();
+        console.log(key + ": " + checked);
+        // this.checkboxes[+key].checked = checked;
+        // this.debouncedCommitChanges();
+        // this.props.update(this.checkboxes);
     }
 
 }

@@ -15,7 +15,7 @@
                             t-att-disabled="checkbox.disabled"
                             t-att-checked="checkbox.checked"
                             t-att-name="checkbox.name"
-                            t-on-change="onChange"
+                            t-on-change="(e) => this.onChange(e.target.id, e.target.checked)"
                         />
                         <label t-att-for="checkbox.id" class="form-check-label">
                             <t t-out="checkbox.label"/>
