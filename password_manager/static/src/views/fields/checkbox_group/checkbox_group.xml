@@ -6,10 +6,9 @@
             <t t-foreach="checkboxes" t-as="checkbox" t-key="checkbox.id">
                 <span class="d-inline-block me-3" t-att-title="checkbox.question_circle">
                     <div class="o-checkbox form-check"
-                        t-on-click="onClick"
                         t-ref="root">
                         <input
-                            t-att-id="checkbox.id"
+                            t-att-id="checkbox.name"
                             type="checkbox"
                             class="form-check-input"
                             t-att-disabled="checkbox.disabled"
@@ -17,7 +16,7 @@
                             t-att-name="checkbox.name"
                             t-on-change="(e) => this.onChange(e.target.id, e.target.checked)"
                         />
-                        <label t-att-for="checkbox.id" class="form-check-label">
+                        <label t-att-for="checkbox.name" class="form-check-label">
                             <t t-out="checkbox.label"/>
                         </label>
                     </div>

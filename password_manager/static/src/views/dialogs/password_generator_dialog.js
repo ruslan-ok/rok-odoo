@@ -82,7 +82,7 @@ export class PasswordGeneratorDialog extends Component {
             if (vals.name === "uppercase")
                 newVals.checked = true;
             else
-                newVals.checked = this.getStorageItem(vals.name) === true;
+                newVals.checked = this.getStorageItem("include_" + vals.name) === "1";
             includeValues.push(newVals);
         });
         this.includeValues = includeValues;
@@ -115,5 +115,9 @@ export class PasswordGeneratorDialog extends Component {
     setStorageItem(name, value) {
         localStorage.setItem(name, value);
         this.generateNewValue();
+    }
+
+    updateInclude(data) {
+        data.forEach(item => this.setStorageItem("include_" + item.name, item.checked ? "1" : "0"));
     }
 }
