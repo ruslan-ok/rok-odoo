@@ -15,7 +15,7 @@ class Passwords(models.Model):
     def _get_default_category_id(self):
         return self.env.ref("password_manager.password_category_all")
 
-    title = fields.Char()
+    title = fields.Char(required=True)
     login = fields.Char(default=_get_default_login, tracking=True)
     value = fields.Char(tracking=True)
     info = fields.Html()

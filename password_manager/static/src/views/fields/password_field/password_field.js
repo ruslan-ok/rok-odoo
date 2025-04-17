@@ -83,8 +83,11 @@ class FormPasswordField extends PasswordField {
         return "fa-rotate-right";
     }
 
-    useGeneratedValue(value) {
-        this.props.record.data[this.props.name] = value;
+    async useGeneratedValue(value) {
+        await this.props.record.update(
+            { [this.props.name]: value },
+            { save: this.props.autosave }
+        );
     }
 }
 
