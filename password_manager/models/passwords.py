@@ -27,6 +27,7 @@ class Passwords(models.Model):
         string="Tags", comodel_name="password.tag", relation="password_tag_passwords_rel"
     )
     is_favorite = fields.Boolean(string="Favorite")
+    active = fields.Boolean(default=True, help="If unchecked, it will allow you to hide the password without removing it.")
 
     def _read_group_categ_id(self, categories, domain):
         category_ids = self.env.context.get("default_categ_id")
