@@ -12,8 +12,8 @@ Password Manager
     "data": [
         "data/password_data.xml",
         "security/ir.model.access.csv",
-        "views/password_category_views.xml",
         "views/passwords_views.xml",
+        "views/password_category_views.xml",
     ],
     "demo": [],
     "installable": True,

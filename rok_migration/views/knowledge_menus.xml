@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="knowledge_menu_migrate"
+        name="Migrate"
+        parent="knowledge.knowledge_menu_root"
+        action="rok_migration.ir_actions_server_knowledge_migrate"
+        sequence="3"/>
+</odoo>
