@@ -2,7 +2,7 @@
 <odoo>
     <menuitem
         id="knowledge_menu_migrate"
-        name="Migrate"
+        name="Migrate Notes"
         parent="knowledge.knowledge_menu_root"
         action="rok_migration.ir_actions_server_knowledge_migrate"
         sequence="3"/>

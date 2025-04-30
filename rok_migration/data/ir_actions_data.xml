@@ -3,10 +3,17 @@
     <data noupdate="0">
 
         <record id="ir_actions_server_knowledge_migrate" model="ir.actions.server">
-            <field name="name">Migration</field>
+            <field name="name">Migrate Notes</field>
             <field name="model_id" ref="model_knowledge_article"/>
             <field name="state">code</field>
             <field name="code">action = model.action_migrate_notes()</field>
+        </record>
+
+        <record id="ir_actions_server_passwords_migrate" model="ir.actions.server">
+            <field name="name">Migrate Passwords</field>
+            <field name="model_id" ref="model_passwords"/>
+            <field name="state">code</field>
+            <field name="code">action = model.action_migrate_passwords()</field>
         </record>
 
     </data>

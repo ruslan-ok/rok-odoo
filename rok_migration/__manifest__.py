@@ -15,6 +15,7 @@ Migrating data from rok-apps server.
     "data": [
         "data/ir_actions_data.xml",
         "views/knowledge_menus.xml",
+        "views/passwords_menus.xml",
     ],
     "demo": [],
     "installable": True,
