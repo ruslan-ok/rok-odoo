@@ -11,18 +11,15 @@ class Passwords(models.Model):
     def _get_default_login(self):
         return self.env.user.login
     
-    @tools.ormcache()
-    def _get_default_category_id(self):
-        return self.env.ref("password_manager.password_category_all")
-
     title = fields.Char(required=True)
     login = fields.Char(default=_get_default_login, tracking=True)
     value = fields.Char(tracking=True)
     info = fields.Html()
     categ_id = fields.Many2one(
         "password.category", "Password Category",
-        change_default=True, default=_get_default_category_id, group_expand="_read_group_categ_id",
-        required=True)
+        change_default=True, 
+        group_expand="_read_group_categ_id",
+    )
     password_tag_ids = fields.Many2many(
         string="Tags", comodel_name="password.tag", relation="password_tag_passwords_rel"
     )

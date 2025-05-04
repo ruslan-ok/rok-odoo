@@ -55,9 +55,3 @@ class PasswordCategory(models.Model):
             return super()._compute_display_name()
         for record in self:
             record.display_name = record.name
-
-    @api.ondelete(at_uninstall=False)
-    def _unlink_except_default_category(self):
-        main_category = self.env.ref("password_manager.password_category_all", raise_if_not_found=False)
-        if main_category and main_category in self:
-            raise UserError(_("You cannot delete this password category, it is the default generic category."))

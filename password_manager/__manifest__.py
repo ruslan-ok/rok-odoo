@@ -10,7 +10,6 @@ Password Manager
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "depends": ["base", "mail"],
     "data": [
-        "data/password_data.xml",
         "security/ir.model.access.csv",
         "security/passwords_security.xml",
         "views/passwords_views.xml",

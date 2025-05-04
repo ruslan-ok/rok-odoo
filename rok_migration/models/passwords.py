@@ -21,15 +21,8 @@ class Passwords(models.Model):
         return action
 
     def delete_migrated(self):
-        root_category = self.env.ref("password_manager.password_category_all")
-        if root_category:
-            all_categories = root_category.with_context(active_test=False).search([
-                ('id', 'child_of', root_category.id)
-            ])
-            rok_passwords = self.env["passwords"].search([
-                ('categ_id', 'in', all_categories.ids),
-            ])
-            rok_passwords.unlink()
+        passwords = self.env["passwords"].search([])
+        passwords.unlink()
 
     def migrate_item(self, connection, item_id, row):
         categ = self.migrate_item_groups(connection, item_id)
@@ -48,7 +41,7 @@ class Passwords(models.Model):
         return password
 
     def migrate_item_groups(self, connection, item_id):
-        root_category = self.env.ref("password_manager.password_category_all")
+        root_category = self.env["password.category"]
         categ = self.migrate_groups_branch(connection, "store", root_category, item_id)
         return categ
 
