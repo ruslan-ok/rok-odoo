@@ -12,6 +12,7 @@ Password Manager
     "data": [
         "data/password_data.xml",
         "security/ir.model.access.csv",
+        "security/passwords_security.xml",
         "views/passwords_views.xml",
         "views/password_category_views.xml",
     ],

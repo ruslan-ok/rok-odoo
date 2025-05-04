@@ -27,31 +27,31 @@ GET_ROK_GROUPS_SQL = """
         WHERE role = %s
             AND task_id = %s
     )
-    , cte_group_ids(parent_id) AS (
-        SELECT g.id 
+    , cte_group_ids(num, parent_id) AS (
+        SELECT 1 as num, g.id 
         FROM task_group g 
         JOIN cte_group_id tg
             ON tg.group_id = g.id
         UNION ALL
-        SELECT g.node_id 
+        SELECT num+1 as num, g.node_id 
         FROM task_group g, cte_group_ids sg 
         WHERE g.id = sg.parent_id
             AND sg.parent_id IS NOT NULL
     )
     , cte_groups AS (
         SELECT
-            ROW_NUMBER() OVER() AS rn,
-            g.id,
+            sg.num,
+			g.id,
             g.name
         FROM task_group g
         JOIN cte_group_ids sg
             ON sg.parent_id = g.id
     )
     SELECT
-        id,
+		id,
         name
     FROM cte_groups
-    ORDER BY rn;
+    ORDER BY num DESC;
 """
 
 GET_URLS_SQL = """
@@ -190,7 +190,7 @@ class RokMigrationMixin(models.AbstractModel):
                 if filename:
                     if filename.startswith("/"):
                         filename = filename[1:]
-                    with sftp.file(f"{remote_path}{role}_{item_id}/{filename}",'rb') as remote_file:
+                    with sftp.file(f"{remote_path}{role}_{item_id}/{filename}", 'rb') as remote_file:
                         file_data = remote_file.read()
                         self.env["ir.attachment"].sudo().with_user(user).create({
                             "name": filename,
@@ -198,7 +198,8 @@ class RokMigrationMixin(models.AbstractModel):
                             "res_model": self._name,
                             "res_id": new_item_id,
                         })
-                        print(f"Attachment {filename} added to new item {new_item_id}")
+                        print(f"Attachment for {self._name}({new_item_id}): {filename}")
+            self.update_item_with_attachments(new_item_id)
         print("Checking for attachments finished.")
         client.close()
 

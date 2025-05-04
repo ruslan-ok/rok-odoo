@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="documents_menu_migrate"
+        name="Migrate Documents"
+        parent="documents.menu_root"
+        action="rok_migration.ir_actions_server_documents_migrate"
+        sequence="9"/>
+</odoo>

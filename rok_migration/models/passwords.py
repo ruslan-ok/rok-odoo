@@ -1,8 +1,8 @@
 from odoo import models
 from .rok_migration_mixin import TASK_TASK_FIELDS
 
-
 GET_ITEMS_SQL = "SELECT * FROM task_task WHERE app_store != 0;"
+
 
 class Passwords(models.Model):
     _name = "passwords"
@@ -21,7 +21,20 @@ class Passwords(models.Model):
         return action
 
     def delete_migrated(self):
-        print("delete_migrated...")
+        root_category = self.env.ref("password_manager.password_category_all")
+        rok_category_name = "Migrated"
+        rok_category = self.env["password.category"].search([
+            ("parent_id", "=", root_category.id), 
+            ("name", "=", rok_category_name), 
+        ])
+        if rok_category:
+            all_categories = rok_category.with_context(active_test=False).search([
+                ('id', 'child_of', rok_category.id)
+            ])
+            rok_passwords = self.env["passwords"].search([
+                ('categ_id', 'in', all_categories.ids),
+            ])
+            rok_passwords.unlink()
 
     def migrate_item(self, connection, item_id, row):
         categ = self.migrate_item_groups(connection, item_id)
@@ -40,20 +53,20 @@ class Passwords(models.Model):
         return password
 
     def migrate_item_groups(self, connection, item_id):
-        root_categ = self.env.ref("password_manager.password_category_all")
-        rok_categ_name = "Migrated"
-        rok_categ = self.env["password.category"].search([
-            ("parent_id", "=", root_categ.id), 
-            ("name", "=", rok_categ_name), 
+        root_category = self.env.ref("password_manager.password_category_all")
+        rok_category_name = "Migrated"
+        rok_category = self.env["password.category"].search([
+            ("parent_id", "=", root_category.id), 
+            ("name", "=", rok_category_name), 
         ])
-        if not rok_categ:
-            rok_categ = self.env["password.category"].create(
+        if not rok_category:
+            rok_category = self.env["password.category"].create(
                 {
-                    "parent_id": root_categ.id, 
-                    "name": rok_categ_name, 
+                    "parent_id": root_category.id, 
+                    "name": rok_category_name, 
                 }
             )
-        categ = self.migrate_groups_branch(connection, "store", rok_categ, item_id)
+        categ = self.migrate_groups_branch(connection, "store", rok_category, item_id)
         return categ
 
     def migrate_group(self, parent, row):

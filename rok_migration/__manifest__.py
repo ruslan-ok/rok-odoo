@@ -10,12 +10,14 @@ Migrating data from rok-apps server.
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "depends": [
         "knowledge", 
-        "password_manager"
+        "password_manager",
+        "documents",
     ],
     "data": [
         "data/ir_actions_data.xml",
         "views/knowledge_menus.xml",
         "views/passwords_menus.xml",
+        "views/documents_menus.xml",
     ],
     "demo": [],
     "installable": True,

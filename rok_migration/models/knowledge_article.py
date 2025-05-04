@@ -1,5 +1,3 @@
-import os
-import paramiko
 from odoo import models
 from .rok_migration_mixin import TASK_TASK_FIELDS
 
@@ -90,7 +88,6 @@ class Article(models.Model):
     def migrate_group(self, parent, row):
         group_name = row[1]
         group = self.env["knowledge.article"].search([
-            ("icon", "=", False), 
             ("category", "=", "private"), 
             ("parent_id", "=", parent.id), 
             ("name", "=", group_name), 
@@ -102,6 +99,7 @@ class Article(models.Model):
                     "parent_id": parent.id, 
                     "category": "private", 
                     "name": group_name, 
+                    "icon": "📁",
                     "internal_permission": "none",
                     "article_member_ids": [(0, 0, {
                         "partner_id": user.partner_id.id,
@@ -111,3 +109,6 @@ class Article(models.Model):
             )
         return group
     
+    def update_item_with_attachments(self, item_id):
+        item = self.env["knowledge.article"].browse(item_id)
+        item.icon = "📎"
