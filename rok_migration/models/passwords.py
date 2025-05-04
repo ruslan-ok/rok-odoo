@@ -22,14 +22,9 @@ class Passwords(models.Model):
 
     def delete_migrated(self):
         root_category = self.env.ref("password_manager.password_category_all")
-        rok_category_name = "Migrated"
-        rok_category = self.env["password.category"].search([
-            ("parent_id", "=", root_category.id), 
-            ("name", "=", rok_category_name), 
-        ])
-        if rok_category:
-            all_categories = rok_category.with_context(active_test=False).search([
-                ('id', 'child_of', rok_category.id)
+        if root_category:
+            all_categories = root_category.with_context(active_test=False).search([
+                ('id', 'child_of', root_category.id)
             ])
             rok_passwords = self.env["passwords"].search([
                 ('categ_id', 'in', all_categories.ids),
@@ -54,19 +49,7 @@ class Passwords(models.Model):
 
     def migrate_item_groups(self, connection, item_id):
         root_category = self.env.ref("password_manager.password_category_all")
-        rok_category_name = "Migrated"
-        rok_category = self.env["password.category"].search([
-            ("parent_id", "=", root_category.id), 
-            ("name", "=", rok_category_name), 
-        ])
-        if not rok_category:
-            rok_category = self.env["password.category"].create(
-                {
-                    "parent_id": root_category.id, 
-                    "name": rok_category_name, 
-                }
-            )
-        categ = self.migrate_groups_branch(connection, "store", rok_category, item_id)
+        categ = self.migrate_groups_branch(connection, "store", root_category, item_id)
         return categ
 
     def migrate_group(self, parent, row):
