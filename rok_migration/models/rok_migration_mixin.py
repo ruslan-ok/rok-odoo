@@ -165,43 +165,32 @@ class RokMigrationMixin(models.AbstractModel):
 
     def check_attachments(self, items_map, role):
         print("Checking for attachments started...")
-        HOST = os.getenv("DB_HOST")
-        USER = os.getenv("DB_USER")
-        PASSWORD = os.getenv("PASSWORD")
         STORAGE = os.getenv("STORAGE")
         user = self.env["res.users"].search([("login", "=", "admin")])
+        storage_dir = os.path.join(STORAGE, "attachments", role)
 
-        client = paramiko.SSHClient()
-        client.load_system_host_keys()
-        client.connect(HOST, username=USER, password=PASSWORD)
-        sftp = client.open_sftp()
-        remote_path = "%s/attachments/%s/" % (STORAGE, role)
-        dir_command = 'find %s -name "%s_*"' % (remote_path, role)
-        _, dir_stdout, _ = client.exec_command(dir_command)
-        for dir_line in dir_stdout:
-            item_id = int(dir_line.strip('\n').replace(remote_path, "").replace(f"{role}_", ""))
+        for root, dirs, files in os.walk(storage_dir):
+            if root == storage_dir:
+                continue
+            item_id = int(os.path.basename(root).replace(f"{role}_", ""))
             new_item_id = items_map.get(item_id, False)
             if not new_item_id:
                 continue
-            file_command = 'find %s%s_%s -name "*"' % (remote_path, role, item_id)
-            _, file_stdout, _ = client.exec_command(file_command)
-            for file_line in file_stdout:
-                filename = file_line.strip('\n').replace(f"{remote_path}{role}_{item_id}", "")
-                if filename:
-                    if filename.startswith("/"):
-                        filename = filename[1:]
-                    with sftp.file(f"{remote_path}{role}_{item_id}/{filename}", 'rb') as remote_file:
-                        file_data = remote_file.read()
-                        self.env["ir.attachment"].sudo().with_user(user).create({
-                            "name": filename,
-                            "raw": file_data,
-                            "res_model": self._name,
-                            "res_id": new_item_id,
-                        })
-                        print(f"Attachment for {self._name}({new_item_id}): {filename}")
+            for dir in dirs:
+                raise ValueError(f"Directory {dir} is not expected.")
+            for file in files:
+                filename = os.path.join(root, file)
+                with open(filename, 'rb') as f:
+                    file_data = f.read()
+                    self.env["ir.attachment"].sudo().with_user(user).create({
+                        "name": file,
+                        "raw": file_data,
+                        "res_model": self._name,
+                        "res_id": new_item_id,
+                    })
+                    print(f"Attachment for {self._name}({new_item_id}): {file}")
             self.update_item_with_attachments(new_item_id)
         print("Checking for attachments finished.")
-        client.close()
 
     def update_create_date(self, table, item_id, row):
         UPDATE_DATES_SQL = f"""
