@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        name="Migrate Tasks"
+        id="menu_migrate_tasks"
+        parent="project.menu_main_pm"
+        action="rok_migration.ir_actions_server_task_migrate"
+        sequence="3"
+    />
+</odoo>

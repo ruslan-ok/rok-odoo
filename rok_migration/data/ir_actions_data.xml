@@ -23,5 +23,12 @@
             <field name="code">action = model.action_migrate_documents()</field>
         </record>
 
+        <record id="ir_actions_server_task_migrate" model="ir.actions.server">
+            <field name="name">Migrate Tasks</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="state">code</field>
+            <field name="code">action = model.action_migrate_tasks()</field>
+        </record>
+
     </data>
 </odoo>

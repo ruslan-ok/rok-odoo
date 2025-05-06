@@ -43,7 +43,6 @@ class Article(models.Model):
 
     def migrate_item(self, connection, item_id, row):
         group = self.migrate_item_groups(connection, item_id)
-        user = self.env["res.users"].search([("login", "=", "admin")])
         body = self.prepare_body(connection, item_id, row[TASK_TASK_FIELDS.index("info")])
         article = self.env["knowledge.article"].create(
             {
@@ -54,7 +53,7 @@ class Article(models.Model):
                 "active": not row[TASK_TASK_FIELDS.index("completed")],
                 "internal_permission": "none",
                 "article_member_ids": [(0, 0, {
-                    "partner_id": user.partner_id.id,
+                    "partner_id": self.user.partner_id.id,
                     "permission": 'write'
                 })],
             }
@@ -71,7 +70,6 @@ class Article(models.Model):
             ("name", "=", root_name), 
         ])
         if not rok_root:
-            user = self.env["res.users"].search([("login", "=", "admin")])
             rok_root = self.env["knowledge.article"].create(
                 {
                     "parent_id": False, 
@@ -79,7 +77,7 @@ class Article(models.Model):
                     "name": root_name, 
                     "internal_permission": "none",
                     "article_member_ids": [(0, 0, {
-                        "partner_id": user.partner_id.id,
+                        "partner_id": self.user.partner_id.id,
                         "permission": 'write'
                     })],
                 }
@@ -95,7 +93,6 @@ class Article(models.Model):
             ("name", "=", group_name), 
         ])
         if not group:
-            user = self.env["res.users"].search([("login", "=", "admin")])
             group = self.env["knowledge.article"].create(
                 {
                     "parent_id": parent.id, 
@@ -104,7 +101,7 @@ class Article(models.Model):
                     "icon": "📁",
                     "internal_permission": "none",
                     "article_member_ids": [(0, 0, {
-                        "partner_id": user.partner_id.id,
+                        "partner_id": self.user.partner_id.id,
                         "permission": 'write'
                     })],
                 }

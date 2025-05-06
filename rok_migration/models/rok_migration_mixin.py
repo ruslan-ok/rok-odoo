@@ -1,7 +1,6 @@
 import pg8000
 from dotenv import load_dotenv
 import os
-import paramiko
 from odoo import models
 
 TASK_TASK_FIELDS = [
@@ -66,6 +65,10 @@ class RokMigrationMixin(models.AbstractModel):
     _name = "rok.migration.mixin"
     _description = "Rok Migration Mixin"
 
+    @property
+    def user(self):
+        return self.env.user
+
     def do_migrate(self, get_items_sql, role):
         load_dotenv()
 
@@ -93,7 +96,8 @@ class RokMigrationMixin(models.AbstractModel):
             for row in rows:
                 item_id = int(row[TASK_TASK_FIELDS.index("id")])
                 new_item = self.migrate_item(connection, item_id, row)
-                items_map[item_id] = new_item.id
+                if new_item:
+                    items_map[item_id] = new_item.id
 
             # Close the cursor and connection
             cursor.close()
@@ -115,8 +119,10 @@ class RokMigrationMixin(models.AbstractModel):
         lines = []
         last_line = ""
         counter = 0
-        body = body.replace("\r\n", "\n") if body else ""
-        src_lines = body.split("\n")
+        src_lines = []
+        if body:
+            body = body.replace("\r\n", "\n")
+            src_lines = body.split("\n")
         for line in src_lines:
             if not line:
                 counter += 1
@@ -151,6 +157,8 @@ class RokMigrationMixin(models.AbstractModel):
         return '<p>' + line + "</p>"
     
     def check_links(self, line):
+        if not line:
+            return line
         parts = line.split("https://")
         if len(parts) > 1:
             part_1 = parts[0]
@@ -166,7 +174,6 @@ class RokMigrationMixin(models.AbstractModel):
     def check_attachments(self, items_map, role):
         print("Checking for attachments started...")
         STORAGE = os.getenv("STORAGE")
-        user = self.env["res.users"].search([("login", "=", "admin")])
         storage_dir = os.path.join(STORAGE, "attachments", role)
 
         for root, dirs, files in os.walk(storage_dir):
@@ -182,7 +189,7 @@ class RokMigrationMixin(models.AbstractModel):
                 filename = os.path.join(root, file)
                 with open(filename, 'rb') as f:
                     file_data = f.read()
-                    self.env["ir.attachment"].sudo().with_user(user).create({
+                    self.env["ir.attachment"].sudo().with_user(self.user).create({
                         "name": file,
                         "raw": file_data,
                         "res_model": self._name,
