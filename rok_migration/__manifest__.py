@@ -9,11 +9,7 @@ Migrating data from rok-apps server.
     "category": "Productivity/Knowledge",
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "depends": [
-        "knowledge", 
-        "password_manager",
-        "documents",
-        "project",
-        "calendar",
+        'rok_setup',
     ],
     "data": [
         "data/ir_actions_data.xml",

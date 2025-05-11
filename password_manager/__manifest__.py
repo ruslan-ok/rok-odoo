@@ -23,5 +23,6 @@ Password Manager
             "password_manager/static/src/views/**/*",
         ],
     },
+    'author': 'Ruslan Akunevich',
     "license": "LGPL-3",
 }

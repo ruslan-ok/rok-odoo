@@ -167,11 +167,12 @@ class Task(models.Model):
             return
         res_model_id=self.env['ir.model']._get_id("project.task")
         body = self.prepare_body(connection, item_id, row[TASK_TASK_FIELDS.index("info")])
-        category_names = []
+        category_names = ["rok", role]
+        task_category_names = category_names.copy()
         categories = row[TASK_TASK_FIELDS.index("categories")]
         if categories:
-            category_names = categories.split()
-        tags = self.get_tags_by_names(category_names)
+            task_category_names += categories.split()
+        tags = self.get_tags_by_names(task_category_names)
         completed = row[TASK_TASK_FIELDS.index("completed")]
         repeat_units = ["no", "day", "day", "week", "month", "year"]
         repeat = row[TASK_TASK_FIELDS.index("repeat")] or 0
