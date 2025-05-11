@@ -34,30 +34,37 @@ class Article(models.Model):
         load_dotenv()
         STORAGE = os.getenv("STORAGE")
 
-        storage = f"{STORAGE}/docs"
-        info = {
-            "totals": {
-                "folders": 0,
-                "documents": 0,
-            },
-            "migrated": {
-                "folders": 0,
-                "documents": 0,
-            },
-        }
-        print("Counting totals...")
-        self.walk_local("get_totals", info, storage)
-        print("Total folders: " + str(info["totals"]["folders"]))
-        print("Total documents: " + str(info["totals"]["documents"]))
-        print("Migrating documents...")
-        self.walk_local("do_migrate", info, storage)
+        sources = ["docs", "photo"]
+
+        for source in sources:
+            storage = f"{STORAGE}/{source}"
+            if not os.path.exists(storage):
+                print(f"Storage path {storage} does not exist.")
+                continue
+            info = {
+                "source": source,
+                "totals": {
+                    "folders": 0,
+                    "documents": 0,
+                },
+                "migrated": {
+                    "folders": 0,
+                    "documents": 0,
+                },
+            }
+            print("Counting totals...")
+            self.walk_local("get_totals", info, storage)
+            print("Total folders: " + str(info["totals"]["folders"]))
+            print("Total documents: " + str(info["totals"]["documents"]))
+            print("Migrating documents...")
+            self.walk_local("do_migrate", info, storage)
 
     def walk_local(self, walk_mode, info, storage):
         DEBUG_LIMIT_DOCS = int(os.getenv("DEBUG_LIMIT_DOCS"))
         DEBUG_LIMIT_FOLDERS = int(os.getenv("DEBUG_LIMIT_FOLDERS"))
         for root, dirs, files in os.walk(storage):
             if walk_mode == "do_migrate":
-                parent = self.get_parent(storage, root)
+                parent = self.get_parent(storage, root, info["source"])
             for name in dirs:
                 path = os.path.join(root, name)
                 if walk_mode == "get_totals":
@@ -111,15 +118,27 @@ class Article(models.Model):
                     info["migrated"]["documents"] += 1
                     print(f"{info["migrated"]["documents"]}. Added doc: " + path)
 
-    def get_parent(self, storage, path):
+    def get_parent(self, storage, path, source=None):
         if path == storage:
-            return self.env["documents.document"].sudo()
+            parent = self.env["documents.document"].search([
+                ("owner_id", "=", self.user.id),
+                ("type", "=", "folder"),
+                ("folder_id", "=", False),
+                ("name", "=", source),
+            ])
+            if not parent:
+                parent = self.env["documents.document"].create({
+                    "owner_id": self.user.id,
+                    "type": "folder",
+                    "folder_id": False,
+                    "name": source,
+                })
         else:
             parent_path = os.path.dirname(path)
             parent = self.env["documents.document"].search([
                 ("owner_id", "=", self.user.id),
                 ("type", "=", "folder"),
-                ("folder_id", "=", self.get_parent(storage, parent_path).id),
+                ("folder_id", "=", self.get_parent(storage, parent_path, source).id),
                 ("name", "=", os.path.basename(path)),
             ])
-            return parent
+        return parent.sudo()

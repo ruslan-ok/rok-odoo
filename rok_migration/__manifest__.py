@@ -13,6 +13,7 @@ Migrating data from rok-apps server.
         "password_manager",
         "documents",
         "project",
+        "calendar",
     ],
     "data": [
         "data/ir_actions_data.xml",
@@ -25,5 +26,6 @@ Migrating data from rok-apps server.
     "installable": True,
     "application": False,
     "assets": {},
+    'author': 'Ruslan Akunevich',
     "license": "LGPL-3",
 }
