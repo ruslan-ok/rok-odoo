@@ -19,6 +19,7 @@ class Passwords(models.Model):
         "password.category", "Password Category",
         change_default=True, 
         group_expand="_read_group_categ_id",
+        required=True,
     )
     password_tag_ids = fields.Many2many(
         string="Tags", comodel_name="password.tag", relation="password_tag_passwords_rel"

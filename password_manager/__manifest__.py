@@ -2,7 +2,7 @@
     "name": "Password Manager",
     "version": "1.0",
     "summary": "Password Manager",
-    "sequence": 20,
+    "sequence": 46,
     "description": """
 Password Manager
 """,

@@ -21,6 +21,7 @@ class PasswordCategory(models.Model):
     password_count = fields.Integer(
         "# Passwords", compute="_compute_password_count",
         help="The number of passwords under this category (Does not consider the children categories)")
+    active = fields.Boolean(default=True)
 
     @api.depends("name", "parent_id.complete_name")
     def _compute_complete_name(self):

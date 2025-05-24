@@ -17,6 +17,7 @@ class PasswordTag(models.Model):
         relation="password_tag_passwords_rel",
         default=_get_default_password_id,
     )
+    active = fields.Boolean(default=True)
 
     _sql_constraints = [
         ("name_uniq", "unique (name)", "Tag name already exists!"),
