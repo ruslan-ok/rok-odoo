@@ -12,6 +12,7 @@ class RadioSelection extends Component {
         onChange: Function,
         selectedValue: { optional: false },
         name: String,
+        direction: { type: String, optional: true, default: "horizontal" },
     };
     static defaultProps = {};
 }
@@ -157,6 +158,8 @@ export class PasswordGeneratorDialog extends Component {
     static props = {
         value: { type: String },
         useGeneratedValue: { type: Function },
+        title: { type: String },
+        close: { type: Function },
     };
 
     setup() {
