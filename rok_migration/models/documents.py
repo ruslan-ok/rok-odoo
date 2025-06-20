@@ -39,7 +39,7 @@ class Article(models.Model):
         ])
         _logger.info(f"Found {len(my_docs)} documents owned by the user {self.user.name}.")
         _logger.info(str(my_docs.ids))
-        projects_with_folder = self.env['project.project'].search([('use_documents', '=', True)])
+        projects_with_folder = self.env['project.project'].with_context(active_test=False).search([('use_documents', '=', True)])
         _logger.info(f"Found {len(projects_with_folder)} projects with documents folders.")
         projects_folder_ids = projects_with_folder.mapped('documents_folder_id.id')
         _logger.info(str(projects_folder_ids))
