@@ -1,6 +1,9 @@
+import logging
 import os
 from dotenv import load_dotenv
 from odoo import models
+
+_logger = logging.getLogger(__name__)
 
 
 class Article(models.Model):
@@ -21,13 +24,26 @@ class Article(models.Model):
 
 
     def delete_migrated(self):
-        projects_with_folder = self.env['project.project'].search([('use_documents', '=', True), ('documents_folder_id', '!=', False)])
-        projects_folder_ids = projects_with_folder.mapped('documents_folder_id.id')
+        _logger.info("Deleting previously migrated documents...")
+        # Delete documents that are owned by the user and not in any project folder
+        if not self.user:
+            _logger.warning("No user found, skipping deletion of migrated documents.")
+            return
+        if not self.user._is_internal():
+            _logger.warning("User is not internal, skipping deletion of migrated documents.")
+            return
+        # Get the user's documents that are not in any project folder
         my_docs = self.env["documents.document"].with_context(active_test=False).search([
             ("owner_id", "=", self.user.id), 
             ("res_model", "in", [False, "documents.document"]),
-            ("id", "not in", projects_folder_ids), 
         ])
+        _logger.info(f"Found {len(my_docs)} documents owned by the user {self.user.name}.")
+        projects_with_folder = self.env['project.project'].search([('use_documents', '=', True), ('documents_folder_id', 'child_of', my_docs.ids)])
+        _logger.info(f"Found {len(projects_with_folder)} projects with documents folders.")
+        projects_folder_ids = projects_with_folder.mapped('documents_folder_id.id')
+        # Exclude documents that are in project folders and not in the root folder
+        my_docs = my_docs.filtered(lambda doc: doc.id not in projects_folder_ids and (not doc.folder_id or doc.folder_id.id not in projects_folder_ids))
+        _logger.info(f"Deleting {len(my_docs)} documents owned by the user {self.user.name} that are not in any project folder.")
         my_docs.unlink()
 
     def do_migrate_docs(self):
