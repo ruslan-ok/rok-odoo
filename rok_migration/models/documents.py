@@ -11,7 +11,7 @@ class Article(models.Model):
         print("Deleting previously migrated documents...")
         self.delete_migrated()
 
-        print("Migrating knowledge articles...")
+        print("Migrating documents and photos...")
         self.do_migrate_docs()
         print("Done")
 
@@ -88,8 +88,6 @@ class Article(models.Model):
                 if walk_mode == "get_totals":
                     info["totals"]["documents"] += len(files)
                 if walk_mode == "do_migrate":
-                    if DEBUG_LIMIT_FOLDERS and info["migrated"]["folders"] >= DEBUG_LIMIT_FOLDERS:
-                        break
                     if DEBUG_LIMIT_DOCS and info["migrated"]["documents"] >= DEBUG_LIMIT_DOCS:
                         break
                     path = os.path.join(root, name)
