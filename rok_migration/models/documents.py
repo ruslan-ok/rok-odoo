@@ -11,12 +11,12 @@ class Article(models.Model):
     _inherit = ["documents.document", "rok.migration.mixin"]
 
     def action_migrate_documents(self):
-        print("Deleting previously migrated documents...")
+        _logger.info("Deleting previously migrated documents...")
         self.delete_migrated()
 
-        print("Migrating documents and photos...")
+        _logger.info("Migrating documents and photos...")
         self.do_migrate_docs()
-        print("Done")
+        _logger.info("Done")
 
         action = self.env['ir.actions.act_window']._for_xml_id('documents.document_action')
         action['res_id'] = False
@@ -37,12 +37,8 @@ class Article(models.Model):
             ("owner_id", "=", self.user.id), 
             ("res_model", "in", [False, "documents.document"]),
         ])
-        _logger.info(f"Found {len(my_docs)} documents owned by the user {self.user.name}.")
-        _logger.info(str(my_docs.ids))
         projects_with_folder = self.env['project.project'].with_context(active_test=False).search([('use_documents', '=', True)])
-        _logger.info(f"Found {len(projects_with_folder)} projects with documents folders.")
         projects_folder_ids = projects_with_folder.mapped('documents_folder_id.id')
-        _logger.info(str(projects_folder_ids))
         # Exclude documents that are in project folders and not in the root folder
         my_docs = my_docs.filtered(lambda doc: doc.id not in projects_folder_ids and (not doc.folder_id or doc.folder_id.id not in projects_folder_ids))
         _logger.info(f"Deleting {len(my_docs)} documents owned by the user {self.user.name} that are not in any project folder.")
@@ -58,7 +54,7 @@ class Article(models.Model):
         for source in sources:
             storage = f"{STORAGE}/{source}"
             if not os.path.exists(storage):
-                print(f"Storage path {storage} does not exist.")
+                _logger.info(f"Storage path {storage} does not exist.")
                 continue
             info = {
                 "source": source,
@@ -71,11 +67,11 @@ class Article(models.Model):
                     "documents": 0,
                 },
             }
-            print("Counting totals...")
+            _logger.info("Counting totals...")
             self.walk_local("get_totals", info, storage)
-            print("Total folders: " + str(info["totals"]["folders"]))
-            print("Total documents: " + str(info["totals"]["documents"]))
-            print("Migrating documents...")
+            _logger.info("Total folders: " + str(info["totals"]["folders"]))
+            _logger.info("Total documents: " + str(info["totals"]["documents"]))
+            _logger.info("Migrating documents...")
             self.walk_local("do_migrate", info, storage)
 
     def walk_local(self, walk_mode, info, storage):
@@ -100,7 +96,7 @@ class Article(models.Model):
                         "type": "folder",
                     })
                     info["migrated"]["folders"] += 1
-                    print(f"{info["migrated"]["folders"]}. Added folder: " + path)
+                    _logger.info(f"{info["migrated"]["folders"]}. Added folder: " + path)
             for name in files:
                 if name == ".DS_Store":
                     continue
@@ -133,7 +129,7 @@ class Article(models.Model):
                     attachment.res_model = "documents.document"
                     attachment.res_id = document_sudo.id
                     info["migrated"]["documents"] += 1
-                    print(f"{info["migrated"]["documents"]}. Added doc: " + path)
+                    _logger.info(f"{info["migrated"]["documents"]}. Added doc: " + path)
 
     def get_parent(self, storage, path, source=None):
         if path == storage:
