@@ -38,12 +38,15 @@ class Article(models.Model):
             ("res_model", "in", [False, "documents.document"]),
         ])
         _logger.info(f"Found {len(my_docs)} documents owned by the user {self.user.name}.")
+        _logger.info(str(my_docs.ids))
         projects_with_folder = self.env['project.project'].search([('use_documents', '=', True), ('documents_folder_id', 'child_of', my_docs.ids)])
         _logger.info(f"Found {len(projects_with_folder)} projects with documents folders.")
         projects_folder_ids = projects_with_folder.mapped('documents_folder_id.id')
+        _logger.info(str(projects_folder_ids))
         # Exclude documents that are in project folders and not in the root folder
         my_docs = my_docs.filtered(lambda doc: doc.id not in projects_folder_ids and (not doc.folder_id or doc.folder_id.id not in projects_folder_ids))
         _logger.info(f"Deleting {len(my_docs)} documents owned by the user {self.user.name} that are not in any project folder.")
+        _logger.info(str(my_docs.ids))
         my_docs.unlink()
 
     def do_migrate_docs(self):
