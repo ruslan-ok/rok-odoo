@@ -1,0 +1,17 @@
+<t t-name="rok_filestore.FolderTree" owl="1">
+  <div class="p-2 border-end" style="width: 250px; overflow-y: auto;">
+    <ul>
+      <t t-foreach="props.folders" t-as="folder" t-key="folder.path">
+        <li>
+          <a href="#" t-att-class="{'fw-bold': folder.path === props.selectedPath}"
+             t-on-click.prevent="() => props.onSelect(folder.path)">
+            <t t-esc="folder.name"/>
+          </a>
+          <t t-if="folder.children.length > 0">
+            <FolderTree folders="folder.children" selectedPath="props.selectedPath" onSelect="props.onSelect"/>
+          </t>
+        </li>
+      </t>
+    </ul>
+  </div>
+</t>

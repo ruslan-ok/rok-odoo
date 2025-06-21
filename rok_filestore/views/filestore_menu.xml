@@ -1,0 +1,10 @@
+<odoo>
+  <record id="action_filestore_app" model="ir.actions.client">
+    <field name="name">Filestore</field>
+    <field name="tag">rok_filestore.filestore_app</field>
+  </record>
+
+  <menuitem id="menu_filestore_root" name="Filestore" sequence="10"/>
+  <menuitem id="menu_filestore_app" name="Browse" parent="menu_filestore_root"
+            action="action_filestore_app"/>
+</odoo>
