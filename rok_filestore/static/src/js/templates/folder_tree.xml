@@ -3,12 +3,30 @@
     <ul>
       <t t-foreach="props.folders" t-as="folder" t-key="folder.path">
         <li>
-          <a href="#" t-att-class="{'fw-bold': folder.path === props.selectedPath}"
+          <span t-if="folder.has_children">
+            <button
+              t-on-click.prevent="() => props.onToggle(folder.path)"
+              t-att-disabled="props.loadingPath === folder.path"
+              class="btn btn-sm btn-link p-0 me-1"
+            >
+              <t t-if="props.expandedPaths.includes(folder.path)">&#9660;</t>
+              <t t-else="">&#9654;</t>
+            </button>
+          </span>
+          <a href="#"
+             t-att-class="{'fw-bold': folder.path === props.selectedPath}"
              t-on-click.prevent="() => props.onSelect(folder.path)">
             <t t-esc="folder.name"/>
           </a>
-          <t t-if="folder.children.length > 0">
-            <FolderTree folders="folder.children" selectedPath="props.selectedPath" onSelect="props.onSelect"/>
+          <t t-if="props.expandedPaths.includes(folder.path)">
+            <FolderTree
+              folders="folder.children || []"
+              selectedPath="props.selectedPath"
+              expandedPaths="props.expandedPaths"
+              loadingPath="props.loadingPath"
+              onSelect="props.onSelect"
+              onToggle="props.onToggle"
+            />
           </t>
         </li>
       </t>

@@ -7,22 +7,28 @@ FILE_STORAGE_PATH = "/mnt/c/Users/ruslan/Documents/Projects/rok/rok-apps_data/ro
 
 class FolderTreeAPI(http.Controller):
 
-    def build_tree(self, base_path, depth=0):
+    def build_tree(self, base_path):
         tree = []
         for entry in sorted(os.listdir(base_path)):
             full_path = os.path.join(base_path, entry)
             if os.path.isdir(full_path):
+                # Проверяем, есть ли подкаталоги
+                has_children = any(
+                    os.path.isdir(os.path.join(full_path, child))
+                    for child in os.listdir(full_path)
+                )
                 node = {
                     'name': entry,
                     'path': os.path.relpath(full_path, FILE_STORAGE_PATH),
-                    'children': self.build_tree(full_path, depth + 1) if depth < 1 else [],
+                    'has_children': has_children,
                 }
                 tree.append(node)
         return tree
 
     @http.route('/rok_filestore/api/folders', type='json', auth='user')
-    def get_folders_tree(self):
-        return self.build_tree(FILE_STORAGE_PATH)
+    def get_folders_tree(self, path=''):
+        abs_path = os.path.join(FILE_STORAGE_PATH, path)
+        return self.build_tree(abs_path)
 
     @http.route('/rok_filestore/api/files', type='json', auth='user')
     def get_files(self, path):

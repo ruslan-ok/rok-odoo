@@ -1,13 +1,13 @@
 /** @odoo-module */
 
 import { Component, useState, onWillStart } from "@odoo/owl";
-import { FolderTree } from "./FolderTree";
+import { FolderTreeContainer } from "./FolderTreeContainer";
 import { FileGallery } from "./FileGallery";
 import { rpc } from "@web/core/network/rpc";
 
 export class FilestoreApp extends Component {
   static template = "rok_filestore.FilestoreApp";
-  static components = { FolderTree, FileGallery };
+  static components = { FolderTreeContainer, FileGallery };
 
 
   setup() {
