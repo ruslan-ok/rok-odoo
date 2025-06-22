@@ -4,38 +4,63 @@ import { Component, useState, onWillStart } from "@odoo/owl";
 import { FolderTree } from "./FolderTree";
 import { rpc } from "@web/core/network/rpc";
 
+const EXPANDED_PATHS_KEY = "rok_filestore.expandedPaths";
+
 export class FolderTreeContainer extends Component {
     static template = "rok_filestore.FolderTreeContainer";
     static components = { FolderTree };
+    static props = { selectedPath: String, onSelect: Function };
 
     setup() {
+        this.onToggle = this.onToggle.bind(this);
+
+        // Load expandedPaths from localStorage
+        let expandedPaths = [];
+        try {
+            expandedPaths = JSON.parse(localStorage.getItem(EXPANDED_PATHS_KEY)) || [];
+        } catch {
+            expandedPaths = [];
+        }
+
         this.state = useState({
             folders: [],
-            expandedPaths: [],
+            expandedPaths,
             loadingPath: "",
-            selectedPath: "",
         });
 
-        // Загрузка корневых папок при инициализации
+        // Load root folders and all expanded branches on initialization
         onWillStart(async () => {
             this.state.folders = await this.fetchFolders("");
+            await this.loadExpandedFolders(this.state.folders, this.state.expandedPaths);
         });
     }
 
     async fetchFolders(path) {
-        // Замените на ваш реальный RPC вызов
         return await rpc("/rok_filestore/api/folders", { path });
+    }
+
+    // Recursively loads children for all paths from expandedPaths
+    async loadExpandedFolders(folders, expandedPaths) {
+        for (const folder of folders) {
+            if (expandedPaths.includes(folder.path)) {
+                if (!folder.children) {
+                    folder.children = await this.fetchFolders(folder.path);
+                }
+                if (folder.children && folder.children.length) {
+                    await this.loadExpandedFolders(folder.children, expandedPaths);
+                }
+            }
+        }
     }
 
     async onToggle(path) {
         const idx = this.state.expandedPaths.indexOf(path);
         if (idx >= 0) {
-            // Сворачиваем
+            // Collapse
             this.state.expandedPaths.splice(idx, 1);
         } else {
-            // Раскрываем
+            // Expand
             this.state.expandedPaths.push(path);
-            // Найти папку по пути и загрузить детей, если ещё не загружены
             const folder = this.findFolderByPath(this.state.folders, path);
             if (folder && !folder.children) {
                 this.state.loadingPath = path;
@@ -43,14 +68,10 @@ export class FolderTreeContainer extends Component {
                 this.state.loadingPath = "";
             }
         }
+        // Save expandedPaths to localStorage
+        localStorage.setItem(EXPANDED_PATHS_KEY, JSON.stringify(this.state.expandedPaths));
     }
 
-    onSelect(path) {
-        this.state.selectedPath = path;
-        // Можно добавить дополнительную логику при выборе папки
-    }
-
-    // Рекурсивный поиск папки по пути
     findFolderByPath(folders, path) {
         for (const folder of folders) {
             if (folder.path === path) return folder;

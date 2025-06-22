@@ -4,7 +4,16 @@
     <field name="tag">rok_filestore.filestore_app</field>
   </record>
 
-  <menuitem id="menu_filestore_root" name="Filestore" sequence="10"/>
-  <menuitem id="menu_filestore_app" name="Browse" parent="menu_filestore_root"
-            action="action_filestore_app"/>
+  <menuitem
+    id="menu_filestore_root"
+    name="Filestore"
+    web_icon="rok_filestore,static/description/icon.png"
+    sequence="301"/>
+
+  <menuitem
+    id="menu_filestore_app"
+    name="Browse"
+    parent="menu_filestore_root"
+    action="action_filestore_app"/>
+
 </odoo>

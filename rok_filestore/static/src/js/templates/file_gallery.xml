@@ -6,8 +6,11 @@
     </t>
     <div class="d-flex flex-wrap gap-2" t-if="onlyImages">
       <t t-foreach="props.files" t-as="file" t-key="file.url">
-        <div class="border p-1" style="width: 150px;">
-          <img t-att-src="file.url" style="max-width: 100%;"/>
+        <div class="file-thumb">
+          <a t-att-href="file.url" target="_blank">
+            <img t-att-src="file.thumbUrl"
+              style="cursor:pointer;max-width:128px;max-height:128px;" />
+          </a>
           <div class="text-center"><t t-esc="file.name"/></div>
         </div>
       </t>

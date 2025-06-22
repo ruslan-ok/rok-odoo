@@ -15,14 +15,12 @@ Password Manager
         "views/passwords_views.xml",
         "views/password_category_views.xml",
     ],
-    "demo": [],
-    "installable": True,
     "application": True,
     "assets": {
         "web.assets_backend": [
             "password_manager/static/src/views/**/*",
         ],
     },
-    'author': 'Ruslan Akunevich',
+    "author": "Ruslan Akunevich",
     "license": "LGPL-3",
 }

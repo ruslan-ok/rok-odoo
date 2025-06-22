@@ -1,10 +1,10 @@
 <t t-name="rok_filestore.FolderTreeContainer" owl="1">
   <FolderTree
     folders="state.folders"
-    selectedPath="state.selectedPath"
+    selectedPath="props.selectedPath"
     expandedPaths="state.expandedPaths"
     loadingPath="state.loadingPath"
-    onSelect="onSelect"
+    onSelect="props.onSelect"
     onToggle="onToggle"
   />
 </t>
