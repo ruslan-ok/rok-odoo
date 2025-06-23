@@ -15,6 +15,8 @@ export class FilestoreApp extends Component {
 
   setup() {
     this.onSelectFolder = this.onSelectFolder.bind(this);
+    this.onDeleteFile = this.onDeleteFile.bind(this);
+    this.onUploadFile = this.onUploadFile.bind(this);
 
     // Restore selectedPath from localStorage
     let selectedPath = "";
@@ -62,5 +64,37 @@ export class FilestoreApp extends Component {
 
   async onSelectFile(path) {
     console.log(path);
+  }
+
+  async onDeleteFile(path) {
+    if (!confirm("Are you sure you want to delete this file?")) return;
+    const result = await rpc("/rok_filestore/api/delete_file", { path });
+    if (result.success) {
+      // Refresh file list
+      await this.onSelectFolder(this.state.selectedPath);
+    } else {
+      alert("Error deleting file: " + (result.error || "Unknown error"));
+    }
+  }
+
+  async onUploadFile(ev) {
+    ev.preventDefault();
+    const form = ev.target;
+    const fileInput = form.querySelector('input[type="file"]');
+    if (!fileInput.files.length) return;
+    const file = fileInput.files[0];
+    const data = new FormData();
+    data.append('file', file);
+    data.append('path', this.state.selectedPath);
+    data.append("csrf_token", odoo.csrf_token);
+
+    const xhr = new window.XMLHttpRequest();
+    xhr.open("POST", '/rok_filestore/api/upload_file');
+    xhr.send(data);
+    xhr.onload = async () => {
+      // Refresh file list
+      await this.onSelectFolder(this.state.selectedPath);
+    };
+    form.reset();
   }
 }

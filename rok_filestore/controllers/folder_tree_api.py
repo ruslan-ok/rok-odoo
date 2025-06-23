@@ -112,3 +112,35 @@ class FolderTreeAPI(http.Controller):
                 )
         except Exception:
             return request.not_found()
+
+    @http.route('/rok_filestore/api/delete_file', type='json', auth='user')
+    def delete_file(self, path):
+        root_path = self._get_user_filestore_path()
+        if not root_path:
+            return {'success': False, 'error': 'No root path'}
+        abs_path = os.path.join(root_path, path)
+        abs_path = os.path.abspath(abs_path)
+        if not abs_path.startswith(os.path.abspath(root_path)) or not os.path.isfile(abs_path):
+            return {'success': False, 'error': 'Invalid path'}
+        try:
+            os.remove(abs_path)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/rok_filestore/api/upload_file', type='http', auth='user', methods=['POST'])
+    def upload_file(self, path, **kwargs):
+        root_path = self._get_user_filestore_path()
+        if not root_path:
+            return request.make_response('No root path', status=400)
+        abs_path = os.path.join(root_path, path)
+        abs_path = os.path.abspath(abs_path)
+        if not abs_path.startswith(os.path.abspath(root_path)) or not os.path.isdir(abs_path):
+            return request.make_response('Invalid path', status=400)
+        file = request.httprequest.files.get('file')
+        if not file:
+            return request.make_response('No file', status=400)
+        file_path = os.path.join(abs_path, file.filename)
+        with open(file_path, 'wb') as f:
+            f.write(file.read())
+        return request.make_response({'success': True}, status=200)
