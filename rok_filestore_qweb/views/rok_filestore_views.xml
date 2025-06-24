@@ -4,7 +4,7 @@
         <field name="name">rok.filestore.view.form</field>
         <field name="model">rok.filestore.folder</field>
         <field name="arch" type="xml">
-            <form>
+            <form js_class="filestore_view_form">
                 Hello from Filestore QWeb
             </form>
         </field>

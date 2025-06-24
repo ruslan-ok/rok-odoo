@@ -19,4 +19,14 @@ Representation of file system folders
     "category": "Productivity",
     "application": True,
     "license": "LGPL-3",
+    "assets": {
+        "web.assets_backend": [
+            'rok_filestore_qweb/static/src/xml/**/*',
+            'rok_filestore_qweb/static/src/components/**/*',
+            "rok_filestore_qweb/static/src/js/filestore_controller.js",
+            "rok_filestore_qweb/static/src/js/filestore_renderers.js",
+            "rok_filestore_qweb/static/src/js/filestore_views.js",
+        ],
+    },
+
 }

@@ -21,3 +21,10 @@ class RokFilestoreFolder(models.TransientModel):
             'parent_id': False,
         })
         return res
+
+    def get_sidebar_folders(self, unfolded_ids=False):
+        return {
+            "folders": [],
+            "favorite_ids": [],
+            "active_folder_accessible_root_id": False,
+        }
