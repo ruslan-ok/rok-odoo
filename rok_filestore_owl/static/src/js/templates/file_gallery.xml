@@ -1,4 +1,4 @@
-<t t-name="rok_filestore.FileGallery" owl="1">
+<t t-name="rok_filestore_owl.FileGallery" owl="1">
   <div class="p-2 flex-grow-1" style="overflow-y: auto;">
     <t t-if="!props.files || props.files.length === 0">
       <p>No files in this folder.</p>

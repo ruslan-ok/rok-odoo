@@ -1,0 +1,19 @@
+<odoo>
+  <record id="rok_filestore_folder_action" model="ir.actions.act_window">
+      <field name="name">Home</field>
+      <field name="res_model">rok.filestore.folder</field>
+      <field name="view_mode">form</field>
+  </record>
+
+  <menuitem
+    id="rff_menu_root"
+    name="Filestore QWeb"
+    web_icon="rok_filestore_qweb,static/description/icon.png"
+    sequence="301"/>
+
+  <menuitem
+    id="rff_menu_action"
+    parent="rff_menu_root"
+    action="rok_filestore_folder_action"/>
+
+</odoo>

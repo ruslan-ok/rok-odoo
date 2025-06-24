@@ -6,10 +6,10 @@ import { FileGallery } from "./FileGallery";
 import { rpc } from "@web/core/network/rpc";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 
-const SELECTED_PATH_KEY = "rok_filestore.selectedPath";
+const SELECTED_PATH_KEY = "rok_filestore_owl.selectedPath";
 
 export class FilestoreApp extends Component {
-  static template = "rok_filestore.FilestoreApp";
+  static template = "rok_filestore_owl.FilestoreApp";
   static components = { FolderTreeContainer, FileGallery };
   static props = {...standardActionServiceProps};
 
@@ -33,7 +33,7 @@ export class FilestoreApp extends Component {
     });
 
     onWillStart(async () => {
-      const folders = await rpc("/rok_filestore/api/folders");
+      const folders = await rpc("/rok_filestore_owl/api/folders");
       this.state.folders = folders;
 
       // Check if selectedPath is still valid
@@ -52,12 +52,12 @@ export class FilestoreApp extends Component {
     this.state.selectedPath = path;
     // Save selectedPath to localStorage
     localStorage.setItem(SELECTED_PATH_KEY, path);
-    const files = await rpc("/rok_filestore/api/files", { path });
+    const files = await rpc("/rok_filestore_owl/api/files", { path });
     this.state.files = files.map(f => ({
       ...f,
-      url: `/rok_filestore/file?path=${encodeURIComponent(f.path)}`,
+      url: `/rok_filestore_owl/file?path=${encodeURIComponent(f.path)}`,
       thumbUrl: f.is_image
-        ? `/rok_filestore/thumbnail?path=${encodeURIComponent(f.path)}&size=128`
+        ? `/rok_filestore_owl/thumbnail?path=${encodeURIComponent(f.path)}&size=128`
         : null,
     }));
   }
@@ -68,7 +68,7 @@ export class FilestoreApp extends Component {
 
   async onDeleteFile(path) {
     if (!confirm("Are you sure you want to delete this file?")) return;
-    const result = await rpc("/rok_filestore/api/delete_file", { path });
+    const result = await rpc("/rok_filestore_owl/api/delete_file", { path });
     if (result.success) {
       // Refresh file list
       await this.onSelectFolder(this.state.selectedPath);
@@ -89,7 +89,7 @@ export class FilestoreApp extends Component {
     data.append("csrf_token", odoo.csrf_token);
 
     const xhr = new window.XMLHttpRequest();
-    xhr.open("POST", '/rok_filestore/api/upload_file');
+    xhr.open("POST", '/rok_filestore_owl/api/upload_file');
     xhr.send(data);
     xhr.onload = async () => {
       // Refresh file list

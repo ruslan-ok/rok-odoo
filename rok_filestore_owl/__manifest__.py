@@ -1,5 +1,5 @@
 {
-    "name": "Rok Filestore",
+    "name": "Rok Filestore Owl",
     "version": "1.0",
     "summary": "Representation of file system folders",
     "sequence": 47,
@@ -16,8 +16,8 @@ Representation of file system folders
     "application": True,
     "assets": {
         "web.assets_backend": [
-            "rok_filestore/static/src/js/**/*.js",
-            "rok_filestore/static/src/js/templates/**/*.xml",
+            "rok_filestore_owl/static/src/js/**/*.js",
+            "rok_filestore_owl/static/src/js/templates/**/*.xml",
         ],
     },
     "author": "Ruslan Akunevich",

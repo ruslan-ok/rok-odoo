@@ -31,7 +31,7 @@ class FolderTreeAPI(http.Controller):
                 tree.append(node)
         return tree
 
-    @http.route('/rok_filestore/api/folders', type='json', auth='user')
+    @http.route('/rok_filestore_owl/api/folders', type='json', auth='user')
     def get_folders_tree(self, path=''):
         root_path = self._get_user_filestore_path()
         if not root_path:
@@ -43,7 +43,7 @@ class FolderTreeAPI(http.Controller):
             return []
         return self.build_tree(abs_path, root_path)
 
-    @http.route('/rok_filestore/api/files', type='json', auth='user')
+    @http.route('/rok_filestore_owl/api/files', type='json', auth='user')
     def get_files(self, path):
         root_path = self._get_user_filestore_path()
         if not root_path:
@@ -65,7 +65,7 @@ class FolderTreeAPI(http.Controller):
                 })
         return result
 
-    @http.route('/rok_filestore/file', type='http', auth='user')
+    @http.route('/rok_filestore_owl/file', type='http', auth='user')
     def serve_file(self, path, **kwargs):
         root_path = self._get_user_filestore_path()
         if not root_path:
@@ -81,7 +81,7 @@ class FolderTreeAPI(http.Controller):
             'Content-Disposition': f'inline; filename="{os.path.basename(full_path)}"'
         })
 
-    @http.route('/rok_filestore/thumbnail', type='http', auth='user')
+    @http.route('/rok_filestore_owl/thumbnail', type='http', auth='user')
     def serve_thumbnail(self, path, size=128, **kwargs):
         root_path = self._get_user_filestore_path()
         if not root_path:
@@ -113,7 +113,7 @@ class FolderTreeAPI(http.Controller):
         except Exception:
             return request.not_found()
 
-    @http.route('/rok_filestore/api/delete_file', type='json', auth='user')
+    @http.route('/rok_filestore_owl/api/delete_file', type='json', auth='user')
     def delete_file(self, path):
         root_path = self._get_user_filestore_path()
         if not root_path:
@@ -128,7 +128,7 @@ class FolderTreeAPI(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/rok_filestore/api/upload_file', type='http', auth='user', methods=['POST'])
+    @http.route('/rok_filestore_owl/api/upload_file', type='http', auth='user', methods=['POST'])
     def upload_file(self, path, **kwargs):
         root_path = self._get_user_filestore_path()
         if not root_path:

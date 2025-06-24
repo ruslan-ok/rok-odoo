@@ -1,4 +1,4 @@
-<t t-name="rok_filestore.FolderTree" owl="1">
+<t t-name="rok_filestore_owl.FolderTree" owl="1">
   <div class="p-2 border-end" style="width: 250px; overflow-y: auto;">
     <ul style="list-style-type: none; padding-left: 0;">
       <t t-foreach="props.folders" t-as="folder" t-key="folder.path">

@@ -3,7 +3,7 @@
 import { Component } from "@odoo/owl";
 
 export class FolderTree extends Component {
-  static template = "rok_filestore.FolderTree";
+  static template = "rok_filestore_owl.FolderTree";
   static props = {
     folders: Array,
     selectedPath: String,

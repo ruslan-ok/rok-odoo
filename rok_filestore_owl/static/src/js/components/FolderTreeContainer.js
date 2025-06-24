@@ -4,10 +4,10 @@ import { Component, useState, onWillStart } from "@odoo/owl";
 import { FolderTree } from "./FolderTree";
 import { rpc } from "@web/core/network/rpc";
 
-const EXPANDED_PATHS_KEY = "rok_filestore.expandedPaths";
+const EXPANDED_PATHS_KEY = "rok_filestore_owl.expandedPaths";
 
 export class FolderTreeContainer extends Component {
-    static template = "rok_filestore.FolderTreeContainer";
+    static template = "rok_filestore_owl.FolderTreeContainer";
     static components = { FolderTree };
     static props = { selectedPath: String, onSelect: Function };
 
@@ -36,7 +36,7 @@ export class FolderTreeContainer extends Component {
     }
 
     async fetchFolders(path) {
-        return await rpc("/rok_filestore/api/folders", { path });
+        return await rpc("/rok_filestore_owl/api/folders", { path });
     }
 
     // Recursively loads children for all paths from expandedPaths

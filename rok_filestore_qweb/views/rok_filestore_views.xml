@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rok_filestore_view_form" model="ir.ui.view">
+        <field name="name">rok.filestore.view.form</field>
+        <field name="model">rok.filestore.folder</field>
+        <field name="arch" type="xml">
+            <form>
+                Hello from Filestore QWeb
+            </form>
+        </field>
+    </record>
+</odoo>

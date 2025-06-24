@@ -1,4 +1,4 @@
-<t t-name="rok_filestore.FolderTreeContainer" owl="1">
+<t t-name="rok_filestore_owl.FolderTreeContainer" owl="1">
   <FolderTree
     folders="state.folders"
     selectedPath="props.selectedPath"
