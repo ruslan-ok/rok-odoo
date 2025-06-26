@@ -36,7 +36,7 @@ export const SORTABLE_TOLERANCE = 10;
  * - {string} name,
  * - {number} parent_id,
  * - {boolean} user_can_write,
- * - {boolean} has_folder_children,
+ * - {boolean} has_children,
  */
 export class FilestoreSidebar extends Component {
     static props = {
@@ -190,7 +190,7 @@ export class FilestoreSidebar extends Component {
                 if (prevPos.parent) {
                     const prevParent = this.getFolder(parseInt(prevPos.parent.dataset.folderId));
                     // Remove caret if folder has no child
-                    if (!prevParent.has_folder_children ||
+                    if (!prevParent.has_children ||
                         prevParent.child_ids.length === 1 &&
                         prevParent.child_ids[0] === parseInt(element.dataset.folderId)
                     ) {
@@ -241,23 +241,23 @@ export class FilestoreSidebar extends Component {
                 parent_id: nextDataParentId,
                 is_locked: record.data.is_locked,
                 user_can_write: record.data.user_can_write,
-                is_folder_item: record.data.is_folder_item,
+                // is_folder_item: record.data.is_folder_item,
                 is_user_favorite: record.data.is_user_favorite,
                 child_ids: [],
             };
             if (this.state.folders[record.resId]) {
-                if (record.data.is_folder_item !== folder.is_folder_item) {
-                    if (record.data.is_folder_item) {
-                        // Folder became item, remove it from the sidebar
-                        this.removeFolder(folder);
-                    } else {
-                        // Item became folder, add it in the sidebar
-                        this.insertFolder(folder, {
-                            parentId: folder.parent_id
-                        });
-                        this.showFolder(folder);
-                    }
-                }
+                // if (record.data.is_folder_item !== folder.is_folder_item) {
+                //     if (record.data.is_folder_item) {
+                //         // Folder became item, remove it from the sidebar
+                //         this.removeFolder(folder);
+                //     } else {
+                //         // Item became folder, add it in the sidebar
+                //         this.insertFolder(folder, {
+                //             parentId: folder.parent_id
+                //         });
+                //         this.showFolder(folder);
+                //     }
+                // }
                 if (record.data.is_user_favorite !== folder.is_user_favorite) {
                     if (record.data.is_user_favorite) {
                         // Add the folder to the favorites tree
@@ -288,7 +288,7 @@ export class FilestoreSidebar extends Component {
                     icon: record.data.icon,
                     is_locked: record.data.is_locked,
                     user_can_write: record.data.user_can_write,
-                    is_folder_item: record.data.is_folder_item,
+                    // is_folder_item: record.data.is_folder_item,
                     is_user_favorite: record.data.is_user_favorite,
                 });
             } else if (!this.state.loading) {  // New folder, add it in the state and sidebar
@@ -299,16 +299,25 @@ export class FilestoreSidebar extends Component {
                 }
                 this.state.folders[folder.id] = folder;
                 // Don't add new items in the sidebar
-                if (!record.data.is_folder_item) {
-                    await this.insertFolder(folder, {
-                        category: folder.category,
-                        parentId: folder.parent_id,
-                    });
-                    // Make sure the folder is visible
-                    this.showFolder(folder);
-                    if (nextDataParentId && this.getFolder(nextDataParentId)?.is_user_favorite) {
-                        this.unfold(nextDataParentId, true);
-                    }
+                // if (!record.data.is_folder_item) {
+                //     await this.insertFolder(folder, {
+                //         category: folder.category,
+                //         parentId: folder.parent_id,
+                //     });
+                //     // Make sure the folder is visible
+                //     this.showFolder(folder);
+                //     if (nextDataParentId && this.getFolder(nextDataParentId)?.is_user_favorite) {
+                //         this.unfold(nextDataParentId, true);
+                //     }
+                // }
+                await this.insertFolder(folder, {
+                    category: folder.category,
+                    parentId: folder.parent_id,
+                });
+                // Make sure the folder is visible
+                this.showFolder(folder);
+                if (nextDataParentId && this.getFolder(nextDataParentId)?.is_user_favorite) {
+                    this.unfold(nextDataParentId, true);
                 }
             }
 
@@ -331,7 +340,7 @@ export class FilestoreSidebar extends Component {
                 category: parent ? parent.category : false,
                 is_locked: false,
                 user_can_write: true,
-                is_folder_item: false,
+                // is_folder_item: false,
                 is_user_favorite: false,
                 child_ids: [],
             };
@@ -456,7 +465,7 @@ export class FilestoreSidebar extends Component {
                 } else {
                     parent.child_ids.push(folder.id);
                 }
-                parent.has_folder_children = true;
+                parent.has_children = true;
             }
         } else {
             // Add folder in the list of folders of the new category, at the right position
@@ -520,24 +529,24 @@ export class FilestoreSidebar extends Component {
             };
             // Items could be shown in the favorite tree as root folders, but
             // they should not be shown as children of other folders
-            if (!folder.is_folder_item) {
-                if (folder.parent_id) {
-                    const parent = this.getFolder(folder.parent_id);
-                    if (parent) {
-                        parent.child_ids.push(folder.id);
-                    } else {
-                        // Store children temporarily to add them to the parent
-                        // when the parent will be added to the state in this loop.
-                        if (children[folder.parent_id]) {
-                            children[folder.parent_id].push(folder.id);
-                        } else {
-                            children[folder.parent_id] = [folder.id];
-                        }
-                    }
+            // if (!folder.is_folder_item) {
+            if (folder.parent_id) {
+                const parent = this.getFolder(folder.parent_id);
+                if (parent) {
+                    parent.child_ids.push(folder.id);
                 } else {
-                    this.getCategoryIds(folder.category).push(folder.id);
+                    // Store children temporarily to add them to the parent
+                    // when the parent will be added to the state in this loop.
+                    if (children[folder.parent_id]) {
+                        children[folder.parent_id].push(folder.id);
+                    } else {
+                        children[folder.parent_id] = [folder.id];
+                    }
                 }
+            } else {
+                this.getCategoryIds(folder.category).push(folder.id);
             }
+            // }
         }
         const ancestorRootFolderId = res.active_folder_accessible_root_id;
         if (ancestorRootFolderId) {
@@ -558,8 +567,9 @@ export class FilestoreSidebar extends Component {
     async loadChildren(folder) {
         const children = await this.orm.searchRead(
             this.props.record.resModel,
-            [['parent_id', '=', folder.id], ['is_folder_item', '=', false]],
-            ['name', 'icon', 'is_locked', 'user_can_write', 'has_folder_children'],
+            // [['parent_id', '=', folder.id], ['is_folder_item', '=', false]],
+            [['parent_id', '=', folder.id]],
+            ['name', 'icon', 'is_locked', 'user_can_write', 'has_children'],
             {
                 'load': 'None',
                 'order': 'sequence, id',
@@ -576,7 +586,7 @@ export class FilestoreSidebar extends Component {
                 parent_id: folder.id,
                 child_ids: [],
                 category: folder.category,
-                is_folder_item: false,
+                // is_folder_item: false,
                 is_user_favorite: false,
             };
         }
@@ -718,7 +728,7 @@ export class FilestoreSidebar extends Component {
         //     this.dialog.add(
         //         FolderSelectionDialog,
         //         {
-        //             title: _t('Search an Folder...'),
+        //             title: _t('Search a Folder...'),
         //             confirmLabel: _t('Open'),
         //             folderSelected: (folder) => this.env.openFolder(folder.folderId),
         //         }
@@ -771,7 +781,7 @@ export class FilestoreSidebar extends Component {
                     if (!parent.child_ids.length) {
                         this.fold(parent.id);
                         this.fold(parent.id, true);
-                        parent.has_folder_children = false;
+                        parent.has_children = false;
                     }
                 }
             }
@@ -902,7 +912,7 @@ export class FilestoreSidebar extends Component {
     async unfold(folderId, isFavorite) {
         const folder = this.getFolder(folderId);
         // Load the children of the folder if it has not been unfolded yet
-        if (folder.has_folder_children && !folder.child_ids.length) {
+        if (folder.has_children && !folder.child_ids.length) {
             await this.loadChildren(folder);
         }
         if (isFavorite) {

@@ -9,4 +9,11 @@
             </form>
         </field>
     </record>
+
+  <record id="rok_filestore_folder_form" model="ir.actions.act_window">
+      <field name="name">Filestore</field>
+      <field name="res_model">rok.filestore.folder</field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="rok_filestore_qweb.rok_filestore_view_form"/>
+  </record>
 </odoo>

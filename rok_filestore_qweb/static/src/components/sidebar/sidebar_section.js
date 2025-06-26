@@ -2,7 +2,6 @@
 
 import { FilestoreSidebarRow } from "./sidebar_row";
 import { user } from "@web/core/user";
-import { useService } from "@web/core/utils/hooks";
 
 import { Component, onWillStart, useChildSubEnv } from "@odoo/owl";
 
@@ -43,27 +42,6 @@ export class FilestoreSidebarFavoriteSection extends FilestoreSidebarSection {
             unfold: id => this.env.unfold(id, true),
         });
     }
-}
-
-export class FilestoreSidebarWorkspaceSection extends FilestoreSidebarSection {
-    static template = "rok_filestore_qweb.SidebarWorkspaceSection";
-    
-    setup() {
-        super.setup();
-        this.command = useService("command");
-    }
-
-    createRoot() {
-        this.env.createFolder("workspace");
-    }
-
-    searchHiddenFolder() {
-        this.command.openMainPalette({searchValue: "$"});
-    }
-}
-
-export class FilestoreSidebarSharedSection extends FilestoreSidebarSection {
-    static template = "rok_filestore_qweb.SidebarSharedSection";
 }
 
 export class FilestoreSidebarPrivateSection extends FilestoreSidebarSection {

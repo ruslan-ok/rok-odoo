@@ -14,7 +14,7 @@
                     <div id="filestore_search_bar" data-hotkey="f"
                          class="d-flex align-items-center border bg-light rounded cursor-pointer flex-grow-1" 
                          t-on-click="onSearchBarClick">
-                        <div class="flex-grow-1 px-2 py-1">Search an folder...</div>
+                        <div class="flex-grow-1 px-2 py-1">Search a folder...</div>
                         <i class="oi oi-search pe-2" title="search"/>
                     </div>
                 </div>
@@ -37,8 +37,6 @@
                 <FilestoreSidebarFavoriteSection rootIds="state.favoriteIds" unfoldedIds="unfoldedFavoritesIds" record="props.record"/>
             </div>
             <div t-ref="mainTree" class="d-flex flex-column flex-fill">
-                <FilestoreSidebarWorkspaceSection rootIds="state.workspaceIds" unfoldedIds="unfoldedFoldersIds" record="props.record"/>
-                <FilestoreSidebarSharedSection rootIds="state.sharedIds" unfoldedIds="unfoldedFoldersIds" record="props.record"/>
                 <FilestoreSidebarPrivateSection rootIds="state.privateIds" unfoldedIds="unfoldedFoldersIds" record="props.record"/>
                 <!-- Trash is a "o_section" so that one can drop folders in the trash -->
                 <div t-if="isInternalUser" class="o_section o_knowledge_sidebar_trash w-100 py-2 position-sticky bg-view mt-auto">

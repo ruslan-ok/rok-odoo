@@ -24,33 +24,6 @@
         </t>
     </t>
 
-    <t t-name="rok_filestore_qweb.SidebarWorkspaceSection">
-        <t t-call="rok_filestore_qweb.SidebarSection">
-            <t t-set="sectionName">Workspace</t>
-            <t t-set="sectionClass" t-value="props.rootIds.length === 0 ? 'pb-3' : ''"/>
-            <t t-set="dataSection" t-value="'workspace'"/>
-            <t t-if="isInternalUser" t-set="headerButtons">
-                <button class="o_knowledge_join_folder_members btn btn-link text-secondary rounded p-0"
-                    t-on-click="searchHiddenFolder">
-                    <i class="fa fa-fw fa-eye" title="Join a hidden folder"/>
-                </button>
-                <button class="o_section_create btn rounded p-0 ms-1" t-on-click="createRoot">
-                    <i class="fa fa-fw fa-plus" title="Create a new folder in workspace"/>
-                </button>
-            </t>
-            <t t-set="noContentHelper">
-                There are no Folders in your Workspace.
-            </t>
-        </t>
-    </t>
-
-    <t t-name="rok_filestore_qweb.SidebarSharedSection">
-        <t t-call="rok_filestore_qweb.SidebarSection" t-if="props.rootIds.length">
-            <t t-set="sectionName">Shared</t>
-            <t t-set="dataSection" t-value="'shared'"/>
-        </t>
-    </t>
-
     <t t-name="rok_filestore_qweb.SidebarPrivateSection">
         <t t-call="rok_filestore_qweb.SidebarSection">
             <t t-set="sectionName">Private</t>

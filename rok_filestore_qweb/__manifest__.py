@@ -10,6 +10,7 @@ Representation of file system folders
 """,
     "data": [
         "security/ir.model.access.csv",
+        "data/ir_actions_data.xml",
         "views/rok_filestore_views.xml",
         "views/rok_filestore_menu.xml",
     ],
