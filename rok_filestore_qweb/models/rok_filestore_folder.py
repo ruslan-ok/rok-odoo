@@ -23,6 +23,7 @@ class RokFilestoreFolder(models.TransientModel):
         search="_search_is_user_favorite")
     has_children = fields.Boolean('Has children folders?')
     children_fetched = fields.Boolean('Are the child folders fetched from OS?', default=False)
+    files_ids = fields.One2many("rok.filestore.file", "folder_id", "Folder files")
 
     def _compute_category(self):
         for folder in self:
@@ -56,12 +57,12 @@ class RokFilestoreFolder(models.TransientModel):
         folder_full_path = os.path.join(self.root_path, folder_path)
         if os.path.isdir(folder_full_path):
             for entry_name in sorted(os.listdir(folder_full_path)):
-                result |= self.fetch_child_folder(parent, entry_name)
+                result |= self.fetch_folder(parent, entry_name)
         parent.children_fetched = True
         return result
 
     @api.model
-    def fetch_child_folder(self, parent, entry_name):
+    def fetch_folder(self, parent, entry_name):
         folder = self.env["rok.filestore.folder"]
         path = parent.path if parent else ''
         entry_full_path = os.path.join(self.root_path, path, entry_name)

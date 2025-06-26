@@ -15,7 +15,7 @@
                     <a role="button"
                         class="o_article_create p-1 opacity-75 opacity-100-hover"
                         t-on-click="createChild">
-                        <i class="fa fa-fw fa-plus" title="Create a nested folder"/>
+                        <!-- <i class="fa fa-fw fa-plus" title="Create a nested folder"/> -->
                     </a>
                 </div>
             </div>
