@@ -6,6 +6,8 @@
         <field name="arch" type="xml">
             <form js_class="filestore_view_form">
                 Hello from Filestore QWeb
+                <field name="icon"/>
+                <field name="name"/>
             </form>
         </field>
     </record>

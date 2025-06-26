@@ -5,7 +5,7 @@ import { registry } from "@web/core/registry";
 import { exprToBoolean } from "@web/core/utils/strings";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
-import { getRandomIcon } from "@knowledge/js/knowledge_utils";
+import { getRandomIcon } from "@rok_filestore_qweb/js/filestore_utils";
 
 import { Component, useRef } from "@odoo/owl";
 

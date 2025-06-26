@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="rok_filestore_qweb.SidebarRow">
-        <li t-attf-class="o_article position-relative #{hasChildren ? 'o_article_has_children' : ''} #{isReadonly ? 'readonly' : ''}" t-att-data-article-id="props.folder.id">
+        <li t-attf-class="o_article position-relative #{hasChildren ? 'o_folder_has_children' : ''} #{isReadonly ? 'readonly' : ''}" t-att-data-article-id="props.folder.id">
             <div t-attf-class="o_article_handle d-flex align-items-center #{isActive ? 'o_article_active' : ''}">
                 <a class="o_article_caret btn btn-link text-muted p-0" role="button" t-on-click="onCaretClick">
                     <i t-attf-class="align-self-center fa fa-fw #{props.unfolded || !hasChildren ? 'fa-caret-down' : 'fa-caret-right'}"/>
@@ -12,7 +12,7 @@
                         <t t-if="props.folder.name" t-out="props.folder.name"/>
                         <t t-else="">Untitled</t>
                     </a>
-                    <a t-if="props.folder.user_can_write" role="button"
+                    <a role="button"
                         class="o_article_create p-1 opacity-75 opacity-100-hover"
                         t-on-click="createChild">
                         <i class="fa fa-fw fa-plus" title="Create a nested folder"/>

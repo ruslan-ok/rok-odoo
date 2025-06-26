@@ -112,9 +112,9 @@ export class FilestoreSidebar extends Component {
             onDrop: ({ element, next, parent }) => {
                 if (!parent) {
                     // Favorite resequence
-                    const folderId = parseInt(element.dataset.folderId);
-                    const beforeId = next ? parseInt(next.dataset.folderId) : false;
-                    this.resequenceFavorites(folderId, beforeId);
+                    // const folderId = parseInt(element.dataset.folderId);
+                    // const beforeId = next ? parseInt(next.dataset.folderId) : false;
+                    // this.resequenceFavorites(folderId, beforeId);
                 } else {
                     // Child of favorite resequence
                     const folder = this.getFolder(parseInt(element.dataset.folderId));
@@ -194,7 +194,7 @@ export class FilestoreSidebar extends Component {
                         prevParent.child_ids.length === 1 &&
                         prevParent.child_ids[0] === parseInt(element.dataset.folderId)
                     ) {
-                        prevPos.parent.classList.remove('o_article_has_children');
+                        prevPos.parent.classList.remove('o_folder_has_children');
                     }
                 }
                 if (parent) {
@@ -207,7 +207,7 @@ export class FilestoreSidebar extends Component {
                         return;
                     }
                     // Add caret
-                    parent.classList.add('o_article_has_children');
+                    parent.classList.add('o_folder_has_children');
                 } else if (newGroup.dataset.section === "shared") {
                     // Private folders cannot be dropped in the shared section
                     const folder = this.getFolder(parseInt(element.dataset.folderId));
@@ -240,7 +240,7 @@ export class FilestoreSidebar extends Component {
                 category: record.data.category,
                 parent_id: nextDataParentId,
                 is_locked: record.data.is_locked,
-                user_can_write: record.data.user_can_write,
+                // user_can_write: record.data.user_can_write,
                 // is_folder_item: record.data.is_folder_item,
                 is_user_favorite: record.data.is_user_favorite,
                 child_ids: [],
@@ -287,7 +287,7 @@ export class FilestoreSidebar extends Component {
                     name: record.data.name,
                     icon: record.data.icon,
                     is_locked: record.data.is_locked,
-                    user_can_write: record.data.user_can_write,
+                    // user_can_write: record.data.user_can_write,
                     // is_folder_item: record.data.is_folder_item,
                     is_user_favorite: record.data.is_user_favorite,
                 });
@@ -339,7 +339,7 @@ export class FilestoreSidebar extends Component {
                 parent_id: parent ? parent.id : false,
                 category: parent ? parent.category : false,
                 is_locked: false,
-                user_can_write: true,
+                // user_can_write: true,
                 // is_folder_item: false,
                 is_user_favorite: false,
                 child_ids: [],
@@ -568,11 +568,12 @@ export class FilestoreSidebar extends Component {
         const children = await this.orm.searchRead(
             this.props.record.resModel,
             // [['parent_id', '=', folder.id], ['is_folder_item', '=', false]],
+            // ['name', 'icon', 'is_locked', 'user_can_write', 'has_children'],
             [['parent_id', '=', folder.id]],
-            ['name', 'icon', 'is_locked', 'user_can_write', 'has_children'],
+            ['name', 'icon', 'is_locked', 'has_children'],
             {
                 'load': 'None',
-                'order': 'sequence, id',
+                'order': 'id',
             }
         );
         for (const child of children) {
@@ -594,7 +595,7 @@ export class FilestoreSidebar extends Component {
 
     /**
      * Try to move the given folder to the given position (change its parent/
-     * category/sequence) and update its position in the sidebar.
+     * category) and update its position in the sidebar.
      * If the move will change the permissions of the folder, show a
      * confirmation dialog.
      * @param {Object} folder
@@ -835,17 +836,17 @@ export class FilestoreSidebar extends Component {
      * @param {integer} beforeId - Id of the favorite folder after
      *      which the folder is moved
      */
-    resequenceFavorites(folderId, beforeId) {
-        this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(folderId), 1);
-        if (beforeId) {
-            this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(beforeId), 0, folderId);
-        } else {
-            this.state.favoriteIds.push(folderId);
-        }
-        this.orm.call("rok_filestore_qweb.folder.favorite", "resequence_favorites", [false], {
-            folder_ids: this.state.favoriteIds,
-        });
-    }
+    // resequenceFavorites(folderId, beforeId) {
+    //     this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(folderId), 1);
+    //     if (beforeId) {
+    //         this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(beforeId), 0, folderId);
+    //     } else {
+    //         this.state.favoriteIds.push(folderId);
+    //     }
+    //     this.orm.call("rok_filestore_qweb.folder.favorite", "resequence_favorites", [false], {
+    //         folder_ids: this.state.favoriteIds,
+    //     });
+    // }
 
     /**
      * User could have unfolded ids in its local storage of folders that are

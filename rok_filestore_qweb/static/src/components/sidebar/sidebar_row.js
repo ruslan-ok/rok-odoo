@@ -73,7 +73,7 @@ export class FilestoreSidebarRow extends Component {
     }
 
     get hasChildren() {
-        return this.props.folder.has_folder_children;
+        return this.props.folder.has_children;
     }
 
     get isActive() {
@@ -85,7 +85,8 @@ export class FilestoreSidebarRow extends Component {
     }
 
     get isReadonly() {
-        return !this.props.folder.user_can_write;
+        // return !this.props.folder.user_can_write;
+        return false;
     }
 
     /**
@@ -99,7 +100,7 @@ export class FilestoreSidebarRow extends Component {
      * (Un)fold the row
      */
     onCaretClick() {
-        if (!this.props.folder.has_folder_children) {
+        if (!this.props.folder.has_children) {
             return;
         }
         if (this.props.unfolded) {

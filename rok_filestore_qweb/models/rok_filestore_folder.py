@@ -21,7 +21,8 @@ class RokFilestoreFolder(models.TransientModel):
         string="Is Favorited",
         compute="_compute_is_user_favorite",
         search="_search_is_user_favorite")
-    has_children = fields.Boolean('Has children folders?', compute="_compute_has_children")
+    has_children = fields.Boolean('Has children folders?')
+    children_fetched = fields.Boolean('Are the child folders fetched from OS?', default=False)
 
     def _compute_category(self):
         for folder in self:
@@ -32,39 +33,53 @@ class RokFilestoreFolder(models.TransientModel):
         for folder in self:
             folder.is_user_favorite = False
 
-    @api.depends('child_ids')
-    def _compute_has_children(self):
-        results = self.env['rok.filestore.folder']._read_group([('parent_id', 'in', self.ids)])
-        count_by_folder_id = {parent.id for parent in results}
-        for folder in self:
-            folder.has_children = folder.id in count_by_folder_id
+    @api.model
+    @api.readonly
+    def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None, **read_kwargs):
+        if len(domain) == 1 and len(domain[0]) == 3 and domain[0][0] == "parent_id" and domain[0][1] == "=":
+            folder_id = domain[0][2]
+            folder = self.env["rok.filestore.folder"].browse(folder_id)
+            self.fetch_child_folders(folder)
+        return super().search_read(domain, fields, offset, limit, order, **read_kwargs)
+
+    @property
+    @api.model
+    def root_path(self):
+        return self.env.user.filestore_path
 
     @api.model
-    def get_root_path(self):
-        user = self.env.user
-        root_path = user.filestore_path
-        return root_path
+    def fetch_child_folders(self, parent):
+        result = self.env["rok.filestore.folder"]
+        if parent and (not parent.has_children or parent.children_fetched):
+            return result
+        folder_path = parent.path if parent else ''
+        folder_full_path = os.path.join(self.root_path, folder_path)
+        if os.path.isdir(folder_full_path):
+            for entry_name in sorted(os.listdir(folder_full_path)):
+                result |= self.fetch_child_folder(parent, entry_name)
+        parent.children_fetched = True
+        return result
 
     @api.model
-    def get_child_folder(self, parent, name):
-        parent_id = parent.id if parent else False
-        child_folder = self.env["rok.filestore.folder"].search([("parent_id", "=", parent_id), ("name", "=", name)])
-        if not child_folder:
-            root_path = self.get_root_path()
-            full_path = os.path.join(root_path, name)
+    def fetch_child_folder(self, parent, entry_name):
+        folder = self.env["rok.filestore.folder"]
+        path = parent.path if parent else ''
+        entry_full_path = os.path.join(self.root_path, path, entry_name)
+        if os.path.isdir(entry_full_path):
             has_children = any(
-                os.path.isdir(os.path.join(full_path, child))
-                for child in os.listdir(full_path)
+                os.path.isdir(os.path.join(entry_full_path, child))
+                for child in os.listdir(entry_full_path)
             )
-            path = Path(parent.path) / name if parent else name
-            child_folder = self.env["rok.filestore.folder"].create({
-                "parent_id": parent_id,
-                "name": name,
+            path = Path(path) / entry_name
+            folder = self.env["rok.filestore.folder"].create({
+                "parent_id": parent.id if parent else False,
+                "name": entry_name,
                 "path": path,
-                "icon": "📄",
+                "icon": "📂",
                 "has_children": has_children,
+                "children_fetched": False,
             })
-        return child_folder
+        return folder
     
     def get_sidebar_folders(self, unfolded_ids=False):
         result = {
@@ -72,24 +87,20 @@ class RokFilestoreFolder(models.TransientModel):
             "favorite_ids": [],
             "active_folder_accessible_root_id": False,
         }
-        root_path = self.get_root_path()
-
-        for entry in sorted(os.listdir(root_path)):
-            full_path = os.path.join(root_path, entry)
-            if os.path.isdir(full_path):
-                folder = self.get_child_folder(False, entry)
-                node = {
-                    'id': folder.id,
-                    'name': folder.name,
-                    'parent_id': folder.parent_id.id,
-                    'icon': folder.icon,
-                    'category': folder.category,
-                    'is_locked': folder.is_locked,
-                    'user_can_write': True,
-                    'is_user_favorite': folder.is_user_favorite,
-                    'has_children': folder.has_children,
-                }
-                result["folders"].append(node)
+        parent = self.env["rok.filestore.folder"]
+        child_folders = self.fetch_child_folders(parent)
+        for folder in child_folders:
+            node = {
+                'id': folder.id,
+                'name': folder.name,
+                'parent_id': folder.parent_id.id,
+                'icon': folder.icon,
+                'category': folder.category,
+                'is_locked': folder.is_locked,
+                'is_user_favorite': folder.is_user_favorite,
+                'has_children': folder.has_children,
+            }
+            result["folders"].append(node)
         return result
 
     def _get_first_accessible_folder(self):
@@ -99,13 +110,9 @@ class RokFilestoreFolder(models.TransientModel):
         #         ('user_id', '=', self.env.uid), ('is_folder_active', '=', True)
         #     ], limit=1).folder_id
         if not folder:
-            # retrieve workspace folders first, then private/shared ones.
-            self.get_sidebar_folders()
-            folder = self.search(
-                [('parent_id', '=', False)],
-                limit=1,
-                order='id'
-            )
+            parent = self.env["rok.filestore.folder"]
+            folders = self.fetch_child_folders(parent)
+            folder = folders[0] if folders else folder
         return folder
 
     def action_home_page(self):

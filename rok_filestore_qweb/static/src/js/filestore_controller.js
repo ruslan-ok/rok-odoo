@@ -130,7 +130,7 @@ export class FilestoreFormController extends FormController {
         const recordData = this.model.root.data;
         if (
             !recordData.name &&
-            !(recordData.is_locked || !recordData.user_can_write || !recordData.active)
+            !(recordData.is_locked || !recordData.active)
         ) {
             return this.renameFolder();
         }
@@ -247,7 +247,7 @@ export class FilestoreFormController extends FormController {
      * @param {boolean} force
      */
     toggleAsideMobile(force) {
-        const container = this.root.el.querySelector('.o_knowledge_form_view');
+        const container = this.root.el.querySelector('.o_filestore_form_view');
         container.classList.toggle('o_toggle_aside', force);
     }
 }
