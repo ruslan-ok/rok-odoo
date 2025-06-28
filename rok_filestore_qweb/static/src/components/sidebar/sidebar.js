@@ -697,7 +697,7 @@ export class FilestoreSidebar extends Component {
     async moveToTrash(folder) {
         try {
             await this.orm.call(
-                "rok_filestore_qweb.folder",
+                "rok.filestore.folder",
                 "action_send_to_trash",
                 [folder.id],
             );
@@ -709,7 +709,7 @@ export class FilestoreSidebar extends Component {
         // folder, redirect to first accessible folder.
         if (this.isAncestor(folder.id)) {
             this.actionService.doAction(
-                await this.orm.call('rok_filestore_qweb.folder', 'action_home_page', [false]),
+                await this.orm.call('rok.filestore.folder', 'action_home_page', [false]),
                 {stackPosition: 'replaceCurrentAction'}
             );
         } else {

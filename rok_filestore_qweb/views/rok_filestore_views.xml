@@ -1,21 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="rok_filestore_view_form" model="ir.ui.view">
-        <field name="name">rok.filestore.view.form</field>
+        <field name="name">rok.filestore.view.kanban</field>
         <field name="model">rok.filestore.folder</field>
         <field name="arch" type="xml">
             <form js_class="filestore_view_form">
-                Hello from Filestore QWeb
-                <field name="icon"/>
-                <field name="name"/>
+                <widget name="knowledge_topbar"/>
+                <field name="icon" invisible="1"/>
+                <field name="name" invisible="1"/>
+                <field name="files_ids">
+                    <kanban>
+                        <field name="name"/>
+                        <field name="file_size"/>
+                        <field name="mime_type"/>
+                        <templates>
+                            <t t-name="kanban-box">
+                                <div class="oe_kanban_global_click">
+                                    <strong><field name="name"/></strong>
+                                    <div><field name="file_size"/> bytes</div>
+                                    <div><field name="mime_type"/></div>
+                                </div>
+                            </t>
+                        </templates>
+                    </kanban>
+                    <list>
+                        <field name="name"/>
+                        <field name="file_size"/>
+                        <field name="mime_type"/>
+                    </list>
+                </field>
             </form>
         </field>
     </record>
 
-  <record id="rok_filestore_folder_form" model="ir.actions.act_window">
-      <field name="name">Filestore</field>
-      <field name="res_model">rok.filestore.folder</field>
-      <field name="view_mode">form</field>
-      <field name="view_id" ref="rok_filestore_qweb.rok_filestore_view_form"/>
-  </record>
+    <record id="rok_filestore_folder_action" model="ir.actions.act_window">
+        <field name="name">Filestore</field>
+        <field name="res_model">rok.filestore.folder</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="rok_filestore_qweb.rok_filestore_view_form"/>
+    </record>
 </odoo>

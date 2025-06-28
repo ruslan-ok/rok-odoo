@@ -1,4 +1,5 @@
 import os
+import mimetypes
 from pathlib import Path
 from odoo import models, fields, _, api
 from odoo.exceptions import UserError
@@ -51,11 +52,13 @@ class RokFilestoreFolder(models.TransientModel):
     @api.model
     def fetch_child_folders(self, parent):
         result = self.env["rok.filestore.folder"]
-        if parent and (not parent.has_children or parent.children_fetched):
+        if not self.root_path or parent and (not parent.has_children or parent.children_fetched):
             return result
         folder_path = parent.path if parent else ''
-        folder_full_path = os.path.join(self.root_path, folder_path)
-        if os.path.isdir(folder_full_path):
+        folder_full_path = self.root_path
+        if folder_path:
+            folder_full_path = os.path.join(self.root_path, folder_path)
+        if not parent or os.path.isdir(folder_full_path):
             for entry_name in sorted(os.listdir(folder_full_path)):
                 result |= self.fetch_folder(parent, entry_name)
         parent.children_fetched = True
@@ -71,15 +74,26 @@ class RokFilestoreFolder(models.TransientModel):
                 os.path.isdir(os.path.join(entry_full_path, child))
                 for child in os.listdir(entry_full_path)
             )
-            path = Path(path) / entry_name
+            path_obj = Path(path) / entry_name
             folder = self.env["rok.filestore.folder"].create({
                 "parent_id": parent.id if parent else False,
                 "name": entry_name,
-                "path": path,
+                "path": str(path_obj),
                 "icon": "📂",
                 "has_children": has_children,
                 "children_fetched": False,
             })
+            for file_name in os.listdir(entry_full_path):
+                file_full_path = os.path.join(entry_full_path, file_name)
+                if os.path.isfile(file_full_path):
+                    file_size = os.path.getsize(file_full_path)
+                    mime_type, _ = mimetypes.guess_type(file_full_path)
+                    self.env["rok.filestore.file"].create({
+                        "folder_id": folder.id,
+                        "name": file_name,
+                        "file_size": file_size,
+                        "mime_type": mime_type or "application/octet-stream",
+                    })
         return folder
     
     def get_sidebar_folders(self, unfolded_ids=False):
@@ -125,6 +139,6 @@ class RokFilestoreFolder(models.TransientModel):
         if not folder:
             folder = self._get_first_accessible_folder()
 
-        action = self.env['ir.actions.act_window']._for_xml_id('rok_filestore_qweb.rok_filestore_folder_form')
+        action = self.env['ir.actions.act_window']._for_xml_id('rok_filestore_qweb.rok_filestore_folder_action')
         action['res_id'] = folder.id
         return action

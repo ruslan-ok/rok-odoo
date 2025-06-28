@@ -7,4 +7,4 @@ class RokFilestoreFile(models.TransientModel):
     folder_id = fields.Many2one('rok.filestore.folder', "Folder")
     name = fields.Char("Name", required=True)
     file_size = fields.Integer("File Size (bytes)", default=0)
-    file_type = fields.Char("File Type", required=True)
+    mime_type = fields.Char("File Type", required=True)
