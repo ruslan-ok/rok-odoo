@@ -1,0 +1,16 @@
+<odoo>
+
+  <menuitem
+    id="file_manager_menu_root"
+    name="File Manager"
+    web_icon="file_manager,static/description/icon.png"
+    sequence="301"/>
+
+  <menuitem
+      id="file_manager_menu_home"
+      name="Home"
+      parent="file_manager_menu_root"
+      action="file_manager.ir_actions_server_file_manager_home_page"
+      sequence="1"/>
+
+</odoo>

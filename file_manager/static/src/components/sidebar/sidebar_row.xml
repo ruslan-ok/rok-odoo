@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="file_manager.SidebarRow">
+        <li t-attf-class="o_article position-relative #{hasChildren ? 'o_folder_has_children' : ''} #{isReadonly ? 'readonly' : ''}" t-att-data-article-id="props.folder.id">
+            <div t-attf-class="o_article_handle d-flex align-items-center #{isActive ? 'o_article_active' : ''}">
+                <a class="o_article_caret btn btn-link text-muted p-0" role="button" t-on-click="onCaretClick">
+                    <i t-attf-class="align-self-center fa fa-fw #{props.unfolded || !hasChildren ? 'fa-caret-down' : 'fa-caret-right'}"/>
+                </a>
+                <div class="w-100 d-flex min-w-0 align-items-center">
+                    <FileManagerSidebarIcon folder="props.folder" record="props.record" readonly="isLocked || isReadonly" iconClasses="'p-1'"/>
+                    <a t-attf-class="o_article_name p-1 flex-grow-1 text-truncate #{isActive ? 'fw-bold text-900' : 'text-muted'}" role="button" t-on-click="onNameClick">
+                        <t t-if="props.folder.name" t-out="props.folder.name"/>
+                        <t t-else="">Untitled</t>
+                    </a>
+                    <a role="button"
+                        class="o_article_create p-1 opacity-75 opacity-100-hover"
+                        t-on-click="createChild">
+                        <!-- <i class="fa fa-fw fa-plus" title="Create a nested folder"/> -->
+                    </a>
+                </div>
+            </div>
+            <ul t-if="props.unfolded">
+                <t t-foreach="props.folder.child_ids" t-as="childId" t-key="childId">
+                    <FileManagerSidebarRow folder="env.getFolder(childId)" unfolded="props.unfoldedIds.has(childId)" unfoldedIds="props.unfoldedIds" record="props.record"/>
+                </t>
+            </ul>
+            <div t-elif="state.loading" class="p-1 text-center">
+                <i class="fa fa-circle-o-notch fa-spin" title="loader" role="img"/>
+            </div>
+        </li>
+    </t>
+</templates>

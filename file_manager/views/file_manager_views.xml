@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="file_manager_view_form" model="ir.ui.view">
+        <field name="name">file_manager.view.form</field>
+        <field name="model">file.manager.folder</field>
+        <field name="arch" type="xml">
+            <form js_class="file_manager_view_form">
+                <!-- <widget name="knowledge_topbar"/> -->
+                <field name="icon" invisible="1"/>
+                <field name="name" invisible="1"/>
+                <field name="files_ids">
+                    <kanban>
+                        <field name="name"/>
+                        <field name="mime_type"/>
+                        <field name="file_size"/>
+                        <templates>
+                            <t t-name="card">
+                                <div class="oe_kanban_global_click">
+                                    <strong><field name="name"/></strong>
+                                    <div><field name="file_size"/> bytes</div>
+                                    <div><field name="mime_type"/></div>
+                                </div>
+                            </t>
+                        </templates>
+                    </kanban>
+                    <list>
+                        <field name="name"/>
+                        <field name="mime_type"/>
+                        <field name="file_size"/>
+                    </list>
+                </field>
+            </form>
+        </field>
+    </record>
+
+    <record id="file_manager_folder_action" model="ir.actions.act_window">
+        <field name="name">File Manager</field>
+        <field name="res_model">file.manager.folder</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="file_manager.file_manager_view_form"/>
+    </record>
+</odoo>

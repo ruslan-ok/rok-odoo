@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_file_manager_folder_user,file.manager.folder.user,model_file_manager_folder,base.group_user,1,1,1,1
+access_file_manager_file_user,file.manager.file.user,model_file_manager_file,base.group_user,1,1,1,1
