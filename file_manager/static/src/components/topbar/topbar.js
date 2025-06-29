@@ -79,6 +79,15 @@ class FileManagerTopbar extends Component {
         this.dialog.add(MoveFolderDialog, {fileManagerFolder: this.props.record});
     }
 
+    async onRefreshFolderClick() {
+        await this.orm.call(
+            this.props.record.resModel,
+            "action_refresh",
+            [this.props.record.resId],
+        );
+        await this.props.record.load();
+    }
+
     async onFileUploaded(file) {
         const att_data = {
             name: file.name,
@@ -87,6 +96,7 @@ class FileManagerTopbar extends Component {
             folder_id: this.props.record.resId,
         };
         await this.orm.create("file.manager.file", [att_data]);
+        await this.props.record.load();
     }
 }
 

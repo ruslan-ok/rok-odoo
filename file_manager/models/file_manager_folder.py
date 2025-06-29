@@ -201,23 +201,6 @@ class FileManagerFolder(models.Model):
         parent.children_fetched = True
         return result
 
-    def populate_files(self):
-        for folder in self:
-            folder.file_ids.unlink()
-            path = folder.parent_id.path if folder.parent_id else ""
-            folder_full_path = os.path.join(self.root_path, path, folder.name)
-            for file_name in os.listdir(folder_full_path):
-                file_full_path = os.path.join(folder_full_path, file_name)
-                if os.path.isfile(file_full_path):
-                    file_size = os.path.getsize(file_full_path)
-                    mimetype, _ = mimetypes.guess_type(file_full_path)
-                    self.env["file.manager.file"].create({
-                        "folder_id": folder.id,
-                        "name": file_name,
-                        "file_size": file_size,
-                        "mimetype": mimetype or "application/octet-stream",
-                    })
-
     @api.model
     def fetch_folder(self, parent, entry_name):
         folder = self.env["file.manager.folder"]
@@ -241,6 +224,23 @@ class FileManagerFolder(models.Model):
             folder.populate_files()
         return folder
     
+    def populate_files(self):
+        for folder in self:
+            folder.file_ids.unlink()
+            path = folder.parent_id.path if folder.parent_id else ""
+            folder_full_path = os.path.join(self.root_path, path, folder.name)
+            for file_name in os.listdir(folder_full_path):
+                file_full_path = os.path.join(folder_full_path, file_name)
+                if os.path.isfile(file_full_path):
+                    file_size = os.path.getsize(file_full_path)
+                    mimetype, _ = mimetypes.guess_type(file_full_path)
+                    self.env["file.manager.file"].create({
+                        "folder_id": folder.id,
+                        "name": file_name,
+                        "file_size": file_size,
+                        "mimetype": mimetype or "application/octet-stream",
+                    })
+
     def get_visible_folders(self, root_folders_ids, unfolded_ids):
         """ Get the folders that are visible in the sidebar with the given
         root folders and unfolded ids.
@@ -339,6 +339,18 @@ class FileManagerFolder(models.Model):
         action["res_id"] = folder.id
         return action
 
+    def unlink_nested(self):
+        self.file_ids.unlink()
+        for folder in self.child_ids:
+            folder.unlink_nested()
+            folder.unlink()
+
+    def action_refresh(self):
+        for folder in self.child_ids:
+            folder.unlink_nested()
+        self.children_fetched = False
+        self.populate_files()
+
     def _get_ancestor_ids(self):
         """ Return the union of sets including the ids for the ancestors of
         records in recordset. E.g.,
@@ -392,11 +404,6 @@ class FileManagerFolder(models.Model):
         to_kanban_sudo.file_mode_kanban = True
         to_unkanban.file_mode_kanban = False
         return self[0].file_mode_kanban if self else True
-
-    def web_read(self, specification: dict[str, dict]) -> list[dict]:
-        self.populate_files()
-        values_list = super().web_read(specification)
-        return values_list
 
     def web_save(self, vals, specification: dict[str, dict], next_id=None) -> list[dict]:
         if "file_ids" in vals:

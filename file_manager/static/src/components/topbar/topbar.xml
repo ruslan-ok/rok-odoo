@@ -36,12 +36,16 @@
                     </a>
                     <div class="o_knowledge_more_options_panel dropdown-menu" role="menu" aria-labelledby="dropdown_tools_panel">
                         <div>
-                            <button t-if="props.record.data.user_can_write and props.record.data.active and !props.record.data.is_article_item and isInternalUser"
+                            <button t-if="isInternalUser"
+                                class="dropdown-item btn-move" t-on-click="onRefreshFolderClick">
+                                <i class="me-2 fa fa-fw fa-lg fa-refresh"/> Refresh
+                            </button>
+                            <button t-if="isInternalUser"
                                 class="dropdown-item btn-move" t-on-click="onMoveFolderClick">
                                 <i class="me-2 fa fa-fw fa-lg fa-angle-double-right"/> Move To
                             </button>
                             <button class="dropdown-item" t-on-click="sendToTrash"
-                                t-if="props.record.data.user_can_write and props.record.data.active and isInternalUser">
+                                t-if="isInternalUser">
                                 <i class="me-2 fa fa-fw fa-lg fa-trash"/> Send to Trash
                             </button>
                             <div class="dropdown-divider" t-if="props.record.data.user_can_write and props.record.data.active"/>

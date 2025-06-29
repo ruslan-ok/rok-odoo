@@ -10,7 +10,7 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 
-class FileManagerFile(models.TransientModel):
+class FileManagerFile(models.Model):
     _name = "file.manager.file"
     _description = "Represent file in filesystem"
 
