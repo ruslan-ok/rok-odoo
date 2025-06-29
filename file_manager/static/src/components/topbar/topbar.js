@@ -9,6 +9,7 @@ import { _t } from "@web/core/l10n/translation";
 import { Component, onWillStart, useEffect, useRef, useState } from '@odoo/owl';
 import FileManagerHierarchy from '@file_manager/components/hierarchy/hierarchy';
 import MoveFolderDialog from '@file_manager/components/move_folder_dialog/move_folder_dialog';
+import { FileUploader } from "@web/views/fields/file_handler";
 
 class FileManagerTopbar extends Component {
     static template = "file_manager.FileManagerTopbar";
@@ -17,6 +18,7 @@ class FileManagerTopbar extends Component {
     };
     static components = {
         FileManagerHierarchy,
+        FileUploader,
     };
 
     setup() {
@@ -75,6 +77,16 @@ class FileManagerTopbar extends Component {
     async onMoveFolderClick() {
         await this.env._saveIfDirty();
         this.dialog.add(MoveFolderDialog, {fileManagerFolder: this.props.record});
+    }
+
+    async onFileUploaded(file) {
+        const att_data = {
+            name: file.name,
+            mimetype: file.type,
+            datas: file.data,
+            folder_id: this.props.record.resId,
+        };
+        await this.orm.create("file.manager.file", [att_data]);
     }
 }
 

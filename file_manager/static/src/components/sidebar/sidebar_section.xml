@@ -3,7 +3,7 @@
     <t t-name="file_manager.SidebarSection">
         <section t-attf-class="o_section #{sectionClass || ''}" t-att-data-section="dataSection">
             <div class="o_section_header d-flex h4 mb-0">
-                <!-- <div class="flex-grow-1 text-truncate" t-out="sectionName"/> -->
+                <div class="flex-grow-1 text-truncate" t-out="sectionName"/>
                 <!-- <t t-out="headerButtons"/> -->
             </div>
             <ul t-if="props.rootIds.length" class="o_tree">
@@ -26,7 +26,7 @@
 
     <t t-name="file_manager.SidebarPrivateSection">
         <t t-call="file_manager.SidebarSection">
-            <t t-set="sectionName">Private</t>
+            <t t-set="sectionName">All</t>
             <t t-set="sectionClass" t-value="'flex-fill'"/>
             <t t-set="dataSection" t-value="'private'"/>
             <t t-set="headerButtons">

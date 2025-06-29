@@ -2,7 +2,7 @@
 
   <menuitem
     id="file_manager_menu_root"
-    name="File Manager"
+    name="Files"
     web_icon="file_manager,static/description/icon.png"
     sequence="301"/>
 

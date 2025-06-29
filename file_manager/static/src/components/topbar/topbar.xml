@@ -11,7 +11,11 @@
                 </t>
             </div>
             <div class="d-flex gap-1 flex-md-nowrap mx-auto justify-content-end">
-                <a role="button" t-on-click="() => this.env.createArticle('private')" class="btn btn-primary btn-create text-nowrap" data-hotkey="n">Upload</a>
+                <FileUploader multiUpload="true" onUploaded.bind="onFileUploaded">
+                    <t t-set-slot="toggler">
+                        <button class="btn btn-primary" type="button">Upload</button>
+                    </t>
+                </FileUploader>
                 <a role="button" class="btn btn-light o_knowledge_toggle_favorite" t-on-click="env.toggleFavorite" t-if="props.record.resId" data-hotkey="t" t-att-title="props.record.data.is_user_favorite ? removeFavoriteLabel : addFavoriteLabel">
                     <i class="fa fa-fw fs-6 fa-star" t-if="props.record.data.is_user_favorite"/>
                     <i class="fa fa-fw fs-6 fa-star-o" t-if="!props.record.data.is_user_favorite"/>

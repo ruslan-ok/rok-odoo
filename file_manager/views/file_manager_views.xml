@@ -10,24 +10,25 @@
                 <field name="parent_id" class="d-none"/>
                 <field name="icon" invisible="1"/>
                 <field name="name" invisible="1"/>
+                <field name="is_user_favorite" invisible="1"/>
                 <field name="files_ids">
                     <kanban>
                         <field name="name"/>
-                        <field name="mime_type"/>
+                        <field name="mimetype"/>
                         <field name="file_size"/>
                         <templates>
                             <t t-name="card">
                                 <div class="oe_kanban_global_click">
                                     <strong><field name="name"/></strong>
                                     <div><field name="file_size"/> bytes</div>
-                                    <div><field name="mime_type"/></div>
+                                    <div><field name="mimetype"/></div>
                                 </div>
                             </t>
                         </templates>
                     </kanban>
                     <list>
                         <field name="name"/>
-                        <field name="mime_type"/>
+                        <field name="mimetype"/>
                         <field name="file_size"/>
                     </list>
                 </field>

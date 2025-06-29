@@ -44,8 +44,8 @@ class FileManagerFolder(models.Model):
     )
     user_favorite_sequence = fields.Integer(string="User Favorite Sequence", compute="_compute_is_user_favorite")
     favorite_ids = fields.One2many(
-        'file.manager.folder.favorite', 'folder_id',
-        string='Favorite Folders', copy=False)
+        "file.manager.folder.favorite", "folder_id",
+        string="Favorite Folders", copy=False)
     # Set default=0 to avoid false values and messed up order
     favorite_count = fields.Integer(
         string="#Is Favorite",
@@ -81,12 +81,12 @@ class FileManagerFolder(models.Model):
          "Folder with this path is already stored.")
     ]
 
-    @api.constrains('parent_id')
+    @api.constrains("parent_id")
     def _check_parent_id_recursion(self):
         if self._has_cycle():
             raise ValidationError(
-                _('Folders %s cannot be updated as this would create a recursive hierarchy.',
-                  ', '.join(self.mapped('name'))
+                _("Folders %s cannot be updated as this would create a recursive hierarchy.",
+                  ", ".join(self.mapped("name"))
                  )
             )
 
@@ -94,22 +94,22 @@ class FileManagerFolder(models.Model):
     # COMPUTED FIELDS
     # ------------------------------------------------------------
 
-    @api.depends('favorite_ids')
+    @api.depends("favorite_ids")
     def _compute_favorite_count(self):
-        favorites = self.env['file.manager.folder.favorite']._read_group(
-            [('folder_id', 'in', self.ids)], ['folder_id'], ['__count']
+        favorites = self.env["file.manager.folder.favorite"]._read_group(
+            [("folder_id", "in", self.ids)], ["folder_id"], ["__count"]
         )
         favorites_count_by_folder = {folder.id: count for folder, count in favorites}
         for folder in self:
             folder.favorite_count = favorites_count_by_folder.get(folder.id, 0)
 
-    @api.depends_context('uid')
-    @api.depends('favorite_ids.user_id')
+    @api.depends_context("uid")
+    @api.depends("favorite_ids.user_id")
     def _compute_is_user_favorite(self):
         if self.env.user._is_public():
             self.is_user_favorite = False
             return
-        favorites = self.env['file.manager.folder.favorite'].search([
+        favorites = self.env["file.manager.folder.favorite"].search([
             ("folder_id", "in", self.ids),
             ("user_id", "=", self.env.user.id),
         ])
@@ -125,18 +125,18 @@ class FileManagerFolder(models.Model):
             fav_folder.user_favorite_sequence = fav_sequence_by_folder[fav_folder.id]
 
     def _search_is_user_favorite(self, operator, value):
-        if operator not in ('=', '!='):
+        if operator not in ("=", "!="):
             raise NotImplementedError("Unsupported search operation on favorite folders")
 
-        if (value and operator == '=') or (not value and operator == '!='):
-            return [('favorite_ids', 'in', self.env['file.manager.folder.favorite'].sudo()._search(
-                [('user_id', '=', self.env.uid)]
+        if (value and operator == "=") or (not value and operator == "!="):
+            return [("favorite_ids", "in", self.env["file.manager.folder.favorite"].sudo()._search(
+                [("user_id", "=", self.env.uid)]
             ))]
 
         # easier than a not in on a 2many field (hint: use sudo because of
         # complicated ACL on favorite based on user access on folder)
-        return [('favorite_ids', 'not in', self.env['file.manager.folder.favorite'].sudo()._search(
-            [('user_id', '=', self.env.uid)]
+        return [("favorite_ids", "not in", self.env["file.manager.folder.favorite"].sudo()._search(
+            [("user_id", "=", self.env.uid)]
         ))]
 
     @api.depends("parent_id", "parent_id.root_folder_id")
@@ -206,6 +206,23 @@ class FileManagerFolder(models.Model):
         parent.children_fetched = True
         return result
 
+    def populate_files(self):
+        for folder in self:
+            folder.file_ids.unlink()
+            path = folder.parent_id.path if folder.parent_id else ""
+            folder_full_path = os.path.join(self.root_path, path, folder.name)
+            for file_name in os.listdir(folder_full_path):
+                file_full_path = os.path.join(folder_full_path, file_name)
+                if os.path.isfile(file_full_path):
+                    file_size = os.path.getsize(file_full_path)
+                    mimetype, _ = mimetypes.guess_type(file_full_path)
+                    self.env["file.manager.file"].create({
+                        "folder_id": folder.id,
+                        "name": file_name,
+                        "file_size": file_size,
+                        "mimetype": mimetype or "application/octet-stream",
+                    })
+
     @api.model
     def fetch_folder(self, parent, entry_name):
         folder = self.env["file.manager.folder"]
@@ -226,17 +243,7 @@ class FileManagerFolder(models.Model):
                 "children_fetched": False,
                 "last_check": fields.Datetime.now(),
             })
-            for file_name in os.listdir(entry_full_path):
-                file_full_path = os.path.join(entry_full_path, file_name)
-                if os.path.isfile(file_full_path):
-                    file_size = os.path.getsize(file_full_path)
-                    mime_type, _ = mimetypes.guess_type(file_full_path)
-                    self.env["file.manager.file"].create({
-                        "folder_id": folder.id,
-                        "name": file_name,
-                        "file_size": file_size,
-                        "mime_type": mime_type or "application/octet-stream",
-                    })
+            folder.populate_files()
         return folder
     
     def get_visible_folders(self, root_folders_ids, unfolded_ids):
@@ -304,8 +311,6 @@ class FileManagerFolder(models.Model):
                     "name",
                     "icon", 
                     "parent_id", 
-                    # "category", 
-                    # "is_locked", 
                     "is_user_favorite", 
                     "has_children",
                 ],
@@ -373,6 +378,20 @@ class FileManagerFolder(models.Model):
             ancestor_ids.difference_update(exclude_folder_ids)
         return self.sudo().browse(reversed(list(ancestor_ids))).read(["display_name"])
 
+    def action_toggle_favorite(self):
+        # need to sudo to be able to write on the folder model even with read access
+        to_favorite_sudo = self.sudo().filtered(lambda folder: not folder.is_user_favorite)
+        to_unfavorite = self - to_favorite_sudo
+        to_favorite_sudo.write({"favorite_ids": [(0, 0, {"user_id": self.env.user.id})]})
+        if to_unfavorite:
+            self.env["file.manager.folder.favorite"].sudo().search([
+                ("folder_id", "in", to_unfavorite.ids), ("user_id", "=", self.env.user.id)
+            ]).unlink()
+        # manually invalidate cache to recompute the favorites related fields
+        self.invalidate_recordset(fnames=["is_user_favorite", "favorite_ids"])
+        return self[0].is_user_favorite if self else False
+
     def web_read(self, specification: dict[str, dict]) -> list[dict]:
+        self.populate_files()
         values_list = super().web_read(specification)
         return values_list
