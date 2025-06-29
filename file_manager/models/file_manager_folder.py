@@ -6,6 +6,7 @@ from odoo import models, fields, _, api
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import OrderedSet
 
+
 class FileManagerFolder(models.Model):
     _name = "file.manager.folder"
     _description = "Represent folder in filesystem"

@@ -4,7 +4,7 @@
         <field name="name">file.manager.file.kanban</field>
         <field name="model">file.manager.file</field>
         <field name="arch" type="xml">
-            <kanban create="False">
+            <kanban create="false">
                 <field name="name"/>
                 <field name="mimetype"/>
                 <field name="file_size"/>
@@ -25,7 +25,8 @@
         <field name="name">file.manager.file.list</field>
         <field name="model">file.manager.file</field>
         <field name="arch" type="xml">
-            <list create="False">
+            <list create="false" multi_edit="1">
+                <field name="type" width="25px" widget="documents_type_icon" nolabel="1" optional="show"/>
                 <field name="name"/>
                 <field name="mimetype"/>
                 <field name="file_size"/>
