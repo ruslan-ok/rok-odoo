@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="file_manager_file_kanban_view" model="ir.ui.view">
+        <field name="name">file.manager.file.kanban</field>
+        <field name="model">file.manager.file</field>
+        <field name="arch" type="xml">
+            <kanban create="False">
+                <field name="name"/>
+                <field name="mimetype"/>
+                <field name="file_size"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div><field name="file_size"/> bytes</div>
+                            <div><field name="mimetype"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="file_manager_file_list_view" model="ir.ui.view">
+        <field name="name">file.manager.file.list</field>
+        <field name="model">file.manager.file</field>
+        <field name="arch" type="xml">
+            <list create="False">
+                <field name="name"/>
+                <field name="mimetype"/>
+                <field name="file_size"/>
+            </list>
+        </field>
+    </record>
+
     <record id="file_manager_view_form" model="ir.ui.view">
         <field name="name">file_manager.view.form</field>
         <field name="model">file.manager.folder</field>
@@ -11,27 +44,8 @@
                 <field name="icon" invisible="1"/>
                 <field name="name" invisible="1"/>
                 <field name="is_user_favorite" invisible="1"/>
-                <field name="files_ids">
-                    <kanban>
-                        <field name="name"/>
-                        <field name="mimetype"/>
-                        <field name="file_size"/>
-                        <templates>
-                            <t t-name="card">
-                                <div class="oe_kanban_global_click">
-                                    <strong><field name="name"/></strong>
-                                    <div><field name="file_size"/> bytes</div>
-                                    <div><field name="mimetype"/></div>
-                                </div>
-                            </t>
-                        </templates>
-                    </kanban>
-                    <list>
-                        <field name="name"/>
-                        <field name="mimetype"/>
-                        <field name="file_size"/>
-                    </list>
-                </field>
+                <field name="file_ids" mode="list" invisible="file_mode_kanban"/>
+                <field name="file_ids" mode="kanban" invisible="not file_mode_kanban"/>
             </form>
         </field>
     </record>

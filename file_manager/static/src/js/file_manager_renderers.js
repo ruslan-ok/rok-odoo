@@ -21,6 +21,7 @@ export class FileManagerFormRenderer extends FormRenderer {
         useChildSubEnv({
             config: this.env.config,
             toggleFavorite: this.toggleFavorite.bind(this),
+            toggleKanban: this.toggleKanban.bind(this),
             _saveIfDirty: this._saveIfDirty.bind(this),
         });
 
@@ -51,6 +52,11 @@ export class FileManagerFormRenderer extends FormRenderer {
         await this._saveIfDirty();
         await this.orm.call(this.props.record.resModel, "action_toggle_favorite", [[this.resId]]);
         // Load to have the correct value for 'is_user_favorite'.
+        await this.props.record.load();
+    }
+
+    async toggleKanban(event) {
+        await this.orm.call(this.props.record.resModel, "action_toggle_kanban", [[this.resId]]);
         await this.props.record.load();
     }
 

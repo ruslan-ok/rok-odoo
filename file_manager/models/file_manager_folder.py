@@ -26,15 +26,15 @@ class FileManagerFolder(models.Model):
         "file.manager.folder",
         "parent_id", 
         "Child Folders", 
-        copy=True, 
-        auto_join=True,
     )
     file_ids = fields.One2many(
         "file.manager.file", 
         "folder_id", 
         "Files",
-        copy=True, 
-        auto_join=True,
+    )
+    file_mode_kanban = fields.Boolean(
+        "Show files as kanban view",
+        default=True,
     )
     icon = fields.Char(string="Emoji")
     is_user_favorite = fields.Boolean(
@@ -56,11 +56,6 @@ class FileManagerFolder(models.Model):
     children_fetched = fields.Boolean(
         "Are the child folders fetched from OS?", 
         default=False,
-    )
-    files_ids = fields.One2many(
-        "file.manager.file", 
-        "folder_id", 
-        "Folder files",
     )
     # used to speed-up hierarchy operators such as child_of/parent_of
     # see "_parent_store" implementation in the ORM for details
@@ -391,7 +386,22 @@ class FileManagerFolder(models.Model):
         self.invalidate_recordset(fnames=["is_user_favorite", "favorite_ids"])
         return self[0].is_user_favorite if self else False
 
+    def action_toggle_kanban(self):
+        to_kanban_sudo = self.sudo().filtered(lambda folder: not folder.file_mode_kanban)
+        to_unkanban = self - to_kanban_sudo
+        to_kanban_sudo.file_mode_kanban = True
+        to_unkanban.file_mode_kanban = False
+        return self[0].file_mode_kanban if self else True
+
     def web_read(self, specification: dict[str, dict]) -> list[dict]:
         self.populate_files()
         values_list = super().web_read(specification)
         return values_list
+
+    def web_save(self, vals, specification: dict[str, dict], next_id=None) -> list[dict]:
+        if "file_ids" in vals:
+            files_to_unlink_ids = [file_tuple[1] for file_tuple in vals["file_ids"] if file_tuple[0] == 2]
+            files_to_unlink = self.env["file.manager.file"].browse(files_to_unlink_ids)
+            files_to_unlink.with_context(remove_file=True).unlink()
+        result = super().web_save(vals, specification, next_id)
+        return result

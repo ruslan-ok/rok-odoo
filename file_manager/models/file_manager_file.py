@@ -117,3 +117,12 @@ class FileManagerFile(models.TransientModel):
                     f.write(file_data)
     
         return super().create(vals_list)
+
+    def unlink(self):
+        if self.env.context.get("remove_file"):
+            root_path = self.env.user.file_manager_path
+            for file in self:
+                file_path = os.path.join(root_path, file.folder_id.path, file.name)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+        return super().unlink()

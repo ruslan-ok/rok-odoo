@@ -20,6 +20,12 @@
                     <i class="fa fa-fw fs-6 fa-star" t-if="props.record.data.is_user_favorite"/>
                     <i class="fa fa-fw fs-6 fa-star-o" t-if="!props.record.data.is_user_favorite"/>
                 </a>
+                <button class="btn btn-secondary o_switch_view o_list" data-tooltip="List" title="" t-on-click="env.toggleKanban" t-if="props.record.data.file_mode_kanban">
+                    <i class="oi oi-view-list" />
+                </button>
+                <button class="btn btn-secondary o_switch_view o_list" data-tooltip="Kanban" title="" t-on-click="env.toggleKanban" t-if="!props.record.data.file_mode_kanban">
+                    <i class="oi oi-view-kanban" />
+                </button>
                 <a t-ref="btn_comments" t-if="props.record.resId and displayCommentsPanelButton" role="button"
                     t-attf-class="btn btn-light btn-comments #{commentsState.displayMode === 'panel' ? 'active' : ''}" t-on-click="toggleComments">
                     <i class="fa fa-fw fs-6 fa-commenting" title="Open comments panel"/>
