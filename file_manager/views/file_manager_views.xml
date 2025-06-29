@@ -5,7 +5,9 @@
         <field name="model">file.manager.folder</field>
         <field name="arch" type="xml">
             <form js_class="file_manager_view_form">
-                <!-- <widget name="knowledge_topbar"/> -->
+                <widget name="file_manager_topbar"/>
+                <field name="id" invisible="1"/>
+                <field name="parent_id" class="d-none"/>
                 <field name="icon" invisible="1"/>
                 <field name="name" invisible="1"/>
                 <field name="files_ids">

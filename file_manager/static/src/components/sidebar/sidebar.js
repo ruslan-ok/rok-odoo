@@ -27,15 +27,11 @@ export const SORTABLE_TOLERANCE = 10;
  * to show and allow to reorder them. It updates the info of the current
  * folder each time the props are updated.
  * The folders are stored in the state and have the following shape:
- * - {string} category,
  * - {array} child_ids,
  * - {string} icon,
- * - {boolean} is_folder_item,
- * - {boolean} is_locked,
  * - {boolean} is_user_favorite,
  * - {string} name,
  * - {number} parent_id,
- * - {boolean} user_can_write,
  * - {boolean} has_children,
  */
 export class FileManagerSidebar extends Component {
@@ -112,21 +108,19 @@ export class FileManagerSidebar extends Component {
             onDrop: ({ element, next, parent }) => {
                 if (!parent) {
                     // Favorite resequence
-                    // const folderId = parseInt(element.dataset.folderId);
-                    // const beforeId = next ? parseInt(next.dataset.folderId) : false;
-                    // this.resequenceFavorites(folderId, beforeId);
+                    const folderId = parseInt(element.dataset.folderId);
+                    const beforeId = next ? parseInt(next.dataset.folderId) : false;
+                    this.resequenceFavorites(folderId, beforeId);
                 } else {
                     // Child of favorite resequence
                     const folder = this.getFolder(parseInt(element.dataset.folderId));
                     const parentId = parseInt(parent.dataset.folderId);
                     const currentPosition = {
-                        category: folder.category,
                         parentId: folder.parent_id,
                         beforeFolderId:
                             parseInt(element.nextElementSibling?.dataset.folderId) || false,
                     };
                     const newPosition = {
-                        category: folder.category,
                         parentId: parentId,
                         beforeFolderId: parseInt(next?.dataset.folderId) || false,
                     };
@@ -167,12 +161,10 @@ export class FileManagerSidebar extends Component {
                     return;
                 }
                 const currentPosition = {
-                    category: folder.category,
                     parentId: folder.parent_id,
                     beforeFolderId: parseInt(element.nextElementSibling?.dataset.folderId) || false,
                 };
                 const newPosition = {
-                    category: newGroup.dataset.section,
                     parentId: parentId,
                     beforeFolderId: parseInt(next?.dataset.folderId) || false,
                 };
@@ -208,13 +200,6 @@ export class FileManagerSidebar extends Component {
                     }
                     // Add caret
                     parent.classList.add('o_folder_has_children');
-                } else if (newGroup.dataset.section === "shared") {
-                    // Private folders cannot be dropped in the shared section
-                    const folder = this.getFolder(parseInt(element.dataset.folderId));
-                    if (folder.category === "private") {
-                        placeholder.classList.add('bg-danger');
-                        return;
-                    }
                 }
                 placeholder.classList.remove('bg-danger');
             },
@@ -237,27 +222,11 @@ export class FileManagerSidebar extends Component {
                 id: record.resId,
                 name: record.data.name,
                 icon: record.data.icon,
-                category: record.data.category,
                 parent_id: nextDataParentId,
-                is_locked: record.data.is_locked,
-                // user_can_write: record.data.user_can_write,
-                // is_folder_item: record.data.is_folder_item,
                 is_user_favorite: record.data.is_user_favorite,
                 child_ids: [],
             };
             if (this.state.folders[record.resId]) {
-                // if (record.data.is_folder_item !== folder.is_folder_item) {
-                //     if (record.data.is_folder_item) {
-                //         // Folder became item, remove it from the sidebar
-                //         this.removeFolder(folder);
-                //     } else {
-                //         // Item became folder, add it in the sidebar
-                //         this.insertFolder(folder, {
-                //             parentId: folder.parent_id
-                //         });
-                //         this.showFolder(folder);
-                //     }
-                // }
                 if (record.data.is_user_favorite !== folder.is_user_favorite) {
                     if (record.data.is_user_favorite) {
                         // Add the folder to the favorites tree
@@ -267,8 +236,8 @@ export class FileManagerSidebar extends Component {
                         this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(folder.id), 1);
                     }
                 }
-                if ((nextDataParentId !== folder.parent_id || record.data.category !== folder.category) &&
-                    (record.data.parent_id !== this.currentData.parent_id || record.data.category !== this.currentData.category)) {
+                if ((nextDataParentId !== folder.parent_id) &&
+                    (record.data.parent_id !== this.currentData.parent_id)) {
                     // Folder changed position ("Moved to")
                     if (!this.getFolder(nextDataParentId)) {
                         // Parent is not loaded, reload the tree to show moved
@@ -278,7 +247,6 @@ export class FileManagerSidebar extends Component {
                     } else {
                         this.repositionFolder(folder, {
                             parentId: nextDataParentId,
-                            category: record.data.category,
                         });
                     }
                 }
@@ -286,9 +254,6 @@ export class FileManagerSidebar extends Component {
                 Object.assign(folder, {
                     name: record.data.name,
                     icon: record.data.icon,
-                    is_locked: record.data.is_locked,
-                    // user_can_write: record.data.user_can_write,
-                    // is_folder_item: record.data.is_folder_item,
                     is_user_favorite: record.data.is_user_favorite,
                 });
             } else if (!this.state.loading) {  // New folder, add it in the state and sidebar
@@ -298,20 +263,7 @@ export class FileManagerSidebar extends Component {
                     this.state.favoriteIds.push(record.resId);
                 }
                 this.state.folders[folder.id] = folder;
-                // Don't add new items in the sidebar
-                // if (!record.data.is_folder_item) {
-                //     await this.insertFolder(folder, {
-                //         category: folder.category,
-                //         parentId: folder.parent_id,
-                //     });
-                //     // Make sure the folder is visible
-                //     this.showFolder(folder);
-                //     if (nextDataParentId && this.getFolder(nextDataParentId)?.is_user_favorite) {
-                //         this.unfold(nextDataParentId, true);
-                //     }
-                // }
                 await this.insertFolder(folder, {
-                    category: folder.category,
                     parentId: folder.parent_id,
                 });
                 // Make sure the folder is visible
@@ -323,7 +275,6 @@ export class FileManagerSidebar extends Component {
 
             this.currentData = {
                 parent_id: record.data.parent_id,
-                category: record.data.category,
             };
         });
         this.env.bus.addEventListener("file_manager.sidebar.insertNewFolder", async ({ detail }) => {
@@ -337,57 +288,14 @@ export class FileManagerSidebar extends Component {
                 name: detail.name,
                 icon: detail.icon,
                 parent_id: parent ? parent.id : false,
-                category: parent ? parent.category : false,
-                is_locked: false,
-                // user_can_write: true,
-                // is_folder_item: false,
                 is_user_favorite: false,
                 child_ids: [],
             };
             this.state.folders[newFolder.id] = newFolder;
             await this.insertFolder(newFolder, {
                 parentId: newFolder.parent_id,
-                category: parent ? parent.category : false
             });
         });
-    }
-
-    /**
-     * Open the templates dialog
-     */
-    browseTemplates() {
-        // this.dialog.add(FolderTemplatePickerDialog, {
-        //     onLoadTemplate: async folderTemplateId => {
-        //         await this.actionService.doAction("knowledge.ir_actions_server_knowledge_home_page", {
-        //             stackPosition: "replaceCurrentAction",
-        //             additionalContext: {
-        //                 res_id: await this.orm.call("knowledge.folder", "create_folder_from_template", [
-        //                     folderTemplateId
-        //                 ])
-        //             }
-        //         });
-        //     }
-        // });
-    }
-
-    /**
-     * Change the category of an folder, and of all its descendants.
-     * @param {Object} folder
-     * @param {String} category
-     */
-    async changeCategory(folder, category) {
-        folder.category = category;
-        if (folder.id === this.props.record.id) {
-            // Reload current record to propagate changes
-            if (await this.props.record.isDirty()) {
-                await this.props.record.save();
-            } else {
-                await this.props.record.model.load();
-            }
-        }
-        for (const childId of folder.child_ids) {
-            this.changeCategory(this.getFolder(childId), category);
-        }
     }
 
     /**
@@ -395,9 +303,14 @@ export class FileManagerSidebar extends Component {
      * @param {String} - category
      * @param {integer} - targetParentId
      */
-    createFolder(category, targetParentId) {
+    createFolder(
+        // category, 
+        targetParentId
+    ) {
         try {
-            this.env.createFolder(category, targetParentId);
+            this.env.createFolder(
+                targetParentId
+            );
         } catch {
             // Could not create folder, reload tree in case some permission changed
             this.loadFolders();
@@ -469,7 +382,7 @@ export class FileManagerSidebar extends Component {
             }
         } else {
             // Add folder in the list of folders of the new category, at the right position
-            const categoryIds = this.getCategoryIds(position.category);
+            const categoryIds = this.getCategoryIds('private');
             if (categoryIds) {
                 if (position.beforeFolderId) {
                     categoryIds.splice(categoryIds.indexOf(position.beforeFolderId), 0, folder.id);
@@ -544,15 +457,9 @@ export class FileManagerSidebar extends Component {
                     }
                 }
             } else {
-                this.getCategoryIds(folder.category).push(folder.id);
+                this.getCategoryIds('private').push(folder.id);
             }
             // }
-        }
-        const ancestorRootFolderId = res.active_folder_accessible_root_id;
-        if (ancestorRootFolderId) {
-            this.getCategoryIds(this.getFolder(ancestorRootFolderId).category).push(
-                ancestorRootFolderId
-            );
         }
         this.state.favoriteIds = res.favorite_ids;
         this.showFolder(this.getFolder(this.props.record.resId));
@@ -567,10 +474,8 @@ export class FileManagerSidebar extends Component {
     async loadChildren(folder) {
         const children = await this.orm.searchRead(
             this.props.record.resModel,
-            // [['parent_id', '=', folder.id], ['is_folder_item', '=', false]],
-            // ['name', 'icon', 'is_locked', 'user_can_write', 'has_children'],
             [['parent_id', '=', folder.id]],
-            ['name', 'icon', 'is_locked', 'has_children'],
+            ['name', 'icon', 'has_children'],
             {
                 'load': 'None',
                 'order': 'id',
@@ -586,8 +491,6 @@ export class FileManagerSidebar extends Component {
                 ...child,
                 parent_id: folder.id,
                 child_ids: [],
-                category: folder.category,
-                // is_folder_item: false,
                 is_user_favorite: false,
             };
         }
@@ -619,7 +522,6 @@ export class FileManagerSidebar extends Component {
                     'move_to',
                     [folder.id],
                     {
-                        category: position.category,
                         parent_id: position.parentId,
                         before_folder_id: position.beforeFolderId,
                     }
@@ -637,57 +539,58 @@ export class FileManagerSidebar extends Component {
         // Move the folder in the sidebar
         this.repositionFolder(folder, newPosition);
         // Permissions won't change, no need to ask for confirmation
-        if (currentPosition.category === newPosition.category) {
-            confirmMove(folder, newPosition);
-        } else {
-            // Show confirmation dialog, and move folder back to its original
-            // position if the user cancels the move 
-            const emoji = folder.icon || '';
-            const name = folder.name;
-            let message;
-            let confirmLabel;
-            if (newPosition.category === 'workspace') {
-                message = _t(
-                    'Are you sure you want to move "%(icon)s%(title)s" to the Workspace? It will be shared with all internal users.',
-                    { icon: emoji, title: name || _t("Untitled") }
-                );
-                confirmLabel = _t("Move to Workspace");
-            } else if (newPosition.category === 'private') {
-                message = _t(
-                    'Are you sure you want to move "%(icon)s%(title)s" to private? Only you will be able to access it.',
-                    { icon: emoji, title: name || _t("Untitled") }
-                );
-                confirmLabel = _t("Move to Private");
-            } else if (newPosition.category === 'shared') {
-                if (newPosition.parentId) {
-                    const parent = this.getFolder(newPosition.parentId);
-                    message = _t(
-                        'Are you sure you want to move "%(icon)s%(title)s" under "%(parentIcon)s%(parentTitle)s"? It will be shared with the same persons.',
-                        {
-                            icon: emoji,
-                            title: name || _t("Untitled"),
-                            parentIcon: parent.icon || "",
-                            parentTitle: parent.name || _t("Untitled"),
-                        }
-                    );
-                } else {
-                    message = _t(
-                        'Are you sure you want to move "%(icon)s%(title)s" to the Shared section? It will be shared with all listed members.',
-                        { icon: emoji, title: name || _t("Untitled") }
-                    );
-                }
-                confirmLabel = _t('Move to Shared')
-            }
-            this.dialog.add(ConfirmationDialog, {
-                body: message,
-                confirmLabel: confirmLabel,
-                confirm: () => confirmMove(folder, newPosition),
-                cancel: () => {
-                    // Move folder back to its position
-                    this.repositionFolder(folder, currentPosition);
-                },
-            });
-        } 
+        confirmMove(folder, newPosition);
+        // if (currentPosition.category === newPosition.category) {
+        //     confirmMove(folder, newPosition);
+        // } else {
+        //     // Show confirmation dialog, and move folder back to its original
+        //     // position if the user cancels the move 
+        //     const emoji = folder.icon || '';
+        //     const name = folder.name;
+        //     let message;
+        //     let confirmLabel;
+        //     if (newPosition.category === 'workspace') {
+        //         message = _t(
+        //             'Are you sure you want to move "%(icon)s%(title)s" to the Workspace? It will be shared with all internal users.',
+        //             { icon: emoji, title: name || _t("Untitled") }
+        //         );
+        //         confirmLabel = _t("Move to Workspace");
+        //     } else if (newPosition.category === 'private') {
+        //         message = _t(
+        //             'Are you sure you want to move "%(icon)s%(title)s" to private? Only you will be able to access it.',
+        //             { icon: emoji, title: name || _t("Untitled") }
+        //         );
+        //         confirmLabel = _t("Move to Private");
+        //     } else if (newPosition.category === 'shared') {
+        //         if (newPosition.parentId) {
+        //             const parent = this.getFolder(newPosition.parentId);
+        //             message = _t(
+        //                 'Are you sure you want to move "%(icon)s%(title)s" under "%(parentIcon)s%(parentTitle)s"? It will be shared with the same persons.',
+        //                 {
+        //                     icon: emoji,
+        //                     title: name || _t("Untitled"),
+        //                     parentIcon: parent.icon || "",
+        //                     parentTitle: parent.name || _t("Untitled"),
+        //                 }
+        //             );
+        //         } else {
+        //             message = _t(
+        //                 'Are you sure you want to move "%(icon)s%(title)s" to the Shared section? It will be shared with all listed members.',
+        //                 { icon: emoji, title: name || _t("Untitled") }
+        //             );
+        //         }
+        //         confirmLabel = _t('Move to Shared')
+        //     }
+        //     this.dialog.add(ConfirmationDialog, {
+        //         body: message,
+        //         confirmLabel: confirmLabel,
+        //         confirm: () => confirmMove(folder, newPosition),
+        //         cancel: () => {
+        //             // Move folder back to its position
+        //             this.repositionFolder(folder, currentPosition);
+        //         },
+        //     });
+        // } 
     }
 
     /**
@@ -788,7 +691,7 @@ export class FileManagerSidebar extends Component {
             }
         } else {
             // Remove folder from list of folders category
-            const categoryIds = this.getCategoryIds(folder.category);
+            const categoryIds = this.getCategoryIds('private');
             const folderIdx = categoryIds.indexOf(folder.id);
             if (folderIdx !== -1) {
                 categoryIds.splice(folderIdx, 1);
@@ -822,10 +725,6 @@ export class FileManagerSidebar extends Component {
         if (folder.parent_id !== position.parentId) {
             folder.parent_id = position.parentId;
         }
-        // Change category of folder and every descendant
-        if (folder.category !== position.category) {
-            this.changeCategory(folder, position.category);
-        }
         // Make sure the folder is visible
         this.showFolder(folder);
     }
@@ -836,17 +735,17 @@ export class FileManagerSidebar extends Component {
      * @param {integer} beforeId - Id of the favorite folder after
      *      which the folder is moved
      */
-    // resequenceFavorites(folderId, beforeId) {
-    //     this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(folderId), 1);
-    //     if (beforeId) {
-    //         this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(beforeId), 0, folderId);
-    //     } else {
-    //         this.state.favoriteIds.push(folderId);
-    //     }
-    //     this.orm.call("file_manager.folder.favorite", "resequence_favorites", [false], {
-    //         folder_ids: this.state.favoriteIds,
-    //     });
-    // }
+    resequenceFavorites(folderId, beforeId) {
+        this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(folderId), 1);
+        if (beforeId) {
+            this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(beforeId), 0, folderId);
+        } else {
+            this.state.favoriteIds.push(folderId);
+        }
+        this.orm.call("file.manager.folder.favorite", "resequence_favorites", [false], {
+            folder_ids: this.state.favoriteIds,
+        });
+    }
 
     /**
      * User could have unfolded ids in its local storage of folders that are

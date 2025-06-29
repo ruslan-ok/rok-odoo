@@ -81,7 +81,7 @@ export class FileManagerSidebarRow extends Component {
     }
 
     get isLocked() {
-        return this.props.folder.is_locked;
+        return false;
     }
 
     get isReadonly() {
@@ -93,7 +93,9 @@ export class FileManagerSidebarRow extends Component {
      * Create a new child folder for the row's folder.
      */
     createChild() {
-        this.env.createFolder(this.props.folder.category, this.props.folder.id);
+        this.env.createFolder(
+            this.props.folder.id
+        );
     }
 
     /**

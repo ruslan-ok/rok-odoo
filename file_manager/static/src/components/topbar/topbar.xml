@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="file_manager.FileManagerTopbar">
+        <div class="o_knowledge_header d-flex flex-wrap flex-md-nowrap border-bottom d-print-none bg-view px-0 py-2 px-sm-2">
+            <div class="d-flex flex-wrap flex-md-nowrap flex-grow-1 gap-1 px-2 px-sm-0 pt-2 pt-sm-0 align-items-center min-w-0">
+                <a role="button" class="d-md-none btn btn-light align-self-start px-2 py-1" t-on-click="() => this.env.toggleAsideMobile()">
+                    <i class="fa fa-lg fa-bars" title="Toggle aside menu"/>
+                </a>
+                <t t-if="props.record.resId">
+                    <FileManagerHierarchy record="props.record"/>
+                </t>
+            </div>
+            <div class="d-flex gap-1 flex-md-nowrap mx-auto justify-content-end">
+                <a role="button" t-on-click="() => this.env.createArticle('private')" class="btn btn-primary btn-create text-nowrap" data-hotkey="n">Upload</a>
+                <a role="button" class="btn btn-light o_knowledge_toggle_favorite" t-on-click="env.toggleFavorite" t-if="props.record.resId" data-hotkey="t" t-att-title="props.record.data.is_user_favorite ? removeFavoriteLabel : addFavoriteLabel">
+                    <i class="fa fa-fw fs-6 fa-star" t-if="props.record.data.is_user_favorite"/>
+                    <i class="fa fa-fw fs-6 fa-star-o" t-if="!props.record.data.is_user_favorite"/>
+                </a>
+                <a t-ref="btn_comments" t-if="props.record.resId and displayCommentsPanelButton" role="button"
+                    t-attf-class="btn btn-light btn-comments #{commentsState.displayMode === 'panel' ? 'active' : ''}" t-on-click="toggleComments">
+                    <i class="fa fa-fw fs-6 fa-commenting" title="Open comments panel"/>
+                </a>
+                <div class="o-dropdown dropdown" t-if="props.record.resId">
+                    <a role="button" class="btn btn-light dropdown-toggle o-no-caret" data-bs-toggle="dropdown" id="dropdown_tools_panel" aria-haspopup="true" aria-expanded="false" data-hotkey="p" title="More actions" t-ref="optionsBtn">
+                        <i class="fa fa-fw fs-6 fa-ellipsis-v"/>
+                    </a>
+                    <div class="o_knowledge_more_options_panel dropdown-menu" role="menu" aria-labelledby="dropdown_tools_panel">
+                        <div>
+                            <button t-if="props.record.data.user_can_write and props.record.data.active and !props.record.data.is_article_item and isInternalUser"
+                                class="dropdown-item btn-move" t-on-click="onMoveFolderClick">
+                                <i class="me-2 fa fa-fw fa-lg fa-angle-double-right"/> Move To
+                            </button>
+                            <button class="dropdown-item" t-on-click="sendToTrash"
+                                t-if="props.record.data.user_can_write and props.record.data.active and isInternalUser">
+                                <i class="me-2 fa fa-fw fa-lg fa-trash"/> Send to Trash
+                            </button>
+                            <div class="dropdown-divider" t-if="props.record.data.user_can_write and props.record.data.active"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

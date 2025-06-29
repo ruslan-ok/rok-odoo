@@ -129,8 +129,7 @@ export class FileManagerFormController extends FormController {
     ensureFolderName() {
         const recordData = this.model.root.data;
         if (
-            !recordData.name &&
-            !(recordData.is_locked || !recordData.active)
+            !recordData.name && recordData.active
         ) {
             return this.renameFolder();
         }
@@ -145,13 +144,12 @@ export class FileManagerFormController extends FormController {
      * @param {String} category - Category of the new folder
      * @param {integer} targetParentId - Id of the parent of the new folder (optional)
      */
-    async createFolder(category, targetParentId) {
+    async createFolder(targetParentId) {
         const folderId = await this.orm.call(
-            "file_manager.folder",
+            "file.manager.folder",
             "folder_create",
             [],
             {
-                is_private: category === 'private',
                 parent_id: targetParentId ? targetParentId : false
             }
         );

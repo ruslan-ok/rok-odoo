@@ -16,7 +16,7 @@
         .o_form_status_indicator_buttons.invisible {
             width: 0;
         }
-        .o_hierarchy_article_name input {
+        .o_hierarchy_folder_name input {
             &:hover, &:focus {
                 border-bottom: $input-border-width solid $o-brand-primary !important;
                 border-top: $input-border-width solid transparent !important;  // keeps input centered
@@ -296,8 +296,8 @@
     }
 }
 
-.o_knowledge_select_menu,
-.o_knowledge_select_menu_dropdown {
+.o_file_manager_select_menu,
+.o_file_manager_select_menu_dropdown {
     img {
         width: 20px;
         height: 20px;

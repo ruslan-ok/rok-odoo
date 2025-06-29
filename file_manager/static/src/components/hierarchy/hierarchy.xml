@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="file_manager.FileManagerHierarchy">
+        <FileManagerBreadcrumbs record="props.record"/>
+        <!-- Root Folder -->
+        <div t-if="rootId !== props.record.resId" class="o_hierarchy_item d-flex min-w-0 align-items-center"> 
+            <a role="button" class="btn btn-light border-0 px-2 text-truncate me-1"
+                t-on-click="() => this.env.openFolder(this.rootId)"
+                t-out="rootName"
+                t-att-title="rootName"
+                />
+            <i class="fa fa-caret-right"/>
+        </div>
+        <!-- Dropdown with all folders between the root and the direct parent -->
+        <div t-if="displayDropdownToggle" class="o_hierarchy_item d-flex w-auto align-items-center">
+            <Dropdown beforeOpen.bind="onBeforeOpen">
+                <a type="button" class="btn btn-light border-0 px-2 me-1">
+                    ...
+                </a>
+                <t t-set-slot="content">
+                    <i t-if="state.isLoadingFolderHierarchy" class="fa fa-spin fa-circle-o-notch mx-auto"/>
+                    <t t-else="">
+                        <t t-foreach="folderHierarchy" t-as="folder" t-key="folder.id">
+                            <DropdownItem onSelected="() => this.env.openFolder(folder.id)">
+                                <span t-out="folder.display_name"
+                                    t-att-title="folder.display_name"/>
+                            </DropdownItem>
+                        </t>
+                    </t>
+                </t>
+            </Dropdown>
+            <i class="fa fa-caret-right"/>
+        </div>
+        <!-- Parent Folder -->
+        <div t-if="parentId and parentId !== rootId" class="o_hierarchy_item d-flex min-w-0 align-items-center">
+            <a role="button" class="btn btn-light border-0 px-2 text-truncate me-1"
+                t-on-click="() => this.env.openFolder(this.parentId)"
+                t-out="parentName"
+                t-att-title="parentName"/>
+            <i class="fa fa-caret-right"/>
+        </div>
+        <!-- Current Folder -->
+        <div class="o_hierarchy_item d-flex min-w-0 align-items-center ms-2">
+            <FileManagerIcon record="props.record" fallbackDefaultIcon="true" iconClasses="'me-1'" readonly="isReadonly"/>
+            <div t-if="isReadonly" class="text-truncate me-1 fw-bold">
+                <t t-if="this.props.record.data.name" t-out="this.props.record.data.name" />
+                <t t-else="">Untitled</t>
+            </div>
+            <div t-else="" class="o_hierarchy_folder_name position-relative text-truncate" t-on-click="env.ensureFolderName">
+                <input class="o_input position-absolute top-50 start-50 translate-middle fw-bold text-truncate text-700 border-0"
+                    t-model="state.folderName"
+                    t-on-change="ev => this.env.renameFolder(ev.target.value)"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Untitled"/>
+                <!-- span forces the input to match the length of its value -->
+                <span class="d-inline-block pe-1 fw-bold text-truncate invisible">
+                    <t t-if="state.folderName" t-out="state.folderName"/>
+                    <t t-else="">Untitled</t>
+                </span>
+            </div>
+        </div>
+    </t>
+</templates>

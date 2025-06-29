@@ -48,6 +48,6 @@ export class FileManagerSidebarPrivateSection extends FileManagerSidebarSection 
     static template = "file_manager.SidebarPrivateSection";
 
     createRoot() {
-        this.env.createFolder("private");
+        this.env.createFolder();
     }
 }

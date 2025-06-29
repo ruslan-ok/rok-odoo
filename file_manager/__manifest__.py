@@ -1,7 +1,10 @@
 {
     "name": "File Manager",
     "version": "1.0",
-    "depends": ["base"],
+    "depends": [
+        "base",
+        "mail",
+    ],
     "category": "Productivity",
     "author": "Ruslan Akunevich",
     "website": "https://github.com/ruslan-ok/rok-odoo",
@@ -18,7 +21,6 @@ Managing files on the server
 
     "summary": "Managing files on the server",
     "sequence": 48,
-    "category": "Productivity",
     "application": True,
     "license": "LGPL-3",
     "assets": {

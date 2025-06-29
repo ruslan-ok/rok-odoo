@@ -19,7 +19,6 @@ export class FileManagerFormRenderer extends FormRenderer {
         this.root = useRef('compiled_view_root');
 
         useChildSubEnv({
-            // openCoverSelector: this.openCoverSelector.bind(this),
             config: this.env.config,
             toggleFavorite: this.toggleFavorite.bind(this),
             _saveIfDirty: this._saveIfDirty.bind(this),
@@ -27,7 +26,7 @@ export class FileManagerFormRenderer extends FormRenderer {
 
         useExternalListener(document, "click", event => {
             if (event.target.classList.contains("o_nocontent_create_btn")) {
-                this.env.createFolder("private");
+                this.env.createFolder();
             }
         });
     }

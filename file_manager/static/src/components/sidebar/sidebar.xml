@@ -40,11 +40,6 @@
                 <FileManagerSidebarPrivateSection rootIds="state.privateIds" unfoldedIds="unfoldedFoldersIds" record="props.record"/>
                 <!-- Trash is a "o_section" so that one can drop folders in the trash -->
                 <div t-if="isInternalUser" class="o_section o_knowledge_sidebar_trash w-100 py-2 position-sticky bg-view mt-auto">
-                    <a t-if="!state.dragging" href="#" role="button" t-on-click="browseTemplates"
-                        class="o_knowledge_load_template_btn btn btn-light d-block fw-normal text-black text-start text-truncate">
-                        <i class="fa fa-fw fs-6 fa-paint-brush me-1"/>
-                        <span>Browse Templates</span>
-                    </a>
                     <div role="button" class="btn btn-light d-block fw-normal text-black text-start text-truncate"
                         t-on-click="() => actionService.doAction('file_manager.file_manager_action_trashed')">
                         <i class="fa fa-fw fa-trash me-1"/>
