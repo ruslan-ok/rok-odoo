@@ -1,4 +1,4 @@
-sfrom werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest
 from odoo import fields, http, _
 from odoo.exceptions import MissingError
 from odoo.http import request
