@@ -34,6 +34,7 @@ Managing files on the server
             "file_manager/static/src/scss/file_manager_common.scss",
             "file_manager/static/src/scss/file_manager_views.scss",
             "file_manager/static/src/scss/file_manager_editor.scss",
+            "file_manager/static/src/scss/file_manager_kanban_view.scss",
         ],
         "web.assets_backend_lazy_dark": [
             "file_manager/static/src/scss/file_manager_views.dark.scss",

@@ -344,7 +344,7 @@ class FileManagerFolder(models.Model):
         self.file_ids.unlink()
         for folder in self.child_ids:
             folder.unlink_nested()
-            folder.unlink()
+        self.unlink()
 
     def action_refresh(self):
         for folder in self.child_ids:

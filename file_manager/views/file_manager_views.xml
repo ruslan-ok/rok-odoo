@@ -7,13 +7,46 @@
             <kanban create="false">
                 <field name="name"/>
                 <field name="mimetype"/>
+                <field name="type"/>
                 <field name="file_size"/>
+                <field name="thumbnail_status"/>
+                <field name="checksum"/>
+                <field name="access_token"/>
+                <field name="activity_ids"/>
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_global_click">
-                            <strong><field name="name"/></strong>
-                            <div><field name="file_size"/> bytes</div>
-                            <div><field name="mimetype"/></div>
+                        <div draggable="true" class="o_documents_pre_18_1 d-flex flex-column o_kanban_attachment o_documents_attachment h-100 pb-2" t-att-data-id="record.id.raw_value">
+                            <div t-if="record.type.raw_value != 'folder'">
+                                <t t-set="hasStoredThumbnail" t-value="record.thumbnail_status and record.thumbnail_status.raw_value === 'present'"/>
+                                <div name="document_preview" class="o_kanban_image_wrapper d-flex justify-content-center position-relative">
+                                    <t t-if="hasStoredThumbnail">
+                                        <t t-set="unique" t-value="record.checksum.value ? record.checksum.value.slice(-8) : ''"/>
+                                        <img t-attf-src="/file_manager/thumbnail/#{window.encodeURIComponent(record.access_token.raw_value)}?unique=#{unique}" alt="Document preview"/>
+                                    </t>
+                                    <div t-else="!hasStoredThumbnail" class="o_image o_image_thumbnail" t-att-data-mimetype="mimetype"/>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-1 flex-auto">
+                                <div t-if="record.type.raw_value == 'folder'" class="d-flex align-items-center text-truncate p-2 pb-0">
+                                    <i class="fa fa-folder-o me-2" title="This is a folder"/>
+                                    <field name="name" class="text-truncate me-1" required="True" string="Document"/>
+                                </div>
+                                <div t-else="" class="p-2 pb-0">
+                                    <div t-att-title="record.name.raw_value" class="fw-bolder w-100 d-flex align-items-center">
+                                        <div class="d-flex flex-grow-1 align-items-center gap-2 overflow-hidden">
+                                            <field name="name" class="text-truncate" required="True" string="Document"/>
+                                        </div>
+                                        <div class="d-flex d-flex-row align-items-center ms-2 gap-2">
+                                            <field name="activity_ids" widget="documents_kanban_activity"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div t-if="record.type.raw_value == 'folder' and inFolder"
+                                    class="px-2 fw-light text-nowrap overflow-hidden text-overflow-ellipsis" >
+                                    <i t-if="record.type.raw_value === 'folder'" class="fa fa-folder-o me-2 invisible"/>
+                                    <span class="o_documents_in_folder">In <span t-out="inFolder"/></span>
+                                </div>
+                            </div>
                         </div>
                     </t>
                 </templates>
