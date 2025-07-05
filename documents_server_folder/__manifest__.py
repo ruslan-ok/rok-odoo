@@ -1,0 +1,26 @@
+{
+    "name": "Server Folder for Documents",
+    "version": "1.0",
+    "depends": [
+        "documents",
+    ],
+    "category": "Productivity/Documents",
+    "author": "Ruslan Akunevich",
+    "website": "https://github.com/ruslan-ok/rok-odoo",
+    "description": """
+Manage document files on the server, but not as attachments.
+""",
+    "data": [
+        "views/res_users_views.xml",
+        "views/documents_document_views.xml",
+    ],
+    "summary": "Manage document files on the server, but not as attachments.",
+    "sequence": 48,
+    "application": True,
+    "license": "LGPL-3",
+    "assets": {
+        'web.assets_backend': [
+            # 'documents_server_folder/static/src/views/**/*',
+        ],
+    },
+}

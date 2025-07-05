@@ -1,0 +1,14 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="documents_server_folder_view_activity" model="ir.ui.view">
+        <field name="name">documents.server.folder.document activity</field>
+        <field name="model">documents.document</field>
+        <field name="inherit_id" ref="documents.documents_view_activity"/>
+        <field name="mode">extension</field>
+        <field name="arch" type="xml">
+            <xpath expr="//activity" position="attributes">
+                <attribute name="js_class">documents_server_folder_activity</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo> -->
