@@ -1,17 +1,10 @@
 /** @odoo-module **/
 
+import { patch } from "@web/core/utils/patch";
 import { DocumentsSearchModel } from "@documents/views/search/documents_search_model";
 import { browser } from "@web/core/browser/browser";
 
-
-export class DocumentsServerFolderSearchModel extends DocumentsSearchModel {
-    setup(services) {
-        super.setup(services);
-    }
-
-    /**
-     * @override
-     */
+patch(DocumentsSearchModel.prototype, {
     _ensureCategoryValue(category, valueIds) {
         if (
             valueIds.includes(category.activeValueId) &&
@@ -54,5 +47,5 @@ export class DocumentsServerFolderSearchModel extends DocumentsSearchModel {
             // or root folder for portal users
             category.activeValueId = this.documentService.userIsInternal ? false : valueIds[0];
         }
-    }
-}
+    },
+});
