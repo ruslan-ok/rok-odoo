@@ -7,7 +7,7 @@ from odoo.osv import expression
 class Document(models.Model):
     _inherit = "documents.document"
 
-    type = fields.Selection(selection_add=[("server_folder", "Server Folder"), ("server_file", "Server File")], ondelete={"server_folder": "set default", "server_file": "set default"})
+    located_on_the_server = fields.Boolean("This object (folder or file) is located on the Server", default=False)
     has_children = fields.Boolean("Does it have child folders?", default=False)
     fetch_dt = fields.Datetime()
 
@@ -17,8 +17,9 @@ class Document(models.Model):
 
         if field_name == "folder_id" and not self.env.user.share:
             root_folder = self.env["documents.document"].search([
-                ("type", "=", "server_folder"),
+                ("type", "=", "folder"),
                 ("folder_id", "=", False),
+                ("located_on_the_server", "=", True),
                 ("name", "=", "SERVER_FOLDER"),
                 ("owner_id", "=", self.env.user.id),
                 ])
@@ -31,7 +32,11 @@ class Document(models.Model):
                 "is_favorited", "is_pinned_folder", "owner_id", "shortcut_document_id",
                 "user_permission", "active", "alias_name", "alias_domain_id", "alias_tag_ids", "partner_id",
                 "create_activity_type_id", "create_activity_user_id"]
-            domain = [("type", "=", "server_folder"), ("id", "!=", root_folder.id)]
+            domain = [
+                ("type", "=", "folder"),
+                ("located_on_the_server", "=", True),
+                ("id", "!=", root_folder.id),
+            ]
 
             if unique_folder_id := self.env.context.get("documents_unique_folder_id"):
                 values = self.env["documents.document"].search_read(
@@ -121,7 +126,8 @@ class Document(models.Model):
     @api.model
     def create_folder(self, folder_id, folder_name):
         return self.env["documents.document"].create({
-            "type": "server_folder",
+            "type": "folder",
+            "located_on_the_server": True,
             "folder_id": folder_id,
             "name": folder_name,
             "owner_id": self.env.user.id,
@@ -134,7 +140,8 @@ class Document(models.Model):
         file_size = os.path.getsize(file_full_path)
         mimetype, _ = mimetypes.guess_type(file_full_path)
         return self.env["documents.document"].create({
-            "type": "server_file",
+            "type": "binary",
+            "located_on_the_server": True,
             "folder_id": folder_id,
             "name": file_name,
             "owner_id": self.env.user.id,
@@ -144,7 +151,7 @@ class Document(models.Model):
 
     def populate_folder(self, folder_path, force=False):
         self.ensure_one()
-        if self.type != "server_folder":
+        if self.type != "folder" or not self.located_on_the_server:
             return
         if not self.root_path:
             return
@@ -170,12 +177,12 @@ class Document(models.Model):
                 doc = self.env["documents.document"].search([("name", "=", folder_id)])
             elif isinstance(folder_id, int):
                 doc = self.env["documents.document"].search([("id", "=", folder_id)])
-            if doc.type == "server_folder":
+            if doc.type == "folder" and doc.located_on_the_server:
                 folder_path = doc.get_path()
                 doc.populate_folder(folder_path)
         if (len(domain) == 3 and len(domain[0]) == 1 and domain[0] == "&" and len(domain[1]) == 3 and domain[1][0] == "folder_id" and
             domain[1][1] == "=" and len(domain[2]) == 3 and domain[2][0] == "owner_id" and domain[2][1] == "="):
-            filter = ["type", "not in", ["server_folder", "server_file"]]
+            filter = ["located_on_the_server", "=", False]
             domain.append(filter)
         records = super().web_search_read(domain, specification, offset, limit, order, count_limit)
         return records
