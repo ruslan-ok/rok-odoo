@@ -17,11 +17,11 @@ patch(DocumentsSearchModel.prototype, {
         // from localStorage
         const storageItem = browser.localStorage.getItem("searchpanel_documents_document");
         category.activeValueId =
-            storageItem && !["COMPANY", "MY", "MY_FOLDER", "RECENT", "SHARED", "TRASH"].includes(storageItem)
+            storageItem && !["COMPANY", "MY", "SERVER_FOLDER", "RECENT", "SHARED", "TRASH"].includes(storageItem)
                 ? JSON.parse(storageItem)
                 : storageItem;
         if (
-            ["COMPANY", "MY", "MY_FOLDER", "RECENT", "SHARED", "TRASH"].includes(category.activeValueId)
+            ["COMPANY", "MY", "SERVER_FOLDER", "RECENT", "SHARED", "TRASH"].includes(category.activeValueId)
             || (valueIds.includes(category.activeValueId)
                 && this._isCategoryValueReachable(category, category.activeValueId))
         ) {
