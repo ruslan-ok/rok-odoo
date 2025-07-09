@@ -270,6 +270,8 @@ class Document(models.Model):
     def create(self, vals_list):
         folder_id = self.env.context.get("default_folder_id")
         folder = self.env["documents.document"].browse(folder_id)
+        if folder.located_on_the_server:
+            self = self.with_context(default_located_on_the_server=True)
         documents = super().create(vals_list)
         if folder.located_on_the_server:
             for vals in vals_list:
@@ -280,3 +282,12 @@ class Document(models.Model):
                     if not os.path.exists(path):
                         os.makedirs(path)
         return documents
+
+    def write(self, vals):
+        name = vals.get("name")
+        if name and self.located_on_the_server:
+            old_path = self.get_full_path()
+            folder_path = os.path.dirname(old_path)
+            new_path = os.path.join(folder_path, name)
+            os.rename(old_path, new_path)
+        return super().write(vals)
