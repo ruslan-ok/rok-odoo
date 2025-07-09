@@ -251,3 +251,11 @@ class Document(models.Model):
             doc = self.env["documents.document"].browse(int(folder_id))
             names.append(doc.name)
         return "/".join(names)
+
+    def get_full_path(self):
+        self.ensure_one()
+        if not self.located_on_the_server or self.type == "folder":
+            return None
+        path = self.get_path()
+        full_path = os.path.join(self.root_path, path)
+        return full_path
