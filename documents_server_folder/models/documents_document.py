@@ -1,4 +1,5 @@
 import os
+import shutil
 import mimetypes
 from collections import OrderedDict
 from odoo import models, api, _, fields
@@ -262,7 +263,7 @@ class Document(models.Model):
         if not is_abs:
             raise FileNotFoundError("File not found: " + full_path)
         full_path = os.path.normpath(os.path.normcase(full_path))
-        if not os.path.exists(full_path):
+        if not os.path.exists(full_path) and self.active:
             raise FileNotFoundError("File not found: " + full_path)
         return full_path
 
@@ -291,3 +292,19 @@ class Document(models.Model):
             new_path = os.path.join(folder_path, name)
             os.rename(old_path, new_path)
         return super().write(vals)
+
+    def toggle_active(self):
+        server_items = self.filtered("located_on_the_server")
+        active_items = server_items.filtered(self._active_name)
+        for item in active_items:
+            path = item.get_full_path()
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
+        inactive_items = self - active_items
+        folders_to_restore = inactive_items.filtered(lambda x: x.type == "folder")
+        for folder in folders_to_restore:
+            path = folder.get_full_path()
+            os.makedirs(path)
+        super().toggle_active()
