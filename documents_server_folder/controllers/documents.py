@@ -109,19 +109,10 @@ class DsfShareRoute(ShareRoute):
         """
         if document_sudo.type == 'binary':
             path = document_sudo.get_full_path()
-            is_abs = os.path.isabs(path)
-            if not is_abs:
-                raise FileNotFoundError("File not found: " + path)
-            path = os.path.normpath(os.path.normcase(path))
-            if not os.path.exists(path):
-                raise FileNotFoundError("File not found: " + path)
             with open(path, 'wb') as f:
                 f.write(vals['file'].read())
         else:
             folder_path = document_sudo.get_full_path()
-            is_abs = os.path.isabs(folder_path)
-            if not is_abs:
-                raise FileNotFoundError("File not found: " + folder_path)
             file_name = vals['file'].filename
             path = os.path.join(folder_path, file_name)
             path = os.path.normpath(os.path.normcase(path))

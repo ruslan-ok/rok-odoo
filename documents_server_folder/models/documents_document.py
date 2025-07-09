@@ -258,4 +258,25 @@ class Document(models.Model):
             return None
         path = self.get_path()
         full_path = os.path.join(self.root_path, path)
+        is_abs = os.path.isabs(full_path)
+        if not is_abs:
+            raise FileNotFoundError("File not found: " + full_path)
+        full_path = os.path.normpath(os.path.normcase(full_path))
+        if not os.path.exists(full_path):
+            raise FileNotFoundError("File not found: " + full_path)
         return full_path
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        folder_id = self.env.context.get("default_folder_id")
+        folder = self.env["documents.document"].browse(folder_id)
+        documents = super().create(vals_list)
+        if folder.located_on_the_server:
+            for vals in vals_list:
+                if vals["type"] == "folder":
+                    folder_name = vals["name"]
+                    folder_path = folder.get_full_path()
+                    path = os.path.join(folder_path, folder_name)
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+        return documents
