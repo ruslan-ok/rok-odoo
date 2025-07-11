@@ -143,7 +143,7 @@ class Document(models.Model):
                             "display_name": _("Server Folder"),
                             "id": "SERVER_FOLDER",
                             "user_permission": "edit",
-                            "description": _("Your individual space."),
+                            "description": _("Your individual server space."),
                         }, {
                             "display_name": _("Shared with me"),
                             "id": "SHARED",
