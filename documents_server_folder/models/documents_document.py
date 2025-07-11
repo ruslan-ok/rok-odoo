@@ -88,6 +88,8 @@ class Document(models.Model):
                     ("name", "=", "SERVER_FOLDER"),
                 ]
             )
+            if not server_folder:
+                server_folder = self.create_folder(False, "SERVER_FOLDER")
             for record in records:
                 record_id = record["id"]
                 if not self.env.user.share:
