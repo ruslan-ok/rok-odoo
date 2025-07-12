@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Google Contact Connector",
-    'version': '16.0.1.0.0',
+    'version': '18.0.1.0.0',
     "category": "Extra Tools",
     'summary': """Synchronize Google Contacts (Import/Export).""",
     'description': """The Google Contact Connector module helps you import
