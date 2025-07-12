@@ -1,6 +1,0 @@
-<t t-name="rok_filestore.FilestoreApp" owl="1">
-  <div class="o_container d-flex" style="height: 100%">
-    <FolderTreeContainer selectedPath="state.selectedPath" onSelect="onSelectFolder"/>
-    <FileGallery files="state.files" selectedPath="state.selectedPath" onSelect="onSelectFile"/>
-  </div>
-</t>
