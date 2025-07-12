@@ -20,6 +20,7 @@ Manage document files on the server, but not as attachments.
     "assets": {
         "web.assets_backend": [
             "documents_server_folder/static/src/views/search/documents_search_model.js",
+            "documents_server_folder/static/src/views/search/documents_search_panel.js",
         ],
     },
 }
