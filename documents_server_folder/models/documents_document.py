@@ -211,16 +211,19 @@ class Document(models.Model):
             "mimetype": mimetype or "application/octet-stream",
         })
 
-    def populate_folder(self, folder_path, force=False):
+    def populate_folder(self):
         self.ensure_one()
         if self.type != "folder" or not self.located_on_the_server:
             return
         if not self.root_path:
             return
-        if not force and (not self.has_children or (self.fetch_dt and (fields.Datetime.now() - self.fetch_dt).days <= 5)):
+        if self.name == "SERVER_FOLDER":
+            self.has_children = self.check_has_children()
+        if not self.has_children or self.fetch_dt:
             return
         children = self.env["documents.document"].with_context(active_test=False).search([("id", "child_of", self.id)])
         (children - self).unlink()
+        folder_path = self.get_path()
         folder_full_path = os.path.join(self.root_path, folder_path)
         if os.path.isdir(folder_full_path):
             for child in os.listdir(folder_full_path):
@@ -240,8 +243,7 @@ class Document(models.Model):
             elif isinstance(folder_id, int):
                 doc = self.env["documents.document"].search([("id", "=", folder_id)])
             if doc.type == "folder" and doc.located_on_the_server:
-                folder_path = doc.get_path()
-                doc.populate_folder(folder_path)
+                doc.populate_folder()
         if (len(domain) == 3 and len(domain[0]) == 1 and domain[0] == "&" and len(domain[1]) == 3 and domain[1][0] == "folder_id" and
             domain[1][1] == "=" and len(domain[2]) == 3 and domain[2][0] == "owner_id" and domain[2][1] == "="):
             filter = ["located_on_the_server", "=", False]
