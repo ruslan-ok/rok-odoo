@@ -36,7 +36,11 @@ class Document(models.Model):
             if not self.env.user.share:
                 search_panel_fields += ["alias_name", "alias_domain_id", "alias_tag_ids", "partner_id",
                                         "create_activity_type_id", "create_activity_user_id", "located_on_the_server"]
-            domain = [("type", "=", "folder")]
+            domain = [
+                ("type", "=", "folder"),
+                '|',
+                ('located_on_the_server', '=', False),
+                ('owner_id', '=', self.env.user.id)]
 
             if unique_folder_id := self.env.context.get("documents_unique_folder_id"):
                 values = self.env["documents.document"].search_read(
@@ -244,6 +248,7 @@ class Document(models.Model):
                 doc = self.env["documents.document"].search([("id", "=", folder_id)])
             if doc.type == "folder" and doc.located_on_the_server:
                 doc.populate_folder()
+                domain += [('owner_id', '=', self.env.user.id)]
         if (len(domain) == 3 and len(domain[0]) == 1 and domain[0] == "&" and len(domain[1]) == 3 and domain[1][0] == "folder_id" and
             domain[1][1] == "=" and len(domain[2]) == 3 and domain[2][0] == "owner_id" and domain[2][1] == "="):
             filter = ["located_on_the_server", "=", False]
