@@ -1,13 +1,16 @@
 import base64
+import io
 import os
 import shutil
 import mimetypes
+import zipfile
 from collections import OrderedDict
 from odoo import models, api, _, fields
 from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import image_process
 from odoo.addons.documents.models.documents_document import Document as Document_for_patching
+from odoo.addons.documents_spreadsheet.models.documents_document import SUPPORTED_PATHS, XLSX_MIME_TYPES
 
 
 class Document(models.Model):
@@ -426,3 +429,45 @@ class Document(models.Model):
         if self.located_on_the_server:
             return False
         return super()._extract_pdf_from_xml()
+
+    def _unzip_xlsx(self):
+        if not self.located_on_the_server:
+            return super()._unzip_xlsx()
+        file = io.BytesIO(self.get_raw())
+        if not zipfile.is_zipfile(file) or self.mimetype not in XLSX_MIME_TYPES:
+            raise XSLXReadUserError(_("The file is not a xlsx file"))
+
+        unzipped_size = 0
+        with zipfile.ZipFile(file) as input_zip:
+            if len(input_zip.infolist()) > 1000:
+                raise XSLXReadUserError(_("The xlsx file is too big"))
+
+            if "[Content_Types].xml" not in input_zip.namelist() or \
+                    not any(name.startswith("xl/") for name in input_zip.namelist()):
+                raise XSLXReadUserError(_("The xlsx file is corrupted"))
+
+            unzipped = {}
+            attachments = []
+            for info in input_zip.infolist():
+                if not (info.filename.endswith((".xml", ".xml.rels")) or "media/image" in info.filename) or\
+                        not info.filename.startswith(SUPPORTED_PATHS):
+                    # Don't extract files others than xmls or unsupported xmls
+                    continue
+
+                unzipped_size += info.file_size
+                if unzipped_size > 50 * 1000 * 1000:  # 50MB
+                    raise XSLXReadUserError(_("The xlsx file is too big"))
+
+                if info.filename.endswith((".xml", ".xml.rels")):
+                    unzipped[info.filename] = input_zip.read(info.filename).decode()
+                elif "media/image" in info.filename:
+                    image_file = input_zip.read(info.filename)
+                    attachment = self._upload_image_file(image_file, info.filename)
+                    attachments.append(attachment)
+                    unzipped[info.filename] = {
+                        "imageSrc": "/web/image/" + str(attachment.id),
+                    }
+        return unzipped, attachments
+
+class XSLXReadUserError(UserError):
+    pass

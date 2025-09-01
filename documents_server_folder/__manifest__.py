@@ -3,6 +3,7 @@
     "version": "1.0",
     "depends": [
         "documents",
+        "documents_spreadsheet",
     ],
     "category": "Productivity/Documents",
     "author": "Ruslan Akunevich",
