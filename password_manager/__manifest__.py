@@ -19,6 +19,7 @@ Password Manager
     "assets": {
         "web.assets_backend": [
             "password_manager/static/src/views/**/*",
+            "password_manager/static/src/css/passwords_tree.css",
         ],
     },
     "author": "Ruslan Akunevich",
