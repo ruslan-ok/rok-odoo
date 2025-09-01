@@ -171,7 +171,7 @@ class Document(models.Model):
                 "values": list(values_range.values()) + special_roots,
             }
 
-        return super().search_panel_select_range(field_name)
+        return super().search_panel_select_range(field_name, **kwargs)
 
     @property
     @api.model
@@ -191,6 +191,15 @@ class Document(models.Model):
 
     @api.model
     def create_folder(self, folder_id, folder_name):
+        folder = self.env["documents.document"].search([
+            ("type", "=", "folder"),
+            ("located_on_the_server", "=", True),
+            ("folder_id", "=", folder_id),
+            ("name", "=", folder_name),
+            ("owner_id", "=", self.env.user.id),
+        ])
+        if folder:
+            return folder
         return self.env["documents.document"].create({
             "type": "folder",
             "located_on_the_server": True,
@@ -205,6 +214,15 @@ class Document(models.Model):
         file_full_path = os.path.join(folder_full_path, file_name)
         file_size = os.path.getsize(file_full_path)
         mimetype, _ = mimetypes.guess_type(file_full_path)
+        file = self.env["documents.document"].search([
+            ("type", "=", "binary"),
+            ("located_on_the_server", "=", True),
+            ("folder_id", "=", folder_id),
+            ("name", "=", file_name),
+            ("owner_id", "=", self.env.user.id),
+        ])
+        if file:
+            return file
         return self.env["documents.document"].create({
             "type": "binary",
             "located_on_the_server": True,
@@ -226,7 +244,10 @@ class Document(models.Model):
         if not self.has_children or self.fetch_dt:
             return
         children = self.env["documents.document"].with_context(active_test=False).search([("id", "child_of", self.id)])
-        (children - self).unlink()
+        # (children - self).unlink()
+        for child in (children - self):
+            if not child._exist_on_the_server() and not child.spreadsheet_data:
+                child.unlink()
         folder_path = self.get_path()
         folder_full_path = os.path.join(self.root_path, folder_path)
         if os.path.isdir(folder_full_path):
@@ -389,7 +410,7 @@ class Document(models.Model):
 
         child_files = self.children_ids - child_folders
         for file in child_files:
-            if file.type == "binary" and not file._exist_on_the_server():
+            if file.type == "binary" and not file._exist_on_the_server() and not file.spreadsheet_data:
                 items_to_unlink += file
 
         items_to_unlink.unlink()
