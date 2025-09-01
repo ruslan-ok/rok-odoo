@@ -399,3 +399,9 @@ class Document(models.Model):
             self.fetch_dt = False
 
         return {"type": "ir.actions.client", "tag": "reload"}
+
+    def _extract_pdf_from_xml(self):
+        self.ensure_one()
+        if self.located_on_the_server:
+            return False
+        return super()._extract_pdf_from_xml()
