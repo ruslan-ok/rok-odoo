@@ -9,7 +9,7 @@ class Passwords(models.Model):
 
     @tools.ormcache()
     def _get_default_login(self):
-        return self.env.user.login
+        return self.env.user.partner_id.email or self.env.user.login
     
     title = fields.Char(required=True)
     login = fields.Char(default=_get_default_login, tracking=True)
