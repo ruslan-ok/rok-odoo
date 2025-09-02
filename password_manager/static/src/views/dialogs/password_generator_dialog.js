@@ -5,6 +5,25 @@ import { CheckboxGroup } from "../fields/checkbox_group/checkbox_group";
 
 import { Component, useState, useRef } from "@odoo/owl";
 
+// Word list for passphrase generation (common English words)
+const WORD_LIST = [
+    "about", "after", "again", "air", "all", "along", "also", "always", "another", "any",
+    "around", "away", "back", "because", "before", "below", "between", "both", "but", "by",
+    "came", "can", "come", "could", "day", "did", "different", "do", "does", "down",
+    "each", "end", "even", "every", "first", "for", "found", "from", "get", "give",
+    "go", "good", "great", "had", "has", "have", "he", "her", "here", "him",
+    "his", "how", "if", "in", "into", "is", "it", "its", "just", "know",
+    "large", "like", "little", "long", "look", "made", "make", "many", "may", "more",
+    "most", "much", "must", "my", "name", "new", "no", "not", "now", "number",
+    "of", "off", "old", "on", "one", "only", "or", "other", "our", "out",
+    "over", "part", "people", "place", "put", "right", "said", "same", "see", "she",
+    "should", "some", "still", "such", "take", "tell", "than", "that", "the", "their",
+    "them", "then", "there", "these", "they", "thing", "think", "this", "those", "through",
+    "time", "to", "together", "too", "two", "under", "up", "use", "very", "want",
+    "was", "way", "well", "went", "were", "what", "when", "where", "which", "while",
+    "who", "will", "with", "word", "work", "would", "write", "year", "you", "your"
+];
+
 class RadioSelection extends Component {
     static template = "password_manager.RadioSelection";
     static props = {
@@ -62,12 +81,12 @@ const INCLUDE_VALUES = [
 
 class PasswordGenerator {
     constructor(state, use) {
-        this.debugValue = 100;
         this.isPassphrase = state.isPassphrase;
         this.passwordLength = state.passwordLength;
         this.minimumNumbers = state.minimumNumbers;
         this.minimumSpecials = state.minimumSpecials;
-        this.use = use;
+        this.state = state;
+        this.use = use || {};
         this.alphabet = {
             upper: "ABCDEFGHJKLMNPQRSTUVWXYZ" + (this.use.avoid ? "" : "IO"),
             lower: "abcdefghjklmnpqrstuvwxyz" + (this.use.avoid ? "" : "io"),
@@ -107,24 +126,23 @@ class PasswordGenerator {
         this.workLength = this.passwordLength;
         this.value = "";
         if (this.isPassphrase) {
-            this.debugValue++;
-            this.value = this.debugValue.toString();
+            this.value = this.generatePassphrase();
         } else {
             let data = this.alphabet.upper;
             this.value = this.getPasswordChar("upper", "");
-            if (this.use.numbers) {
+            if (this.use && this.use.numbers) {
                 data += this.alphabet.numbers;
                 for (let i = 0; i < this.minimumNumbers; i++) {
                     this.value += this.getPasswordChar("numbers", "");
                 }
             }
-            if (this.use.special) {
+            if (this.use && this.use.special) {
                 data += this.alphabet.special;
                 for (let i = 0; i < this.minimumSpecials; i++) {
                     this.value += this.getPasswordChar("special", "");
                 }
             }
-            if (this.use.lower) {
+            if (this.use && this.use.lower) {
                 data += this.alphabet.lower;
                 this.value += this.getPasswordChar("lower", "");
             }
@@ -133,6 +151,31 @@ class PasswordGenerator {
             this.shuffle();
         }
         return this.value;
+    }
+
+    generatePassphrase() {
+        const words = [];
+        for (let i = 0; i < this.passwordLength; i++) {
+            const randomIndex = Math.floor(Math.random() * WORD_LIST.length);
+            let word = WORD_LIST[randomIndex];
+            
+            // Apply capitalization if enabled
+            if (this.state && this.state.capitalize) {
+                word = word.charAt(0).toUpperCase() + word.slice(1);
+            }
+            
+            words.push(word);
+        }
+        
+        let passphrase = words.join(this.state && this.state.wordSeparator ? this.state.wordSeparator : "-");
+        
+        // Add number at the end if enabled
+        if (this.state && this.state.includeNumber) {
+            const randomNumber = Math.floor(Math.random() * 1000);
+            passphrase += (this.state.wordSeparator || "-") + randomNumber;
+        }
+        
+        return passphrase;
     }
 }
 
@@ -177,11 +220,11 @@ export class PasswordGeneratorDialog extends Component {
             wordSeparator: this.getStorageItem("word_separator") || "-",
             capitalize: this.getStorageItem("capitalize") === "1",
             includeNumber: this.getStorageItem("include_number") === "1",
+            avoid: this.getStorageItem("avoid") === "1",
         });
         this.passphraseChoices = PASSPHRASE_CHOICES;
         this.env.dialogData.dismiss = () => this.discardRecord();
         this.initUse();
-        this.debugValue = 100;
         this.generateNewValue();
     }
 
@@ -190,11 +233,10 @@ export class PasswordGeneratorDialog extends Component {
     }
 
     initUse() {
-        if (this.state.isPassphrase)
-            return;
+        // Always initialize includeValues, even for passphrase mode
         let includeValues = [];
         INCLUDE_VALUES.forEach((vals) => {
-            let newVals = vals;
+            let newVals = { ...vals }; // Create a copy to avoid mutating the original
             if (vals.name === "upper")
                 newVals.checked = true;
             else
@@ -202,16 +244,32 @@ export class PasswordGeneratorDialog extends Component {
             includeValues.push(newVals);
         });
         this.includeValues = includeValues;
-        this.use = includeValues.reduce((result, x) => {result[x.name] = x.checked; return result;}, {});
-        let minLen = 2;
-        if (this.use.lower)
-            minLen++;
-        if (this.use.numbers)
-            minLen += this.state.minimumNumbers;
-        if (this.use.special)
-            minLen += this.state.minimumSpecials;
-        if (this.state.passwordLength < minLen)
-            this.state.passwordLength = minLen;
+        
+        // Only set up use object for password mode
+        if (!this.state.isPassphrase) {
+            this.use = includeValues.reduce((result, x) => {result[x.name] = x.checked; return result;}, {});
+            let minLen = 2;
+            if (this.use && this.use.lower)
+                minLen++;
+            if (this.use && this.use.numbers)
+                minLen += this.state.minimumNumbers;
+            if (this.use && this.use.special)
+                minLen += this.state.minimumSpecials;
+            if (this.state.passwordLength < minLen)
+                this.state.passwordLength = minLen;
+            if (this.use) {
+                this.use.avoid = this.getStorageItem("avoid") === "1";
+            }
+        } else {
+            // For passphrase mode, create a minimal use object
+            this.use = {
+                upper: true,
+                lower: true,
+                numbers: true,
+                special: true,
+                avoid: true
+            };
+        }
     }
 
     generateNewValue() {
@@ -236,6 +294,7 @@ export class PasswordGeneratorDialog extends Component {
         this.setStorageItem("is_passphrase", value);
         this.state.isPassphrase = value === "1";
         this.state.passwordLength = this.state.isPassphrase ? this.numberOfWords : this.passwordLength;
+        this.initUse(); // Reinitialize use object and includeValues
         this.generateNewValue();
     }
 
@@ -270,11 +329,11 @@ export class PasswordGeneratorDialog extends Component {
     }
 
     get isMinimumNumbersDisabled() {
-        return !this.use.numbers;
+        return !(this.use && this.use.numbers);
     }
 
     get isMinimumSpecialsDisabled() {
-        return !this.use.special;
+        return !(this.use && this.use.special);
     }
 
     lengthChanged(el) {
@@ -318,18 +377,21 @@ export class PasswordGeneratorDialog extends Component {
     }
 
     wordSeparatorChanged(el) {
-        console.log("wordSeparatorChanged: " + el.target.value);
         this.state.wordSeparator = el.target.value;
         this.setStorageItem("word_separator", this.state.wordSeparator);
         this.generateNewValue();
     }
 
     capitalizeChanged(el) {
-        console.log("capitalizeChanged: " + el.target.checked);
+        this.state.capitalize = el.target.checked;
+        this.setStorageItem("capitalize", this.state.capitalize ? "1" : "0");
+        this.generateNewValue();
     }
 
     includeNumberChanged(el) {
-        console.log("includeNumberChanged: " + el.target.checked);
+        this.state.includeNumber = el.target.checked;
+        this.setStorageItem("include_number", this.state.includeNumber ? "1" : "0");
+        this.generateNewValue();
     }
 
     useThisValue() {
@@ -337,9 +399,5 @@ export class PasswordGeneratorDialog extends Component {
             this.state.value,
         );
         this.props.close();
-    }
-
-    showHistory() {
-        console.log("showHistory");
     }
 }
