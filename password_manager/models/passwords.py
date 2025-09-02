@@ -6,6 +6,7 @@ class Passwords(models.Model):
     _description = "Password Manager"
     _inherit = ["mail.thread"]
     _order = "is_favorite desc, title"
+    _rec_name = "title"
 
     @tools.ormcache()
     def _get_default_login(self):
@@ -26,6 +27,22 @@ class Passwords(models.Model):
     )
     is_favorite = fields.Boolean(string="Favorite")
     active = fields.Boolean(default=True, help="If unchecked, it will allow you to hide the password without removing it.")
+    password_history_count = fields.Integer(compute='_compute_password_history_count', string='History Count')
+
+    def _compute_password_history_count(self):
+        for record in self:
+            record.password_history_count = self.env['password.history'].search_count([('password_id', '=', record.id)])
+
+    def action_view_password_history(self):
+        self.ensure_one()
+        return {
+            'name': 'Password History',
+            'type': 'ir.actions.act_window',
+            'res_model': 'password.history',
+            'view_mode': 'list,form',
+            'domain': [('password_id', '=', self.id)],
+            'context': {'default_password_id': self.id},
+        }
 
     def _read_group_categ_id(self, categories, domain):
         category_ids = self.env.context.get("default_categ_id")

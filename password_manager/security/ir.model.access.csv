@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_password_category_user,password.category.user,model_password_category,base.group_user,1,1,1,1
 access_password_tag_user,password.tag.user,model_password_tag,base.group_user,1,1,1,1
 access_passwords,access.passwords,model_passwords,base.group_user,1,1,1,1
+access_password_history_user,password.history.user,model_password_history,base.group_user,1,0,0,0
