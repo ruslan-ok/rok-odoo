@@ -27,3 +27,4 @@ class Anthropometry(models.Model):
     systolic = fields.Float()
     diastolic = fields.Float()
     pulse = fields.Integer()
+    info = fields.Html()

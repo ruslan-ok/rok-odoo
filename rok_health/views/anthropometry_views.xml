@@ -13,6 +13,7 @@
                 <field name="systolic"/>
                 <field name="diastolic"/>
                 <field name="pulse"/>
+                <field name="info"/>
             </list>
         </field>
     </record>
@@ -35,6 +36,9 @@
                             <field name="systolic"/>
                             <field name="diastolic"/>
                             <field name="pulse"/>
+                        </group>
+                        <group>
+                            <field name="info"/>
                         </group>
                         <field name="user_id" invisible="1" readonly="1"/>
                     </group>
