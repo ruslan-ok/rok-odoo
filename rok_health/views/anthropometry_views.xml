@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_rok_health_anthropometry_tree" model="ir.ui.view">
+        <field name="name">rok.health.anthropometry.tree</field>
+        <field name="model">rok.health.anthropometry</field>
+        <field name="arch" type="xml">
+            <list string="Anthropometry">
+                <field name="measurement"/>
+                <field name="height"/>
+                <field name="weight"/>
+                <field name="waist"/>
+                <field name="temperature"/>
+                <field name="systolic"/>
+                <field name="diastolic"/>
+                <field name="pulse"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rok_health_anthropometry_form" model="ir.ui.view">
+        <field name="name">rok.health.anthropometry.form</field>
+        <field name="model">rok.health.anthropometry</field>
+        <field name="arch" type="xml">
+            <form string="Anthropometry">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="measurement"/>
+                            <field name="height"/>
+                            <field name="weight"/>
+                            <field name="waist"/>
+                        </group>
+                        <group>
+                            <field name="temperature"/>
+                            <field name="systolic"/>
+                            <field name="diastolic"/>
+                            <field name="pulse"/>
+                        </group>
+                        <field name="user_id" invisible="1" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rok_health_anthropometry" model="ir.actions.act_window">
+        <field name="name">Anthropometry</field>
+        <field name="res_model">rok.health.anthropometry</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first measurement</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_rok_health_root" name="Health" web_icon="rok_health,static/description/icon.png" sequence="10" groups="base.group_user"/>
+    <menuitem id="menu_rok_health_anthropometry" name="Anthropometry" parent="menu_rok_health_root" action="action_rok_health_anthropometry" sequence="10" groups="base.group_user"/>
+</odoo>
