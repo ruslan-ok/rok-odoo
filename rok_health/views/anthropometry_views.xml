@@ -4,7 +4,7 @@
         <field name="name">rok.health.anthropometry.tree</field>
         <field name="model">rok.health.anthropometry</field>
         <field name="arch" type="xml">
-            <list string="Anthropometry">
+            <list string="Anthropometry" default_order="measurement desc">
                 <field name="measurement"/>
                 <field name="height"/>
                 <field name="weight"/>

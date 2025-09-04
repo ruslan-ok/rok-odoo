@@ -3,6 +3,7 @@ from odoo import models, fields, api
 class Anthropometry(models.Model):
     _name = 'rok.health.anthropometry'
     _description = 'Anthropometry'
+    _order = 'measurement desc'
 
     # The owner of the measurement; default to the current user
     user_id = fields.Many2one(
