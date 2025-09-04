@@ -21,11 +21,11 @@ class Anthropometry(models.Model):
         default=fields.Datetime.now,
     )
 
-    height = fields.Integer()
-    weight = fields.Float()
-    waist = fields.Float()
-    temperature = fields.Float()
-    systolic = fields.Float()
-    diastolic = fields.Float()
-    pulse = fields.Integer()
+    height = fields.Integer(group_operator='avg')
+    weight = fields.Float(group_operator='avg')
+    waist = fields.Float(group_operator='avg')
+    temperature = fields.Float(group_operator='avg')
+    systolic = fields.Float(group_operator='avg')
+    diastolic = fields.Float(group_operator='avg')
+    pulse = fields.Integer(group_operator='avg')
     info = fields.Html()

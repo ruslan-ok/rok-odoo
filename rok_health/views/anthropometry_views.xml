@@ -47,15 +47,44 @@
         </field>
     </record>
 
+    <record id="view_rok_health_anthropometry_graph" model="ir.ui.view">
+        <field name="name">rok.health.anthropometry.graph</field>
+        <field name="model">rok.health.anthropometry</field>
+        <field name="arch" type="xml">
+            <graph string="Weight" type="line">
+                <field name="measurement" type="row"/>
+                <field name="weight" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_rok_health_anthropometry_search" model="ir.ui.view">
+        <field name="name">rok.health.anthropometry.search</field>
+        <field name="model">rok.health.anthropometry</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="measurement"/>
+                <separator/>
+                <filter name="period_last_week" string="Last Week" domain="[('measurement','>=',(datetime.datetime.combine(context_today() - relativedelta(days=7), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="period_last_month" string="Last Month" domain="[('measurement','>=',(datetime.datetime.combine(context_today() - relativedelta(months=1), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="period_last_year" string="Last Year" domain="[('measurement','>=',(datetime.datetime.combine(context_today() - relativedelta(years=1), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="period_last_5_years" string="Last 5 Years" domain="[('measurement','>=',(datetime.datetime.combine(context_today() - relativedelta(years=5), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+            </search>
+        </field>
+    </record>
+
     <record id="action_rok_health_anthropometry" model="ir.actions.act_window">
         <field name="name">Anthropometry</field>
         <field name="res_model">rok.health.anthropometry</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">graph,list,form</field>
+        <field name="views" eval="[(ref('view_rok_health_anthropometry_graph'), 'graph'), (ref('view_rok_health_anthropometry_tree'), 'list'), (ref('view_rok_health_anthropometry_form'), 'form')]"/>
+        <field name="search_view_id" ref="view_rok_health_anthropometry_search"/>
+        <field name="context">{'graph_measure': 'weight', 'graph_date': 'measurement'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create your first measurement</p>
         </field>
     </record>
 
-    <menuitem id="menu_rok_health_root" name="Health" web_icon="rok_health,static/description/icon.png" sequence="10" groups="base.group_user"/>
+    <menuitem id="menu_rok_health_root" name="Health" web_icon="rok_health,static/description/icon.png" action="action_rok_health_anthropometry" sequence="10" groups="base.group_user"/>
     <menuitem id="menu_rok_health_anthropometry" name="Anthropometry" parent="menu_rok_health_root" action="action_rok_health_anthropometry" sequence="10" groups="base.group_user"/>
 </odoo>
