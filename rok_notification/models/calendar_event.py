@@ -1,22 +1,19 @@
-import os
-from dotenv import load_dotenv
-from odoo import models, api
-import requests
+from odoo import models, fields
 
 
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
-    @api.model
-    def send_notification(self, text):
-        load_dotenv()
-        TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-        TELEGRAM_API_URL = os.getenv("TELEGRAM_API_URL") % TELEGRAM_TOKEN
-        CHAT_ID = os.getenv("CHAT_ID")
+    def _get_trigger_alarm_types(self):
+        return super()._get_trigger_alarm_types() + ['telegram']
 
-        payload = {
-            'chat_id': CHAT_ID,
-            'text': text,
-            'parse_mode': 'Markdown'
-        }
-        requests.post(TELEGRAM_API_URL, json=payload)
+    def get_telegram_time_text(self, tz=False):
+        self.ensure_one()
+        if not self.start:
+            return ""
+        ctx_model = self.with_context(tz=tz) if tz else self
+        local_dt = fields.Datetime.context_timestamp(ctx_model, fields.Datetime.from_string(self.start))
+        today_local = fields.Date.context_today(ctx_model)
+        if local_dt.date() == today_local:
+            return f"at {local_dt.strftime('%H:%M')}"
+        return f"{local_dt.strftime('%Y-%m-%d')} at {local_dt.strftime('%H:%M')}"
