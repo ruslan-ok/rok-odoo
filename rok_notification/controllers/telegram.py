@@ -1,4 +1,5 @@
 import logging
+import json
 import requests
 from odoo import _, http
 from odoo.exceptions import UserError
@@ -9,9 +10,14 @@ _logger = logging.getLogger(__name__)
 
 class TelegramController(http.Controller):
 
-    @http.route('/telegram/webhook', type='json', auth='public', csrf=False)
-    def telegram_webhook(self):
-        update = request.jsonrequest
+    @http.route('/telegram/webhook', type='http', auth='public', methods=['POST'], csrf=False)
+    def telegram_webhook(self, **kwargs):
+        try:
+            raw = request.httprequest.data or b''
+            update = json.loads(raw.decode('utf-8')) if raw else {}
+        except Exception:
+            _logger.exception("Failed to parse Telegram webhook payload")
+            update = {}
         _logger.info("Telegram webhook received: %s", update)
 
         if "callback_query" in update:
@@ -29,12 +35,16 @@ class TelegramController(http.Controller):
 
             self.send_message(chat_id, f"You wrote: {text}")
 
-        return {"ok": True}
+        # Respond with JSON OK
+        try:
+            return request.make_json_response({"ok": True})
+        except Exception:
+            return http.Response(json.dumps({"ok": True}), content_type='application/json')
 
     def send_message(self, chat_id, text):
         if not chat_id:
             return
-        TELEGRAM_TOKEN = self.env['ir.config_parameter'].sudo().get_param('rok_notification.telegram_token')
+        TELEGRAM_TOKEN = request.env['ir.config_parameter'].sudo().get_param('rok_notification.telegram_token')
         if not TELEGRAM_TOKEN:
             raise UserError(_("Telegram token is not set"))
         TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
