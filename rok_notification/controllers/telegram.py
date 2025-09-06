@@ -1,8 +1,8 @@
 import logging
 import requests
-from odoo import _
+from odoo import _, http
 from odoo.exceptions import UserError
-from odoo import http, request
+from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
