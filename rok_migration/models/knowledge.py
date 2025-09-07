@@ -3,7 +3,7 @@ from markupsafe import Markup
 from odoo import models
 from .rok_migration_mixin import TASK_TASK_FIELDS
 
-GET_ITEMS_SQL = "SELECT * FROM task_task WHERE app_note != 0;"
+GET_ITEMS_SQL = "SELECT * FROM task_task WHERE app_news != 0;"
 
 
 class Article(models.Model):
@@ -15,7 +15,7 @@ class Article(models.Model):
         self.delete_migrated()
 
         print("Migrating knowledge articles...")
-        self.do_migrate(GET_ITEMS_SQL, "note")
+        self.do_migrate(GET_ITEMS_SQL, "news")
         print("Done")
 
         article = self[0] if self else False
@@ -31,25 +31,26 @@ class Article(models.Model):
 
     def delete_migrated(self):
         rok_roots = self.env["knowledge.article"].search([
-            ("icon", "=", False), 
-            ("category", "=", "private"), 
-            ("parent_id", "=", False), 
-            ("name", "=", "notes"), 
+            ("icon", "=", False),
+            ("category", "=", "private"),
+            ("parent_id", "=", False),
+            ("name", "=", "news"),
         ])
         rok_articles = self.env["knowledge.article"].search([
-            ("root_article_id", "in", rok_roots.ids), 
+            ("root_article_id", "in", rok_roots.ids),
         ])
         rok_articles.unlink()
 
     def migrate_item(self, connection, item_id, row):
         group = self.migrate_item_groups(connection, item_id)
+        name = self.prepare_news_name(row)
         body = self.prepare_body(connection, item_id, row[TASK_TASK_FIELDS.index("info")])
         article = self.env["knowledge.article"].create(
             {
-                "parent_id": group.id, 
-                "category": "private", 
-                "name": row[TASK_TASK_FIELDS.index("name")],
-                "body": body, 
+                "parent_id": group.id,
+                "category": "private",
+                "name": name,
+                "body": body,
                 "active": not row[TASK_TASK_FIELDS.index("completed")],
                 "internal_permission": "none",
                 "article_member_ids": [(0, 0, {
@@ -61,20 +62,25 @@ class Article(models.Model):
         self.update_create_date("knowledge_article", article.id, row)
         return article
 
+    def prepare_news_name(self, row):
+        event = row[TASK_TASK_FIELDS.index("event")].strftime("%Y-%m-%d %H:%M")
+        name = row[TASK_TASK_FIELDS.index("name")]
+        return event + " - " + name
+
     def migrate_item_groups(self, connection, item_id):
-        root_name = "notes"
+        root_name = "news"
         rok_root = self.env["knowledge.article"].search([
-            ("icon", "=", False), 
-            ("category", "=", "private"), 
-            ("parent_id", "=", False), 
-            ("name", "=", root_name), 
+            ("icon", "=", False),
+            ("category", "=", "private"),
+            ("parent_id", "=", False),
+            ("name", "=", root_name),
         ])
         if not rok_root:
             rok_root = self.env["knowledge.article"].create(
                 {
-                    "parent_id": False, 
-                    "category": "private", 
-                    "name": root_name, 
+                    "parent_id": False,
+                    "category": "private",
+                    "name": root_name,
                     "internal_permission": "none",
                     "article_member_ids": [(0, 0, {
                         "partner_id": self.user.partner_id.id,
@@ -82,22 +88,22 @@ class Article(models.Model):
                     })],
                 }
             )
-        group = self.migrate_groups_branch(connection, "note", rok_root, item_id)
+        group = self.migrate_groups_branch(connection, "news", rok_root, item_id)
         return group
-    
+
     def migrate_group(self, parent, row):
         group_name = row[1]
         group = self.env["knowledge.article"].search([
-            ("category", "=", "private"), 
-            ("parent_id", "=", parent.id), 
-            ("name", "=", group_name), 
+            ("category", "=", "private"),
+            ("parent_id", "=", parent.id),
+            ("name", "=", group_name),
         ])
         if not group:
             group = self.env["knowledge.article"].create(
                 {
-                    "parent_id": parent.id, 
-                    "category": "private", 
-                    "name": group_name, 
+                    "parent_id": parent.id,
+                    "category": "private",
+                    "name": group_name,
                     "icon": "📁",
                     "internal_permission": "none",
                     "article_member_ids": [(0, 0, {
@@ -107,7 +113,7 @@ class Article(models.Model):
                 }
             )
         return group
-    
+
     def update_item_with_attachments(self, item_id):
         article = self.env["knowledge.article"].browse(item_id)
         attachments = self.env["ir.attachment"].search([("res_id", "=", item_id)])
