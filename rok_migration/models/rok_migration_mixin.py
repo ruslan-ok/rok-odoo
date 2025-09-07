@@ -101,7 +101,7 @@ class RokMigrationMixin(models.AbstractModel):
 
             # Close the cursor and connection
             cursor.close()
-            connection.close()            
+            connection.close()
             self.check_attachments(items_map, role)
         except Exception as e:
             print("An error occurred while connecting to the database:", e)
