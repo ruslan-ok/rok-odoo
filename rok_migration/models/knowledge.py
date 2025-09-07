@@ -3,7 +3,7 @@ from markupsafe import Markup
 from odoo import models
 from .rok_migration_mixin import TASK_TASK_FIELDS
 
-GET_ITEMS_SQL = "SELECT * FROM task_task WHERE app_news != 0;"
+GET_ITEMS_SQL = "SELECT * FROM task_task WHERE app_health = 20;"
 
 
 class Article(models.Model):
@@ -15,7 +15,7 @@ class Article(models.Model):
         self.delete_migrated()
 
         print("Migrating knowledge articles...")
-        self.do_migrate(GET_ITEMS_SQL, "news")
+        self.do_migrate(GET_ITEMS_SQL, "health")
         print("Done")
 
         article = self[0] if self else False
@@ -34,7 +34,7 @@ class Article(models.Model):
             ("icon", "=", False),
             ("category", "=", "private"),
             ("parent_id", "=", False),
-            ("name", "=", "news"),
+            ("name", "=", "health"),
         ])
         rok_articles = self.env["knowledge.article"].search([
             ("root_article_id", "in", rok_roots.ids),
@@ -43,7 +43,7 @@ class Article(models.Model):
 
     def migrate_item(self, connection, item_id, row):
         group = self.migrate_item_groups(connection, item_id)
-        name = self.prepare_news_name(row)
+        name = self.prepare_health_name(row)
         body = self.prepare_body(connection, item_id, row[TASK_TASK_FIELDS.index("info")])
         article = self.env["knowledge.article"].create(
             {
@@ -62,13 +62,20 @@ class Article(models.Model):
         self.update_create_date("knowledge_article", article.id, row)
         return article
 
-    def prepare_news_name(self, row):
-        event = row[TASK_TASK_FIELDS.index("event")].strftime("%Y-%m-%d %H:%M")
+    def prepare_health_name(self, row):
+        start = row[TASK_TASK_FIELDS.index("start")]
+        start = start.strftime("%Y-%m-%d") if start else ""
+        stop = row[TASK_TASK_FIELDS.index("stop")]
+        stop = stop.strftime("%Y-%m-%d") if stop else ""
         name = row[TASK_TASK_FIELDS.index("name")]
-        return event + " - " + name
+        diagnosis = row[TASK_TASK_FIELDS.index("diagnosis")]
+        diagnosis = f" ({diagnosis})" if diagnosis else ""
+        result = f"{name}{diagnosis} [{start} - {stop}]"
+        return result
+
 
     def migrate_item_groups(self, connection, item_id):
-        root_name = "news"
+        root_name = "health"
         rok_root = self.env["knowledge.article"].search([
             ("icon", "=", False),
             ("category", "=", "private"),
@@ -88,7 +95,7 @@ class Article(models.Model):
                     })],
                 }
             )
-        group = self.migrate_groups_branch(connection, "news", rok_root, item_id)
+        group = self.migrate_groups_branch(connection, "health", rok_root, item_id)
         return group
 
     def migrate_group(self, parent, row):
