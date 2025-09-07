@@ -102,7 +102,7 @@ class RokMigrationMixin(models.AbstractModel):
             # Close the cursor and connection
             cursor.close()
             connection.close()
-            self.check_attachments(items_map, role)
+            self.check_attachments(items_map, role="incident", app_name=role)
         except Exception as e:
             print("An error occurred while connecting to the database:", e)
 
@@ -155,7 +155,7 @@ class RokMigrationMixin(models.AbstractModel):
         if not lines:
             return '<p data-oe-version="1.2">' + line + "</p>"
         return '<p>' + line + "</p>"
-    
+
     def check_links(self, line):
         if not line:
             return line
@@ -171,10 +171,11 @@ class RokMigrationMixin(models.AbstractModel):
             line = part_1 + '<a href="http://' + part_2 + '">' + part_2 + "</a>"
         return line
 
-    def check_attachments(self, items_map, role):
+    def check_attachments(self, items_map, role, app_name=None):
         print("Checking for attachments started...")
         STORAGE = os.getenv("STORAGE")
-        storage_dir = os.path.join(STORAGE, "attachments", role)
+        print(os.getcwd())
+        storage_dir = os.path.join(STORAGE, "attachments", app_name or role)
 
         for root, dirs, files in os.walk(storage_dir):
             if root == storage_dir:
