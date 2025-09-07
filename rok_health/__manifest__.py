@@ -5,14 +5,17 @@
     'version': '1.0',
     'depends': [
         'base',
+        'spreadsheet_dashboard',
     ],
     'data': [
         'security/ir.model.access.csv',
         'security/rok_health_rules.xml',
         'views/anthropometry_views.xml',
+        'views/anthropometry_menu_cleanup.xml',
+        'views/dashboard_anthropometry.xml',
     ],
     'installable': True,
-    'application': True,
+    'application': False,
     'author': 'Ruslan Akunevich',
     'license': 'LGPL-3',
 }
