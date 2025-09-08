@@ -57,9 +57,9 @@
         {
           "id": "a7a4c1f4-64f5-4d6a-9e4b-3d02a8a7b901",
           "x": 0,
-          "y": 28,
+          "y": 140,
           "width": 1000,
-          "height": 320,
+          "height": 220,
           "tag": "chart",
           "data": {
             "title": { "text": "" },
