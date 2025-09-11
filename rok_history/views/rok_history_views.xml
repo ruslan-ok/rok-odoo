@@ -5,26 +5,49 @@
         <field name="model">rok.history.event</field>
         <field name="arch" type="xml">
             <list>
-                <field name="name"/>
                 <field name="start_date"/>
                 <field name="stop_date"/>
+                <field name="title"/>
                 <field name="diagnosis" optional="hide"/>
+                <field name="info" optional="show"/>
             </list>
         </field>
     </record>
+
     <record id="view_rok_history_event_form" model="ir.ui.view">
         <field name="name">rok.history.event.form</field>
         <field name="model">rok.history.event</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="History Event">
+                <header>
+                </header>
                 <sheet>
-                    <field name="name"/>
-                    <field name="start_date"/>
-                    <field name="stop_date"/>
-                    <field name="diagnosis"/>
+                    <div class="oe_title">
+                        <label for="title" string="Title"/>
+                        <h2>
+                            <div class="d-flex">
+                                <field name="is_favorite" widget="boolean_favorite" class="me-3" nolabel="1"/>
+                                <field class="text-break" name="title" options="{'line_breaks': False}" widget="text" placeholder="e.g. example.com"/>
+                            </div>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_disease" invisible="1"/>
+                            <field name="diagnosis" invisible="not is_disease"/>
+                            <field name="categ_id" string="Category"/>
+                        </group>
+                        <group class="align-items-center">
+                            <field name="start_date"/>
+                            <field name="stop_date"/>
+                        </group>
+                    </group>
+                    <label for="info" string="Comments" class="o_form_label"/>
                     <field name="info"/>
                     <field name="fact_ids"/>
                 </sheet>
+                <div class="o_attachment_preview"/>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -34,7 +57,7 @@
         <field name="model">rok.history.event</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name"/>
+                <field name="title"/>
                 <field name="start_date"/>
                 <field name="stop_date"/>
                 <field name="diagnosis"/>
