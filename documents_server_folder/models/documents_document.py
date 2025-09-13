@@ -342,7 +342,7 @@ class Document(models.Model):
                     shutil.rmtree(path)
                 else:
                     os.remove(path)
-        inactive_items = self - active_items
+        inactive_items = self.filtered("located_on_the_server") - active_items
         folders_to_restore = inactive_items.filtered(lambda x: x.type == "folder")
         for folder in folders_to_restore:
             path = folder.get_full_path()
