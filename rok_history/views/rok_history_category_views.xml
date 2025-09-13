@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="rok_history_category_form_view" model="ir.ui.view">
+        <field name="name">rok.history.category.form</field>
+        <field name="model">rok.history.category</field>
+        <field name="arch" type="xml">
+            <form class="oe_form_configuration">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                            name="%(action_rok_history)d"
+                            icon="fa-th-list"
+                            type="action"
+                            context="{'search_default_categ_id': id, 'default_categ_id': id, 'group_expand': True}">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="event_count"/></span>
+                                <span class="o_stat_text"> Events</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Category"/>
+                        <h1><field name="name" placeholder="e.g. Lamps"/></h1>
+                    </div>
+                    <group name="first" col="2">
+                        <field name="parent_id" class="oe_inline"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="rok_history_category_list_view" model="ir.ui.view">
+        <field name="name">rok.history.category.list</field>
+        <field name="model">rok.history.category</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="History Event Categories">
+                <field name="display_name" string="Event Category"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rok_history_category_action_form" model="ir.actions.act_window">
+        <field name="name">History Event Categories</field>
+        <field name="res_model">rok.history.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="rok_history_category_list_view"/>
+    </record>
+
+    <menuitem
+        id="menu_rok_history_category"
+        name="Event Categories"
+        parent="rok_history.menu_rok_history_root"
+        action="rok_history_category_action_form"
+        sequence="2"/>
+
+</odoo>

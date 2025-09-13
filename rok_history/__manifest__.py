@@ -11,6 +11,7 @@
         "security/ir.model.access.csv",
         "security/rok_history_rules.xml",
         "views/rok_history_views.xml",
+        "views/rok_history_category_views.xml",
     ],
     "installable": True,
     "application": True,

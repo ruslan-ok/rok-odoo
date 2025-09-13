@@ -93,31 +93,35 @@
         </field>
     </record>
 
-    <!-- <record id="view_rok_history_event_search" model="ir.ui.view">
-        <field name="name">rok.history.event.search</field>
+    <record id="rok_history_view_search_catalog" model="ir.ui.view">
+        <field name="name">rok.history.view.search.catalog</field>
         <field name="model">rok.history.event</field>
         <field name="arch" type="xml">
-            <search>
-                <field name="title"/>
-                <field name="start_date"/>
-                <field name="stop_date"/>
-                <field name="diagnosis"/>
-                <field name="info"/>
+            <search string="History Event">
+                <!-- Search field -->
+                <field name="title"
+                    string="History Event record (any field)"
+                    filter_domain="['|', '|', ('title', 'ilike', self), ('diagnosis', 'ilike', self), ('info', 'ilike', self)]"/>
+                <!-- Filter -->
+                <filter string="Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <!-- searchpanel -->
+                <searchpanel>
+                    <field name="categ_id"
+                        string="History Event Category"
+                        icon="fa-th-list"/>
+                </searchpanel>
             </search>
-            <separator/>
-            <filter name="period_last_week" string="Last Week" domain="[('start_date','>=',(datetime.datetime.combine(context_today() - relativedelta(days=7), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
-            <filter name="period_last_month" string="Last Month" domain="[('start_date','>=',(datetime.datetime.combine(context_today() - relativedelta(months=1), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
-            <filter name="period_last_year" string="Last Year" domain="[('start_date','>=',(datetime.datetime.combine(context_today() - relativedelta(years=1), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
-            <filter name="period_last_5_years" string="Last 5 Years" domain="[('start_date','>=',(datetime.datetime.combine(context_today() - relativedelta(years=5), datetime.time(0,0,0))).strftime('%Y-%m-%d %H:%M:%S'))]"/>
         </field>
-    </record> -->
+    </record>
 
     <record id="action_rok_history" model="ir.actions.act_window">
         <field name="name">Event</field>
         <field name="res_model">rok.history.event</field>
         <field name="view_mode">list,form</field>
         <field name="views" eval="[(ref('view_rok_history_event_list'), 'list'), (ref('view_rok_history_event_form'), 'form')]"/>
-        <!-- <field name="search_view_id" ref="view_rok_history_event_search"/> -->
+        <field name="search_view_id" ref="rok_history_view_search_catalog"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create your first event</p>
         </field>

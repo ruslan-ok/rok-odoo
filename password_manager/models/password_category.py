@@ -11,11 +11,9 @@ class PasswordCategory(models.Model):
     _rec_name = "complete_name"
     _order = "complete_name"
 
-    name = fields.Char("Name", index="trigram", required=True)
-    complete_name = fields.Char(
-        "Complete Name", compute="_compute_complete_name", recursive=True,
-        store=True)
-    parent_id = fields.Many2one("password.category", "Parent Category", index=True, ondelete="cascade")
+    name = fields.Char(index="trigram", required=True)
+    complete_name = fields.Char(compute="_compute_complete_name", recursive=True, store=True)
+    parent_id = fields.Many2one("password.category", string="Parent Category", index=True, ondelete="cascade")
     parent_path = fields.Char(index=True)
     child_id = fields.One2many("password.category", "parent_id", "Child Categories")
     password_count = fields.Integer(
