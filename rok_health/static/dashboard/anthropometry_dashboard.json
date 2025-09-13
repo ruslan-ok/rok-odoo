@@ -83,6 +83,16 @@
                         "verticalAxisPosition": "left",
                         "stacked": false,
                         "fillArea": true,
+                        "cubicInterpolationMode": "monotone",
+                        "tension": 0.4,
+                        "lineTension": 0.4,
+                        "borderWidth": 1,
+                        "elements": {
+                            "line": {
+                                "tension": 0.4,
+                                "borderWidth": 1
+                            }
+                        },
                         "fieldMatching": {
                             "period": {
                                 "chain": "measurement",

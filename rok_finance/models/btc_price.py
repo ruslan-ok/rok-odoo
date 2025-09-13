@@ -2,7 +2,7 @@ from odoo import models, fields, api
 from decimal import Decimal
 import requests
 from datetime import datetime
-from .delta import approximate, SourceData
+from odoo.addons.rok_spreadsheet.utils.delta import approximate, SourceData
 
 
 API_COIN_RATE = "https://api.coinranking.com/v2/coin/Qwsogvtv82FCd/"

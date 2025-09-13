@@ -3,7 +3,7 @@
     'summary': 'Finance tools and dashboards',
     'category': 'Productivity/Finance',
     'version': '1.0',
-    'depends': ['base', 'spreadsheet_dashboard'],
+    'depends': ['base', 'rok_spreadsheet'],
     'data': [
         'security/ir.model.access.csv',
         'views/bitcoin_dashboard.xml',

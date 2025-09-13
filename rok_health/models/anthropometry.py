@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo.addons.rok_finance.models.delta import approximate, SourceData
+from odoo.addons.rok_spreadsheet.utils.delta import approximate, SourceData
 
 class Anthropometry(models.Model):
     _name = 'rok.health.anthropometry'

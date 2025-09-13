@@ -5,7 +5,7 @@
     'version': '1.0',
     'depends': [
         'base',
-        'spreadsheet_dashboard',
+        'rok_spreadsheet',
     ],
     'data': [
         'security/ir.model.access.csv',
