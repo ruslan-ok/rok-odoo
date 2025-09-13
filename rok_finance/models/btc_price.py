@@ -1,6 +1,8 @@
 from odoo import models, fields, api
+from decimal import Decimal
 import requests
 from datetime import datetime
+from .delta import approximate, SourceData
 
 
 API_COIN_RATE = "https://api.coinranking.com/v2/coin/Qwsogvtv82FCd/"
@@ -54,7 +56,7 @@ class RokFinanceBtcPriceLive(models.Model):
         """Provide grouped series from external API to power odoo_line charts.
         Supports groupby on 'timestamp:day'.
         """
-        start, end, period = self._parse_domain_period(domain)
+        _, _, period = self._parse_domain_period(domain)
         api_key = self.env['ir.config_parameter'].sudo().get_param('rok_finance.coinranking_api_key')
         if not api_key:
             return []
@@ -65,36 +67,12 @@ class RokFinanceBtcPriceLive(models.Model):
         payload = resp.json()
         if payload.get('status') != 'success':
             return []
-        history = payload['data']['history']
-        # Bucket by day
-        buckets = {}
-        for h in history:
-            ts_ms = h.get('timestamp')
-            # coinranking returns ms; fallback if seconds
-            ts_sec = int(ts_ms) // 1000 if int(ts_ms) > 10**12 else int(ts_ms)
-            dt = datetime.utcfromtimestamp(ts_sec)
-            if start and dt < start:
-                continue
-            if end and dt > end:
-                continue
-            key = dt.strftime('%Y-%m-%d 00:00:00')
-            price = h.get('price')
-            if price is None:
-                continue
-            buckets.setdefault(key, {'sum': 0.0, 'count': 0})
-            buckets[key]['sum'] += float(price)
-            buckets[key]['count'] += 1
-
-        results = []
-        for day_key in sorted(buckets.keys()):
-            s = buckets[day_key]
-            avg_price = s['sum'] / max(1, s['count'])
-            row = {
-                'timestamp:day': day_key,
-                'price': avg_price,
-                '__count': s['count'],
-            }
-            results.append(row)
-        return results
-
-
+        history = payload.get('data', {}).get('history', [])
+        src_data = []
+        for i in reversed(range(len(history))):
+            h = history[i]
+            sd = SourceData(event=datetime.utcfromtimestamp(h['timestamp']), value=Decimal(h['price'] if h['price'] else prev))
+            src_data.append(sd)
+            prev = sd.value
+        chart_points = approximate(src_data, 100, 'timestamp:day', 'price')
+        return chart_points

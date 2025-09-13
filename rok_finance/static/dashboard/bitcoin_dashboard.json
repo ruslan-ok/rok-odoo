@@ -26,30 +26,30 @@
             "height": 360,
             "tag": "chart",
             "data": {
-            "title": { "text": "" },
-            "background": "#FFFFFF",
-            "legendPosition": "none",
-            "metaData": {
-                "groupBy": ["timestamp:day"],
-                "measure": "price",
-                "order": null,
-                "resModel": "rok.finance.btc_price_live",
-                "mode": "line"
-            },
-            "searchParams": {
-                "comparison": null,
-                "context": {},
-                "domain": [],
-                "groupBy": ["timestamp:day"],
-                "orderBy": []
-            },
-            "type": "odoo_line",
-            "verticalAxisPosition": "left",
-            "stacked": false,
-            "fillArea": true,
-            "fieldMatching": {
-                "period": {"chain": "timestamp", "type": "datetime", "offset": 0}
-            }
+                "title": { "text": "" },
+                "background": "#FFFFFF",
+                "legendPosition": "none",
+                "metaData": {
+                    "groupBy": ["timestamp:day"],
+                    "measure": "price",
+                    "order": null,
+                    "resModel": "rok.finance.btc_price_live",
+                    "mode": "line"
+                },
+                "searchParams": {
+                    "comparison": null,
+                    "context": {},
+                    "domain": [],
+                    "groupBy": ["timestamp:day"],
+                    "orderBy": []
+                },
+                "type": "odoo_line",
+                "verticalAxisPosition": "left",
+                "stacked": false,
+                "fillArea": true,
+                "fieldMatching": {
+                    "period": {"chain": "timestamp", "type": "datetime", "offset": 0}
+                }
             }
         }
         ],
