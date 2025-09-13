@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.addons.rok_finance.models.delta import approximate, SourceData
 
 class Anthropometry(models.Model):
     _name = 'rok.health.anthropometry'
@@ -29,3 +30,13 @@ class Anthropometry(models.Model):
     diastolic = fields.Float(aggregator='avg')
     pulse = fields.Integer(aggregator='avg')
     info = fields.Html()
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if groupby == ["measurement:day"] and fields == ["__count", "weight:avg"]:
+            data = self.search(domain, offset=offset, limit=limit, order="measurement")
+            src_data = [SourceData(event=x.measurement, value=x.weight) for x in data if x.measurement and x.weight]
+            chart_points = approximate(src_data, 100, 'measurement:day', 'weight')
+            return chart_points
+        data = super(Anthropometry, self).read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+        return data
