@@ -19,8 +19,6 @@
         <field name="model">rok.history.event</field>
         <field name="arch" type="xml">
             <form string="History Event">
-                <header>
-                </header>
                 <sheet>
                     <div class="oe_title">
                         <label for="title" string="Title"/>
@@ -33,7 +31,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="is_disease" invisible="1"/>
+                            <field name="is_disease" />
                             <field name="diagnosis" invisible="not is_disease"/>
                             <field name="categ_id" string="Category"/>
                         </group>
@@ -48,6 +46,49 @@
                 </sheet>
                 <div class="o_attachment_preview"/>
                 <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rok_history_fact_list" model="ir.ui.view">
+        <field name="name">rok.history.fact.list</field>
+        <field name="model">rok.history.fact</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="fact_date_time"/>
+                <field name="fact"/>
+                <field name="temperature" optional="hide"/>
+                <field name="info" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rok_history_fact_form" model="ir.ui.view">
+        <field name="name">rok.history.fact.form</field>
+        <field name="model">rok.history.fact</field>
+        <field name="arch" type="xml">
+            <form string="History Fact">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="fact" string="Fact"/>
+                        <h2>
+                            <div class="d-flex">
+                                <field name="fact" options="{'line_breaks': False}" widget="text"/>
+                            </div>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="fact_date_time" />
+                        </group>
+                        <group class="align-items-center">
+                            <field name="is_disease" invisible="1"/>
+                            <field name="temperature" invisible="not is_disease"/>
+                        </group>
+                    </group>
+                    <label for="info" string="Comments" class="o_form_label"/>
+                    <field name="info"/>
+                </sheet>
             </form>
         </field>
     </record>
@@ -82,5 +123,40 @@
         </field>
     </record>
 
-    <menuitem id="menu_rok_history_root" name="History" web_icon="rok_history,static/description/icon.png" action="action_rok_history" sequence="10" groups="base.group_user"/>
+    <record id="ir_actions_server_migrate_news" model="ir.actions.server">
+        <field name="name">Migrate News</field>
+        <field name="model_id" ref="rok_history.model_rok_history_event"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_migrate_news()</field>
+    </record>
+
+    <record id="ir_actions_server_migrate_health" model="ir.actions.server">
+        <field name="name">Migrate Health</field>
+        <field name="model_id" ref="rok_history.model_rok_history_event"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_migrate_health()</field>
+    </record>
+
+    <menuitem
+        id="menu_rok_history_root"
+        name="History"
+        web_icon="rok_history,static/description/icon.png"
+        action="action_rok_history"
+        sequence="10"
+        groups="base.group_user"
+    />
+
+    <menuitem
+        id="menu_rok_history_migrate_news"
+        name="Migrate News"
+        parent="menu_rok_history_root"
+        action="rok_history.ir_actions_server_migrate_news"
+    />
+
+    <menuitem
+        id="menu_rok_history_migrate_health"
+        name="Migrate Health"
+        parent="menu_rok_history_root"
+        action="rok_history.ir_actions_server_migrate_health"
+    />
 </odoo>
