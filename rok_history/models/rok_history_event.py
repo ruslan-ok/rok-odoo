@@ -79,15 +79,16 @@ class HistoryEvent(models.Model):
             rest_children = article.child_ids - nested_folders
             if nested_folders and not rest_children:
                 continue
-            self.add_news_event(article, category)
+            self.add_news_event(article, category, article.name)
         return False
 
-    def add_news_event(self, article, category, title=None):
-        event = self.add_event(article, category, title)
+    def add_news_event(self, article, category, title):
         if not article.child_ids:
+            event = self.add_event(category, title, article.body)
             event.title = article.name[18:]
             self.add_news_fact(event, article)
         else:
+            event = self.add_event(category, title, "")
             for child in article.child_ids:
                 self.add_news_fact(event, child)
         return event
@@ -135,7 +136,7 @@ class HistoryEvent(models.Model):
             else:
                 stop = start
 
-            event = self.add_event(article, category, title=title, diagnosis=diagnosis)
+            event = self.add_event(category, title, article.body, diagnosis)
 
             if start == stop:
                 self.add_fact(event, start, "Event", article.body)
@@ -145,12 +146,11 @@ class HistoryEvent(models.Model):
 
         return False
 
-    def add_event(self, article, category, title=None, diagnosis=None):
-        title = title or article.name
+    def add_event(self, category, title, info, diagnosis=None):
         event = self.env["rok.history.event"].create({
             "user_id": self.env.user.id,
             "title": title,
-            "info": article.body,
+            "info": info,
             "categ_id": category.id,
             "diagnosis": diagnosis,
         })
