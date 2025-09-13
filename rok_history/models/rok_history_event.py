@@ -126,13 +126,16 @@ class HistoryEvent(models.Model):
         ])
         for article in articles:
             title, _, period = article.name.partition(" [")
+            title, _, diagnosis = title.partition(" (")
+            title = title.strip()
+            diagnosis = diagnosis.replace(")", "").strip()
             start = datetime.strptime(period[:10], "%Y-%m-%d")
             if len(period) == 24:
                 stop = datetime.strptime(period[13:23], "%Y-%m-%d")
             else:
                 stop = start
 
-            event = self.add_event(article, category, title=title)
+            event = self.add_event(article, category, title=title, diagnosis=diagnosis)
 
             if start == stop:
                 self.add_fact(event, start, "Event", article.body)
@@ -142,13 +145,14 @@ class HistoryEvent(models.Model):
 
         return False
 
-    def add_event(self, article, category, title=None):
+    def add_event(self, article, category, title=None, diagnosis=None):
         title = title or article.name
         event = self.env["rok.history.event"].create({
             "user_id": self.env.user.id,
             "title": title,
             "info": article.body,
             "categ_id": category.id,
+            "diagnosis": diagnosis,
         })
         return event
 

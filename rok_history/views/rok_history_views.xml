@@ -9,7 +9,7 @@
                 <field name="stop_date"/>
                 <field name="title"/>
                 <field name="diagnosis" optional="hide"/>
-                <field name="info" optional="show"/>
+                <field name="info" widget="rok_html" optional="show"/>
             </list>
         </field>
     </record>
