@@ -73,9 +73,36 @@ class SourceData:
     event: datetime
     value: Decimal
 
+def get_adaptive_date_format(data: list[SourceData]) -> str:
+    """
+    Determine the appropriate date format based on the time span of the data.
+    Returns a format string that provides good readability for the given time range.
+    """
+    if not data or len(data) < 2:
+        return '%Y-%m-%d %H:%M:%S'
+
+    # Get the time span
+    min_time = min(item.event for item in data)
+    max_time = max(item.event for item in data)
+    time_span = max_time - min_time
+
+    # Determine format based on time span
+    if time_span.days <= 1:
+        # Less than 1 day: show time with hours and minutes
+        return '%H:%M'
+    elif time_span.days < 6:
+        # Less than 6 days: show date and time
+        return '%m-%d %H:%M'
+    elif time_span.days <= 30*6:
+        # Less than 6 months: show date only
+        return '%Y-%m-%d'
+    else:
+        # More than 6 years: show year only
+        return '%Y-%m'
+
 def approximate(data: list[SourceData], goal: int, x_label: str, y_label: str) -> list:
     chart_points = []
-    x_mask = '%Y-%m-%d %H:%M:%S'
+    x_mask = get_adaptive_date_format(data)
     cur_time = None
     average: Decimal = Decimal(0)
     qty: int = 0
