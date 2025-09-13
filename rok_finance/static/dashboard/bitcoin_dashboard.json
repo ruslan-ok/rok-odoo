@@ -10,48 +10,48 @@
         "cols": {"0": {"size": 300}, "1": {"size": 120}, "2": {"size": 120}, "3": {"size": 120}, "4": {"size": 120}, "5": {"size": 120}, "6": {"size": 120}, "7": {"size": 120}},
         "merges": [],
         "cells": {
-        "A6": {"content": "=_t(\"Bitcoin\")"},
-        "A10": {"content": "=_t(\"BTC/USD Price\")"}
+            "A6": {"content": "=_t(\"Bitcoin\")"},
+            "A10": {"content": "=_t(\"BTC/USD Price\")"}
         },
         "styles": {"A6": 1, "A10": 2},
         "borders": {"A6:H6": 1, "A10:H10": 1},
         "formats": {},
         "conditionalFormats": [],
         "figures": [
-        {
-            "id": "btc-line-1",
-            "x": 0,
-            "y": 60,
-            "width": 1100,
-            "height": 360,
-            "tag": "chart",
-            "data": {
-                "title": { "text": "" },
-                "background": "#FFFFFF",
-                "legendPosition": "none",
-                "metaData": {
-                    "groupBy": ["timestamp:day"],
-                    "measure": "price",
-                    "order": null,
-                    "resModel": "rok.finance.btc_price_live",
-                    "mode": "line"
-                },
-                "searchParams": {
-                    "comparison": null,
-                    "context": {},
-                    "domain": [],
-                    "groupBy": ["timestamp:day"],
-                    "orderBy": []
-                },
-                "type": "odoo_line",
-                "verticalAxisPosition": "left",
-                "stacked": false,
-                "fillArea": true,
-                "fieldMatching": {
-                    "period": {"chain": "timestamp", "type": "datetime", "offset": 0}
+            {
+                "id": "btc-line-1",
+                "x": 0,
+                "y": 60,
+                "width": 1100,
+                "height": 360,
+                "tag": "chart",
+                "data": {
+                    "title": { "text": "" },
+                    "background": "#FFFFFF",
+                    "legendPosition": "none",
+                    "metaData": {
+                        "groupBy": ["timestamp:day"],
+                        "measure": "price",
+                        "order": null,
+                        "resModel": "rok.finance.btc_price_live",
+                        "mode": "line"
+                    },
+                    "searchParams": {
+                        "comparison": null,
+                        "context": {},
+                        "domain": [],
+                        "groupBy": ["timestamp:day"],
+                        "orderBy": []
+                    },
+                    "type": "odoo_line",
+                    "verticalAxisPosition": "left",
+                    "stacked": false,
+                    "fillArea": true,
+                    "fieldMatching": {
+                        "period": {"chain": "timestamp", "type": "datetime", "offset": 0}
+                    }
                 }
             }
-        }
         ],
         "tables": [],
         "areGridLinesVisible": true,
@@ -72,7 +72,7 @@
     "customTableStyles": {},
     "odooVersion": 12,
     "globalFilters": [
-    {"id": "period", "type": "date", "label": "Period", "defaultValue": "last_week", "rangeType": "relative"}
+        {"id": "period", "type": "date", "label": "Period", "defaultValue": "last_week", "rangeType": "relative"}
     ],
     "lists": {},
     "listNextId": 1,

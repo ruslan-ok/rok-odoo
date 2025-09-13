@@ -1,131 +1,131 @@
 {
-  "version": 21,
-  "sheets": [
-    {
-      "id": "sheet1",
-      "name": "Dashboard",
-      "colNumber": 6,
-      "rowNumber": 60,
-      "rows": {},
-      "cols": {"0": {"size": 320}, "1": {"size": 120}, "2": {"size": 120}, "3": {"size": 120}, "4": {"size": 120}, "5": {"size": 120}},
-      "merges": [],
-      "cells": {
-        "A6": {"content": "[Weight Over Time](odoo://view/{\"viewType\":\"graph\",\"action\":{\"domain\":[],\"context\":{\"graph_measure\":\"weight\",\"graph_date\":\"measurement\",\"graph_mode\":\"line\",\"graph_groupbys\":[\"measurement:day\"]},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"graph\"],[false,\"list\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
-        "A20": {"content": "[Latest Records](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[],\"context\":{},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"list\"],[false,\"graph\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
-        "A22": {"content": "=_t(\"Date\")"},
-        "B22": {"content": "=_t(\"Height\")"},
-        "C22": {"content": "=_t(\"Weight\")"},
-        "D22": {"content": "=_t(\"Waist\")"},
-        "E22": {"content": "=_t(\"Temperature\")"},
-        "F22": {"content": "=_t(\"Pulse\")"},
-        "A23": {"content": "=ODOO.LIST(1,1,\"measurement\")"},
-        "B23": {"content": "=ODOO.LIST(1,1,\"height\")"},
-        "C23": {"content": "=ODOO.LIST(1,1,\"weight\")"},
-        "D23": {"content": "=ODOO.LIST(1,1,\"waist\")"},
-        "E23": {"content": "=ODOO.LIST(1,1,\"temperature\")"},
-        "F23": {"content": "=ODOO.LIST(1,1,\"pulse\")"},
-        "A24": {"content": "=ODOO.LIST(1,2,\"measurement\")"},
-        "B24": {"content": "=ODOO.LIST(1,2,\"height\")"},
-        "C24": {"content": "=ODOO.LIST(1,2,\"weight\")"},
-        "D24": {"content": "=ODOO.LIST(1,2,\"waist\")"},
-        "E24": {"content": "=ODOO.LIST(1,2,\"temperature\")"},
-        "F24": {"content": "=ODOO.LIST(1,2,\"pulse\")"},
-        "A25": {"content": "=ODOO.LIST(1,3,\"measurement\")"},
-        "B25": {"content": "=ODOO.LIST(1,3,\"height\")"},
-        "C25": {"content": "=ODOO.LIST(1,3,\"weight\")"},
-        "D25": {"content": "=ODOO.LIST(1,3,\"waist\")"},
-        "E25": {"content": "=ODOO.LIST(1,3,\"temperature\")"},
-        "F25": {"content": "=ODOO.LIST(1,3,\"pulse\")"},
-        "A26": {"content": "=ODOO.LIST(1,4,\"measurement\")"},
-        "B26": {"content": "=ODOO.LIST(1,4,\"height\")"},
-        "C26": {"content": "=ODOO.LIST(1,4,\"weight\")"},
-        "D26": {"content": "=ODOO.LIST(1,4,\"waist\")"},
-        "E26": {"content": "=ODOO.LIST(1,4,\"temperature\")"},
-        "F26": {"content": "=ODOO.LIST(1,4,\"pulse\")"},
-        "A27": {"content": "=ODOO.LIST(1,5,\"measurement\")"},
-        "B27": {"content": "=ODOO.LIST(1,5,\"height\")"},
-        "C27": {"content": "=ODOO.LIST(1,5,\"weight\")"},
-        "D27": {"content": "=ODOO.LIST(1,5,\"waist\")"},
-        "E27": {"content": "=ODOO.LIST(1,5,\"temperature\")"},
-        "F27": {"content": "=ODOO.LIST(1,5,\"pulse\")"}
-      },
-      "styles": {"A6": 1, "A20": 1},
-      "formats": {},
-      "borders": {"A6:F6": 1, "A20:F20": 1},
-      "conditionalFormats": [],
-      "figures": [
+    "version": 21,
+    "sheets": [
         {
-          "id": "a7a4c1f4-64f5-4d6a-9e4b-3d02a8a7b901",
-          "x": 0,
-          "y": 140,
-          "width": 1000,
-          "height": 220,
-          "tag": "chart",
-          "data": {
-            "title": { "text": "" },
-            "background": "#FFFFFF",
-            "legendPosition": "none",
-            "metaData": {
-              "groupBy": ["measurement:day"],
-              "measure": "weight",
-              "order": null,
-              "resModel": "rok.health.anthropometry",
-              "mode": "line"
+            "id": "sheet1",
+            "name": "Dashboard",
+            "colNumber": 6,
+            "rowNumber": 60,
+            "rows": {},
+            "cols": {"0": {"size": 320}, "1": {"size": 120}, "2": {"size": 120}, "3": {"size": 120}, "4": {"size": 120}, "5": {"size": 120}},
+            "merges": [],
+            "cells": {
+                "A6": {"content": "[Weight Over Time](odoo://view/{\"viewType\":\"graph\",\"action\":{\"domain\":[],\"context\":{\"graph_measure\":\"weight\",\"graph_date\":\"measurement\",\"graph_mode\":\"line\",\"graph_groupbys\":[\"measurement:day\"]},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"graph\"],[false,\"list\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
+                "A20": {"content": "[Latest Records](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[],\"context\":{},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"list\"],[false,\"graph\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
+                "A22": {"content": "=_t(\"Date\")"},
+                "B22": {"content": "=_t(\"Height\")"},
+                "C22": {"content": "=_t(\"Weight\")"},
+                "D22": {"content": "=_t(\"Waist\")"},
+                "E22": {"content": "=_t(\"Temperature\")"},
+                "F22": {"content": "=_t(\"Pulse\")"},
+                "A23": {"content": "=ODOO.LIST(1,1,\"measurement\")"},
+                "B23": {"content": "=ODOO.LIST(1,1,\"height\")"},
+                "C23": {"content": "=ODOO.LIST(1,1,\"weight\")"},
+                "D23": {"content": "=ODOO.LIST(1,1,\"waist\")"},
+                "E23": {"content": "=ODOO.LIST(1,1,\"temperature\")"},
+                "F23": {"content": "=ODOO.LIST(1,1,\"pulse\")"},
+                "A24": {"content": "=ODOO.LIST(1,2,\"measurement\")"},
+                "B24": {"content": "=ODOO.LIST(1,2,\"height\")"},
+                "C24": {"content": "=ODOO.LIST(1,2,\"weight\")"},
+                "D24": {"content": "=ODOO.LIST(1,2,\"waist\")"},
+                "E24": {"content": "=ODOO.LIST(1,2,\"temperature\")"},
+                "F24": {"content": "=ODOO.LIST(1,2,\"pulse\")"},
+                "A25": {"content": "=ODOO.LIST(1,3,\"measurement\")"},
+                "B25": {"content": "=ODOO.LIST(1,3,\"height\")"},
+                "C25": {"content": "=ODOO.LIST(1,3,\"weight\")"},
+                "D25": {"content": "=ODOO.LIST(1,3,\"waist\")"},
+                "E25": {"content": "=ODOO.LIST(1,3,\"temperature\")"},
+                "F25": {"content": "=ODOO.LIST(1,3,\"pulse\")"},
+                "A26": {"content": "=ODOO.LIST(1,4,\"measurement\")"},
+                "B26": {"content": "=ODOO.LIST(1,4,\"height\")"},
+                "C26": {"content": "=ODOO.LIST(1,4,\"weight\")"},
+                "D26": {"content": "=ODOO.LIST(1,4,\"waist\")"},
+                "E26": {"content": "=ODOO.LIST(1,4,\"temperature\")"},
+                "F26": {"content": "=ODOO.LIST(1,4,\"pulse\")"},
+                "A27": {"content": "=ODOO.LIST(1,5,\"measurement\")"},
+                "B27": {"content": "=ODOO.LIST(1,5,\"height\")"},
+                "C27": {"content": "=ODOO.LIST(1,5,\"weight\")"},
+                "D27": {"content": "=ODOO.LIST(1,5,\"waist\")"},
+                "E27": {"content": "=ODOO.LIST(1,5,\"temperature\")"},
+                "F27": {"content": "=ODOO.LIST(1,5,\"pulse\")"}
             },
-            "searchParams": {
-              "comparison": null,
-              "context": {},
-              "domain": [],
-              "groupBy": ["measurement:day"],
-              "orderBy": []
-            },
-            "type": "odoo_line",
-            "verticalAxisPosition": "left",
-            "stacked": false,
-            "fillArea": true,
-            "fieldMatching": {
-              "c8e3b1f2-22f8-4b6f-9a2e-8f3d1a2b4c5d": {
-                "chain": "measurement",
-                "type": "datetime",
-                "offset": 0
-              }
-            }
-          }
+            "styles": {"A6": 1, "A20": 1},
+            "formats": {},
+            "borders": {"A6:F6": 1, "A20:F20": 1},
+            "conditionalFormats": [],
+            "figures": [
+                {
+                    "id": "a7a4c1f4-64f5-4d6a-9e4b-3d02a8a7b901",
+                    "x": 0,
+                    "y": 140,
+                    "width": 1000,
+                    "height": 220,
+                    "tag": "chart",
+                    "data": {
+                        "title": { "text": "" },
+                        "background": "#FFFFFF",
+                        "legendPosition": "none",
+                        "metaData": {
+                            "groupBy": ["measurement:day"],
+                            "measure": "weight",
+                            "order": null,
+                            "resModel": "rok.health.anthropometry",
+                            "mode": "line"
+                        },
+                        "searchParams": {
+                            "comparison": null,
+                            "context": {},
+                            "domain": [],
+                            "groupBy": ["measurement:day"],
+                            "orderBy": []
+                        },
+                        "type": "odoo_line",
+                        "verticalAxisPosition": "left",
+                        "stacked": false,
+                        "fillArea": true,
+                        "fieldMatching": {
+                            "period": {
+                                "chain": "measurement",
+                                "type": "datetime",
+                                "offset": 0
+                            }
+                        }
+                    }
+                }
+            ],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": true,
+            "headerGroups": {"ROW": [], "COL": []},
+            "dataValidationRules": [],
+            "comments": {}
         }
-      ],
-      "tables": [],
-      "areGridLinesVisible": true,
-      "isVisible": true,
-      "headerGroups": {"ROW": [], "COL": []},
-      "dataValidationRules": [],
-      "comments": {}
-    }
-  ],
-  "styles": {"1": {"textColor": "#01666b", "bold": true, "fontSize": 16}},
-  "formats": {},
-  "borders": {"1": {"bottom": {"style": "thin", "color": "#CCCCCC"}}},
-  "revisionId": "START_REVISION",
-  "uniqueFigureIds": true,
-  "settings": {"locale": {"name": "English (US)", "code": "en_US", "thousandsSeparator": ",", "decimalSeparator": ".", "dateFormat": "mm/dd/yyyy", "timeFormat": "hh:mm:ss", "formulaArgSeparator": ",", "weekStart": 7}},
-  "pivots": {},
-  "pivotNextId": 1,
-  "customTableStyles": {},
-  "odooVersion": 12,
-  "globalFilters": [],
-  "lists": {
-    "1": {
-      "columns": ["measurement", "height", "weight", "waist", "temperature", "systolic", "diastolic", "pulse"],
-      "domain": [],
-      "model": "rok.health.anthropometry",
-      "context": {},
-      "orderBy": [{"name": "measurement", "asc": false}],
-      "id": "1",
-      "name": "Anthropometry - Latest",
-      "fieldMatching": {}
-    }
-  },
-  "listNextId": 2,
-  "chartOdooMenusReferences": {}
+    ],
+    "styles": {"1": {"textColor": "#01666b", "bold": true, "fontSize": 16}},
+    "formats": {},
+    "borders": {"1": {"bottom": {"style": "thin", "color": "#CCCCCC"}}},
+    "revisionId": "START_REVISION",
+    "uniqueFigureIds": true,
+    "settings": {"locale": {"name": "English (US)", "code": "en_US", "thousandsSeparator": ",", "decimalSeparator": ".", "dateFormat": "mm/dd/yyyy", "timeFormat": "hh:mm:ss", "formulaArgSeparator": ",", "weekStart": 7}},
+    "pivots": {},
+    "pivotNextId": 1,
+    "customTableStyles": {},
+    "odooVersion": 12,
+    "globalFilters": [
+        {"id": "period", "type": "date", "label": "Period", "defaultValue": "last_week", "rangeType": "relative"}
+    ],
+    "lists": {
+        "1": {
+            "columns": ["measurement", "height", "weight", "waist", "temperature", "systolic", "diastolic", "pulse"],
+            "domain": [],
+            "model": "rok.health.anthropometry",
+            "context": {},
+            "orderBy": [{"name": "measurement", "asc": false}],
+            "id": "1",
+            "name": "Anthropometry - Latest",
+            "fieldMatching": {}
+        }
+    },
+    "listNextId": 2,
+    "chartOdooMenusReferences": {}
 }
-
-
