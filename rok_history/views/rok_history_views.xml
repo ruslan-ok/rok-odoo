@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_rok_history_event_list" model="ir.ui.view">
+        <field name="name">rok.history.event.list</field>
+        <field name="model">rok.history.event</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="start_date"/>
+                <field name="stop_date"/>
+                <field name="title"/>
+                <field name="diagnosis" optional="hide"/>
+                <field name="info" widget="rok_html" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rok_history_event_form" model="ir.ui.view">
+        <field name="name">rok.history.event.form</field>
+        <field name="model">rok.history.event</field>
+        <field name="arch" type="xml">
+            <form string="History Event">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title" string="Title"/>
+                        <h2>
+                            <div class="d-flex">
+                                <field name="is_favorite" widget="boolean_favorite" class="me-3" nolabel="1"/>
+                                <field class="text-break" name="title" options="{'line_breaks': False}" widget="text" placeholder="e.g. example.com"/>
+                            </div>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_disease" />
+                            <field name="diagnosis" invisible="not is_disease"/>
+                            <field name="categ_id" string="Category"/>
+                        </group>
+                        <group class="align-items-center">
+                            <field name="start_date"/>
+                            <field name="stop_date"/>
+                        </group>
+                    </group>
+                    <label for="info" string="Comments" class="o_form_label"/>
+                    <field name="info"/>
+                    <field name="fact_ids"/>
+                </sheet>
+                <div class="o_attachment_preview"/>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rok_history_fact_list" model="ir.ui.view">
+        <field name="name">rok.history.fact.list</field>
+        <field name="model">rok.history.fact</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="fact_date_time"/>
+                <field name="fact"/>
+                <field name="temperature" optional="hide"/>
+                <field name="info" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rok_history_fact_form" model="ir.ui.view">
+        <field name="name">rok.history.fact.form</field>
+        <field name="model">rok.history.fact</field>
+        <field name="arch" type="xml">
+            <form string="History Fact">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="fact" string="Fact"/>
+                        <h2>
+                            <div class="d-flex">
+                                <field name="fact" options="{'line_breaks': False}" widget="text"/>
+                            </div>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="fact_date_time" />
+                        </group>
+                        <group class="align-items-center">
+                            <field name="is_disease" invisible="1"/>
+                            <field name="temperature" invisible="not is_disease"/>
+                        </group>
+                    </group>
+                    <label for="info" string="Comments" class="o_form_label"/>
+                    <field name="info"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="rok_history_view_search_catalog" model="ir.ui.view">
+        <field name="name">rok.history.view.search.catalog</field>
+        <field name="model">rok.history.event</field>
+        <field name="arch" type="xml">
+            <search string="History Event">
+                <!-- Search field -->
+                <field name="title"
+                    string="History Event record (any field)"
+                    filter_domain="['|', '|', ('title', 'ilike', self), ('diagnosis', 'ilike', self), ('info', 'ilike', self)]"/>
+                <!-- Filter -->
+                <filter string="Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <!-- searchpanel -->
+                <searchpanel>
+                    <field name="categ_id"
+                        string="History Event Category"
+                        icon="fa-th-list"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rok_history" model="ir.actions.act_window">
+        <field name="name">Event</field>
+        <field name="res_model">rok.history.event</field>
+        <field name="view_mode">list,form</field>
+        <field name="views" eval="[(ref('view_rok_history_event_list'), 'list'), (ref('view_rok_history_event_form'), 'form')]"/>
+        <field name="search_view_id" ref="rok_history_view_search_catalog"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first event</p>
+        </field>
+    </record>
+
+    <record id="ir_actions_server_migrate_news" model="ir.actions.server">
+        <field name="name">Migrate News</field>
+        <field name="model_id" ref="rok_history.model_rok_history_event"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_migrate_news()</field>
+    </record>
+
+    <record id="ir_actions_server_migrate_health" model="ir.actions.server">
+        <field name="name">Migrate Health</field>
+        <field name="model_id" ref="rok_history.model_rok_history_event"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_migrate_health()</field>
+    </record>
+
+    <menuitem
+        id="menu_rok_history_root"
+        name="History"
+        web_icon="rok_history,static/description/icon.png"
+        action="action_rok_history"
+        sequence="10"
+        groups="base.group_user"
+    />
+
+    <menuitem
+        id="menu_rok_history_migrate_news"
+        name="Migrate News"
+        parent="menu_rok_history_root"
+        action="rok_history.ir_actions_server_migrate_news"
+    />
+
+    <menuitem
+        id="menu_rok_history_migrate_health"
+        name="Migrate Health"
+        parent="menu_rok_history_root"
+        action="rok_history.ir_actions_server_migrate_health"
+    />
+</odoo>

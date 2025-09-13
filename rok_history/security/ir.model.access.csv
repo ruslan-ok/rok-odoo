@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rok_history_event_user,rok.history.event user,model_rok_history_event,base.group_user,1,1,1,1
+access_rok_history_event_manager,rok.history.event manager,model_rok_history_event,base.group_system,1,1,1,1
+access_rok_history_fact_user,rok.history.fact user,model_rok_history_fact,base.group_user,1,1,1,1
+access_rok_history_category_user,rok.history.category user,model_rok_history_category,base.group_user,1,1,1,1
