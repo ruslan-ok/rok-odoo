@@ -1,5 +1,5 @@
 {
-    "version": 21,
+    "version": 23,
     "sheets": [
     {
         "id": "sheet_btc",
@@ -10,18 +10,56 @@
         "cols": {"0": {"size": 300}, "1": {"size": 120}, "2": {"size": 120}, "3": {"size": 120}, "4": {"size": 120}, "5": {"size": 120}, "6": {"size": 120}, "7": {"size": 120}},
         "merges": [],
         "cells": {
-            "A6": {"content": "=_t(\"Bitcoin\")"},
-            "A10": {"content": "=_t(\"BTC/USD Price\")"}
+            "A7": {"content": "=_t(\"BTC/USD Price\")"}
         },
-        "styles": {"A6": 1, "A10": 2},
-        "borders": {"A6:H6": 1, "A10:H10": 1},
+        "styles": {"A7": 1},
+        "borders": {"A7:H7": 1},
         "formats": {},
         "conditionalFormats": [],
         "figures": [
             {
+                "id": "btc-current-price",
+                "x": 0,
+                "y": 11,
+                "width": 200,
+                "height": 109,
+                "tag": "chart",
+                "data": {
+                    "baselineColorDown": "#DC6965",
+                    "baselineColorUp": "#00A04A",
+                    "baselineMode": "text",
+                    "title": { "text": "Current Bitcoin Price", "color": "#434343", "bold": true },
+                    "type": "scorecard",
+                    "background": "#EFF6FF",
+                    "baseline": "Data!C2",
+                    "baselineDescr": "period start",
+                    "keyValue": "Data!C1",
+                    "humanize": false
+                }
+            },
+            {
+                "id": "btc-price-change",
+                "x": 210,
+                "y": 11,
+                "width": 200,
+                "height": 109,
+                "tag": "chart",
+                "data": {
+                    "baselineColorDown": "#DC6965",
+                    "baselineColorUp": "#00A04A",
+                    "baselineMode": "difference",
+                    "title": { "text": "Price Change", "color": "#434343", "bold": true },
+                    "type": "scorecard",
+                    "background": "#FEF2F2",
+                    "baselineDescr": "from period start",
+                    "keyValue": "Data!C3",
+                    "humanize": false
+                }
+            },
+            {
                 "id": "btc-line-1",
                 "x": 0,
-                "y": 60,
+                "y": 200,
                 "width": 1100,
                 "height": 360,
                 "tag": "chart",
@@ -33,7 +71,7 @@
                         "groupBy": ["timestamp:day"],
                         "measure": "price",
                         "order": null,
-                        "resModel": "rok.finance.btc_price_live",
+                        "resModel": "rok.finance.btc_price",
                         "mode": "line"
                     },
                     "searchParams": {
@@ -59,12 +97,43 @@
         "headerGroups": {"ROW": [], "COL": []},
         "dataValidationRules": [],
         "comments": {}
+    },
+    {
+        "id": "btc-data-sheet",
+        "name": "Data",
+        "colNumber": 26,
+        "rowNumber": 20,
+        "rows": {},
+        "cols": {"0": {"size": 142}, "1": {"size": 128}},
+        "merges": [],
+        "cells": {
+            "A1": {"content": "=_t(\"KPI - Current Price\")"},
+            "A2": {"content": "=_t(\"KPI - Period Start Price\")"},
+            "A3": {"content": "=_t(\"KPI - Price Change\")"},
+            "B1": {"content": "=ODOO.LIST(1,1,\"current_price\")"},
+            "B2": {"content": "42000"},
+            "B3": {"content": "=IFERROR((B1-B2)/B2*100,0)"},
+            "C1": {"content": "=FORMAT.LARGE.NUMBER(B1)"},
+            "C2": {"content": "=FORMAT.LARGE.NUMBER(B2)"},
+            "C3": {"content": "=CONCATENATE(IF(B3>=0,\"+\",\"\"),FORMAT.LARGE.NUMBER(B3),\"%\")"}
+        },
+        "styles": {},
+        "borders": {},
+        "formats": {},
+        "conditionalFormats": [],
+        "figures": [],
+        "tables": [],
+        "areGridLinesVisible": true,
+        "isVisible": false,
+        "headerGroups": {"ROW": [], "COL": []},
+        "dataValidationRules": [],
+        "comments": {}
     }
     ],
     "styles": {"1": {"textColor": "#01666b", "bold": true, "fontSize": 18}, "2": {"textColor": "#434343", "bold": true, "fontSize": 12}},
     "formats": {},
     "borders": {"1": {"bottom": {"style": "thin", "color": "#CCCCCC"}}},
-    "revisionId": "START_REVISION",
+    "revisionId": "BTC_DASHBOARD_V5",
     "uniqueFigureIds": true,
     "settings": {"locale": {"name": "English (US)", "code": "en_US", "thousandsSeparator": ",", "decimalSeparator": ".", "dateFormat": "mm/dd/yyyy", "timeFormat": "hh:mm:ss", "formulaArgSeparator": ",", "weekStart": 7}},
     "pivots": {},
@@ -74,8 +143,23 @@
     "globalFilters": [
         {"id": "period", "type": "date", "label": "Period", "defaultValue": "last_week", "rangeType": "relative"}
     ],
-    "lists": {},
-    "listNextId": 1,
+    "lists": {
+        "1": {
+            "model": "rok.finance.btc_kpi",
+            "columns": ["current_price", "period_start_price", "price_change_percent"],
+            "domain": [],
+            "context": {},
+            "orderBy": [],
+            "id": "1",
+            "name": "BTC KPI",
+            "fieldMatching": {
+                "current_price": {"chain": "current_price", "type": "float", "offset": 0},
+                "period_start_price": {"chain": "period_start_price", "type": "float", "offset": 0},
+                "price_change_percent": {"chain": "price_change_percent", "type": "float", "offset": 0}
+            }
+        }
+    },
+    "listNextId": 2,
     "chartOdooMenusReferences": {}
 }
 

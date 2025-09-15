@@ -1,5 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_btc_price_live_user,access_btc_price_live_user,model_rok_finance_btc_price_live,base.group_user,1,0,0,0
-access_btc_price_live_admin,access_btc_price_live_admin,model_rok_finance_btc_price_live,base.group_system,1,1,1,1
-
-
+access_btc_price_user,access_btc_price_user,model_rok_finance_btc_price,base.group_user,1,1,1,1
+access_btc_kpi_user,access_btc_kpi_user,model_rok_finance_btc_kpi,base.group_user,1,1,1,1
