@@ -10,7 +10,7 @@
             "cols": {"0": {"size": 320}, "1": {"size": 120}, "2": {"size": 120}, "3": {"size": 120}, "4": {"size": 120}, "5": {"size": 120}},
             "merges": [],
             "cells": {
-                "A6": {"content": "[Weight Over Time](odoo://view/{\"viewType\":\"graph\",\"action\":{\"domain\":[],\"context\":{\"graph_measure\":\"weight\",\"graph_date\":\"measurement\",\"graph_mode\":\"line\",\"graph_groupbys\":[\"measurement:day\"]},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"graph\"],[false,\"list\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
+                "A7": {"content": "[Weight Over Time](odoo://view/{\"viewType\":\"graph\",\"action\":{\"domain\":[],\"context\":{\"graph_measure\":\"weight\",\"graph_date\":\"measurement\",\"graph_mode\":\"line\",\"graph_groupbys\":[\"measurement:day\"]},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"graph\"],[false,\"list\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
                 "A20": {"content": "[Latest Records](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[],\"context\":{},\"modelName\":\"rok.health.anthropometry\",\"views\":[[false,\"list\"],[false,\"graph\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Anthropometry\"})"},
                 "A22": {"content": "=_t(\"Date\")"},
                 "B22": {"content": "=_t(\"Height\")"},
@@ -49,16 +49,55 @@
                 "E27": {"content": "=ODOO.LIST(1,5,\"temperature\")"},
                 "F27": {"content": "=ODOO.LIST(1,5,\"pulse\")"}
             },
-            "styles": {"A6": 1, "A20": 1},
+            "styles": {"A7": 1, "A20": 1},
             "formats": {},
-            "borders": {"A6:F6": 1, "A20:F20": 1},
+            "borders": {"A7:F7": 1, "A20:F20": 1},
             "conditionalFormats": [],
             "figures": [
                 {
+                    "id": "anthropometry-current-weight",
+                    "x": 0,
+                    "y": 11,
+                    "width": 200,
+                    "height": 109,
+                    "tag": "chart",
+                    "data": {
+                        "baselineColorDown": "#DC6965",
+                        "baselineColorUp": "#00A04A",
+                        "baselineMode": "text",
+                        "title": { "text": "Current Weight", "color": "#434343", "bold": true },
+                        "type": "scorecard",
+                        "background": "#EFF6FF",
+                        "baseline": "Data!C2",
+                        "baselineDescr": "period 7d start",
+                        "keyValue": "Data!C1",
+                        "humanize": false
+                    }
+                },
+                {
+                    "id": "anthropometry-weight-change",
+                    "x": 210,
+                    "y": 11,
+                    "width": 200,
+                    "height": 109,
+                    "tag": "chart",
+                    "data": {
+                        "baselineColorDown": "#DC2626",
+                        "baselineColorUp": "#059669",
+                        "baselineMode": "difference",
+                        "title": { "text": "Weight Change", "color": "#434343", "bold": true },
+                        "type": "scorecard",
+                        "background": "#ECFDF5",
+                        "baselineDescr": "",
+                        "keyValue": "Data!C3",
+                        "humanize": false
+                    }
+                },
+                {
                     "id": "a7a4c1f4-64f5-4d6a-9e4b-3d02a8a7b901",
                     "x": 0,
-                    "y": 140,
-                    "width": 1000,
+                    "y": 210,
+                    "width": 900,
                     "height": 220,
                     "tag": "chart",
                     "data": {
@@ -109,10 +148,42 @@
             "headerGroups": {"ROW": [], "COL": []},
             "dataValidationRules": [],
             "comments": {}
+        },
+        {
+            "id": "weight-data-sheet",
+            "name": "Data",
+            "colNumber": 26,
+            "rowNumber": 20,
+            "rows": {},
+            "cols": {"0": {"size": 142}, "1": {"size": 128}},
+            "merges": [],
+            "cells": {
+                "A1": {"content": "=_t(\"KPI - Current Weight\")"},
+                "A2": {"content": "=_t(\"KPI - Period Start Weight\")"},
+                "A3": {"content": "=_t(\"KPI - Weight Change\")"},
+                "B1": {"content": "=ODOO.LIST(2,1,\"current_weight\")"},
+                "B2": {"content": "=ODOO.LIST(2,1,\"period_start_weight\")"},
+                "B3": {"content": "=ODOO.LIST(2,1,\"weight_change_percent\")"},
+                "C1": {"format": 1, "content": "=CONCATENATE(ROUND(B1,2),\" kg\")"},
+                "C2": {"format": 1, "content": "=CONCATENATE(ROUND(B2,2),\" kg\")"},
+                "C3": {"format": 2, "content": "=CONCATENATE(IF(B3>=0,\"+\",\"\"),ROUND(B3,2),\"%\")"},
+                "D3": {"content": "0"}
+            },
+            "styles": {},
+            "borders": {},
+            "formats": {},
+            "conditionalFormats": [],
+            "figures": [],
+            "tables": [],
+            "areGridLinesVisible": true,
+            "isVisible": false,
+            "headerGroups": {"ROW": [], "COL": []},
+            "dataValidationRules": [],
+            "comments": {}
         }
     ],
     "styles": {"1": {"textColor": "#01666b", "bold": true, "fontSize": 16}},
-    "formats": {},
+    "formats": {"1": "#,##0.00", "2": "0.00%"},
     "borders": {"1": {"bottom": {"style": "thin", "color": "#CCCCCC"}}},
     "revisionId": "START_REVISION",
     "uniqueFigureIds": true,
@@ -134,8 +205,18 @@
             "id": "1",
             "name": "Anthropometry - Latest",
             "fieldMatching": {}
+        },
+        "2": {
+            "columns": ["current_weight", "period_start_weight", "weight_change_percent"],
+            "domain": [],
+            "model": "rok.health.anthropometry_kpi",
+            "context": {},
+            "orderBy": [{"name": "current_weight", "asc": false}],
+            "id": "2",
+            "name": "Anthropometry - KPI",
+            "fieldMatching": {}
         }
     },
-    "listNextId": 2,
+    "listNextId": 3,
     "chartOdooMenusReferences": {}
 }

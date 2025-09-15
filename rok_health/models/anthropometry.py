@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from datetime import timedelta
+from odoo import models, fields, api, fields as fields_api
 from odoo.addons.rok_spreadsheet.utils.delta import approximate, SourceData
 
 class Anthropometry(models.Model):
@@ -40,3 +41,49 @@ class Anthropometry(models.Model):
             return chart_points
         data = super(Anthropometry, self).read_group(domain, fields, groupby, offset, limit, orderby, lazy)
         return data
+
+class AnthropometryKPI(models.Model):
+    _name = 'rok.health.anthropometry_kpi'
+    _description = 'Anthropometry KPI'
+    _order = 'current_weight desc'
+    _auto = False  # virtual, no table
+
+    current_weight = fields.Float(aggregator='avg')
+    period_start_weight = fields.Float(aggregator='avg')
+    weight_change_percent = fields.Float(aggregator='avg')
+
+    @api.model
+    def search_read(self, domain, fields, offset=0, limit=None, order=None):
+        """Return KPI data as search_read format."""
+        domain = [('measurement', '>=', fields_api.Datetime.now() - timedelta(days=7)), ("weight", "!=", 0)]
+        data = self.env['rok.health.anthropometry'].search(domain)
+        current_weight = period_start_weight = weight_change_percent = 0
+        if data:
+            current_weight = data[0].weight
+            period_start_weight = data[-1].weight
+            weight_change_percent = ((current_weight - period_start_weight) / period_start_weight * 100) if period_start_weight > 0 else 0
+
+        # Return in search_read format with virtual ID
+        record = {'id': 1}  # Virtual ID for spreadsheet compatibility
+
+        # Only include requested fields
+        if not fields or 'current_weight' in fields:
+            record['current_weight'] = current_weight
+        if not fields or 'period_start_weight' in fields:
+            record['period_start_weight'] = period_start_weight
+        if not fields or 'weight_change_percent' in fields:
+            record['weight_change_percent'] = weight_change_percent
+        return [record]
+
+    @api.model
+    @api.readonly
+    def web_search_read(self, domain, specification, offset=0, limit=None, order=None, count_limit=None):
+        """Return KPI data as web_search_read format."""
+        fields = list(specification.keys()) if specification else ['current_weight', 'period_start_weight', 'weight_change_percent']
+        records = self.search_read(domain, fields, offset, limit, order)
+
+        # Format for web_search_read - must return dict with 'length' and 'records'
+        return {
+            'length': len(records),
+            'records': records
+        }
