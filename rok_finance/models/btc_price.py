@@ -95,30 +95,19 @@ class RokFinanceBtcKpi(models.Model):
             return []
 
         headers = {'x-access-token': api_key, 'User-Agent': 'Mozilla/5.0'}
-        url = f"{API_COIN_RATE}"
-        resp = requests.get(url, headers=headers, timeout=15)
-        resp.raise_for_status()
-        payload = resp.json()
-
-        if payload.get('status') != 'success':
-            return []
-
-        coin_data = payload.get('data', {}).get('coin', {})
-        current_price = float(coin_data.get('price', 0))
-
         # Get historical data for comparison
-        history_url = f"{API_COIN_RATE}history?timePeriod=24h"
+        history_url = f"{API_COIN_RATE}history?timePeriod=7d"
         history_resp = requests.get(history_url, headers=headers, timeout=15)
         history_resp.raise_for_status()
         history_payload = history_resp.json()
 
-        period_start_price = current_price
+        period_start_price = current_price = price_change_percent = 0
         if history_payload.get('status') == 'success':
             history = history_payload.get('data', {}).get('history', [])
             if history:
-                period_start_price = float(history[0].get('price', current_price))
-
-        price_change_percent = ((current_price - period_start_price) / period_start_price * 100) if period_start_price > 0 else 0
+                current_price = float(history[0].get('price', 0))
+                period_start_price = float(history[-1].get('price', 0))
+                price_change_percent = ((current_price - period_start_price) / period_start_price * 100) if period_start_price > 0 else 0
 
         # Return in search_read format with virtual ID
         record = {'id': 1}  # Virtual ID for spreadsheet compatibility
