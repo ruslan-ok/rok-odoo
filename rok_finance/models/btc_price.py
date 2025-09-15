@@ -1,15 +1,15 @@
 from odoo import models, fields, api
 from decimal import Decimal
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from odoo.addons.rok_spreadsheet.utils.delta import approximate, SourceData
 
 
 API_COIN_RATE = "https://api.coinranking.com/v2/coin/Qwsogvtv82FCd/"
 
 
-class RokFinanceBtcPriceLive(models.Model):
-    _name = 'rok.finance.btc_price_live'
+class RokFinanceBtcPrice(models.Model):
+    _name = 'rok.finance.btc_price'
     _description = 'BTC price (live)'
     _auto = False  # virtual, no table
 
@@ -71,8 +71,66 @@ class RokFinanceBtcPriceLive(models.Model):
         src_data = []
         for i in reversed(range(len(history))):
             h = history[i]
-            sd = SourceData(event=datetime.utcfromtimestamp(h['timestamp']), value=Decimal(h['price'] if h['price'] else prev))
+            sd = SourceData(event=datetime.fromtimestamp(h['timestamp'], tz=timezone.utc), value=Decimal(h['price'] if h['price'] else prev))
             src_data.append(sd)
             prev = sd.value
         chart_points = approximate(src_data, 100, 'timestamp:day', 'price')
         return chart_points
+
+
+class RokFinanceBtcKpi(models.Model):
+    _name = 'rok.finance.btc_kpi'
+    _description = 'BTC KPI data'
+    _auto = False  # virtual, no table
+
+    current_price = fields.Float(readonly=True)
+    period_start_price = fields.Float(readonly=True)
+    price_change_percent = fields.Float(readonly=True)
+
+    @api.model
+    def search_read(self, domain, fields, offset=0, limit=None, order=None):
+        """Return KPI data as search_read format."""
+        api_key = self.env['ir.config_parameter'].sudo().get_param('rok_finance.coinranking_api_key')
+        if not api_key:
+            return []
+
+        headers = {'x-access-token': api_key, 'User-Agent': 'Mozilla/5.0'}
+        # Get historical data for comparison
+        history_url = f"{API_COIN_RATE}history?timePeriod=7d"
+        history_resp = requests.get(history_url, headers=headers, timeout=15)
+        history_resp.raise_for_status()
+        history_payload = history_resp.json()
+
+        period_start_price = current_price = price_change_percent = 0
+        if history_payload.get('status') == 'success':
+            history = history_payload.get('data', {}).get('history', [])
+            if history:
+                current_price = float(history[0].get('price', 0))
+                period_start_price = float(history[-1].get('price', 0))
+                price_change_percent = ((current_price - period_start_price) / period_start_price * 100) if period_start_price > 0 else 0
+
+        # Return in search_read format with virtual ID
+        record = {'id': 1}  # Virtual ID for spreadsheet compatibility
+
+        # Only include requested fields
+        if not fields or 'current_price' in fields:
+            record['current_price'] = current_price
+        if not fields or 'period_start_price' in fields:
+            record['period_start_price'] = period_start_price
+        if not fields or 'price_change_percent' in fields:
+            record['price_change_percent'] = price_change_percent
+
+        return [record]
+
+    @api.model
+    @api.readonly
+    def web_search_read(self, domain, specification, offset=0, limit=None, order=None, count_limit=None):
+        """Return KPI data as web_search_read format."""
+        fields = list(specification.keys()) if specification else ['current_price', 'period_start_price', 'price_change_percent']
+        records = self.search_read(domain, fields, offset, limit, order)
+
+        # Format for web_search_read - must return dict with 'length' and 'records'
+        return {
+            'length': len(records),
+            'records': records
+        }
