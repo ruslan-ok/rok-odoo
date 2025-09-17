@@ -63,6 +63,7 @@ const waitForChart = () => {
                                 dataset.cubicInterpolationMode = 'monotone';
                             });
                         }
+                        this.config.options.scales.y.beginAtZero = false;
 
                         return originalUpdate.call(this, mode);
                     };
