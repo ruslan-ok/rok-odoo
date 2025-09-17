@@ -2,7 +2,7 @@
     "name": "Rok History",
     "summary": "History module for the Rok Project",
     "category": "Productivity/Health",
-    "version": "1.0",
+    "version": "1.0.0",
     "depends": [
         "base",
         "mail",

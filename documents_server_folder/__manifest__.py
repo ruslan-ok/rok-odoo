@@ -1,6 +1,6 @@
 {
     "name": "Server Folder for Documents",
-    "version": "1.0",
+    "version": "1.0.0",
     "depends": [
         "documents",
         "documents_spreadsheet",

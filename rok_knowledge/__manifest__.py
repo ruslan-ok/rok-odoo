@@ -1,8 +1,8 @@
 {
     'name': 'Rok Knowledge',
-    'summary': 'Knowledge module customaization for the Rok Project',
+    'summary': 'Makes all articles private',
     'category': 'Productivity/Knowledge',
-    'version': '1.0',
+    'version': '1.0.0',
     'depends': [
         'knowledge',
     ],

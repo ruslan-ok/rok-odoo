@@ -21,11 +21,11 @@
 #############################################################################
 {
     'name': "Google Contact Connector",
-    'version': '18.0.1.0.0',
+    'version': '1.0.0',
     "category": "Extra Tools",
     'summary': """Synchronize Google Contacts (Import/Export).""",
     'description': """The Google Contact Connector module helps you import
-     Google contacts from Odoo and export Google contacts to Odoo.""",
+        Google contacts from Odoo and export Google contacts to Odoo.""",
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',

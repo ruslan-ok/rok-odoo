@@ -1,7 +1,7 @@
 {
     'name': 'Rok Calendar',
     'summary': 'Calendar module customaization for the Rok Project',
-    'version': '1.0',
+    'version': '1.0.0',
     'depends': [
         'calendar',
     ],

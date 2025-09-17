@@ -1,6 +1,6 @@
 {
     "name": "Password Manager",
-    "version": "1.0",
+    "version": "1.0.0",
     "summary": "Password Manager",
     "sequence": 46,
     "description": "Password Manager",

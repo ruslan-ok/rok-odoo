@@ -1,6 +1,6 @@
 {
     'name': 'Calendar Telegram Notification',
-    'version': '1.0',
+    'version': '1.0.0',
     'depends': ['calendar'],
     'category': 'Tools',
     'description': 'Send calendar notifications to Telegram',
