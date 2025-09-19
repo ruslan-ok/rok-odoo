@@ -1,4 +1,4 @@
-from odoo import fields, models, tools
+from odoo import api, fields, models, tools
 
 
 class Passwords(models.Model):
@@ -29,6 +29,28 @@ class Passwords(models.Model):
     active = fields.Boolean(default=True, help="If unchecked, it will allow you to hide the password without removing it.")
     password_history_count = fields.Integer(compute='_compute_password_history_count', string='History Count')
     website = fields.Char()
+
+    @api.model
+    def default_get(self, fields_list):
+        defaults = super().default_get(fields_list)
+        context = self.env.context or {}
+
+        if "categ_id" in fields_list and not defaults.get("categ_id"):
+            value = context.get("default_categ_id")
+            if value is None:
+                value = context.get("searchpanel_default_categ_id")
+
+            # Accept formats used by the searchpanel: single id, list of ids, or string id
+            if isinstance(value, (list, tuple)):
+                value = value[0] if value else False
+            if isinstance(value, str):
+                # Values from the searchpanel can be stringified ids
+                value = int(value) if value.isdigit() else False
+
+            if value:
+                defaults["categ_id"] = value
+
+        return defaults
 
     def _compute_password_history_count(self):
         for record in self:
