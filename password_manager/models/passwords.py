@@ -28,6 +28,7 @@ class Passwords(models.Model):
     is_favorite = fields.Boolean(string="Favorite")
     active = fields.Boolean(default=True, help="If unchecked, it will allow you to hide the password without removing it.")
     password_history_count = fields.Integer(compute='_compute_password_history_count', string='History Count')
+    website = fields.Char()
 
     def _compute_password_history_count(self):
         for record in self:
