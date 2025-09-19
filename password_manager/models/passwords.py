@@ -11,14 +11,14 @@ class Passwords(models.Model):
     @tools.ormcache()
     def _get_default_login(self):
         return self.env.user.partner_id.email or self.env.user.login
-    
+
     title = fields.Char(required=True)
     login = fields.Char(default=_get_default_login, tracking=True)
     value = fields.Char(tracking=True)
     info = fields.Html()
     categ_id = fields.Many2one(
         "password.category", "Password Category",
-        change_default=True, 
+        change_default=True,
         group_expand="_read_group_categ_id",
         required=True,
     )
