@@ -1,3 +1,4 @@
+from random import randint
 from odoo import fields, models
 
 class PasswordTag(models.Model):
@@ -8,9 +9,13 @@ class PasswordTag(models.Model):
     def _get_default_password_id(self):
         return self.env["passwords"].browse(self.env.context.get("password_id"))
 
+
+    def _get_default_color(self):
+        return randint(1, 11)
+
     name = fields.Char(string="Name", required=True, translate=True)
     sequence = fields.Integer(default=10)
-    color = fields.Char(string="Color", default="#3C3C3C")
+    color = fields.Integer(string='Color', default=_get_default_color, aggregator=False)
     password_ids = fields.Many2many(
         string="Passwords",
         comodel_name="passwords",
