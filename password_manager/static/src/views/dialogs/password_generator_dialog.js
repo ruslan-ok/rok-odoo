@@ -79,7 +79,7 @@ const INCLUDE_VALUES = [
     },
 ];
 
-class PasswordGenerator {
+export class PasswordGenerator {
     constructor(state, use) {
         this.isPassphrase = state.isPassphrase;
         this.passwordLength = state.passwordLength;
