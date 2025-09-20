@@ -41,7 +41,7 @@ patch(ListController.prototype, {
         } catch (e) {
             // Fallback to default behavior on any error
         }
-        return await this._super(options);
+        return await super.createRecord(...arguments);
     },
 });
 
