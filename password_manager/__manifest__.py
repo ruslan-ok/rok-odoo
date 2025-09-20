@@ -1,6 +1,6 @@
 {
     "name": "Password Manager",
-    "version": "1.0",
+    "version": "2.0",
     "summary": "Password Manager",
     "sequence": 46,
     "description": "Password Manager",
@@ -19,6 +19,9 @@
             "password_manager/static/src/views/**/*",
             "password_manager/static/src/css/passwords_tree.css",
         ],
+    },
+    "external_dependencies": {
+        "python": ["cryptography"],
     },
     "author": "Ruslan Akunevich",
     "license": "LGPL-3",
