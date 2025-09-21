@@ -4,6 +4,7 @@ import { documentsCogMenuItemRefresh } from "./documents_cog_menu_item_refresh";
 
 
 patch(DocumentsCogMenu.prototype, {
+    // Rok todo: check
     async _registryItems() {
         let enabledItems = await super._registryItems();
         const item = documentsCogMenuItemRefresh;

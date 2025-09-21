@@ -18,8 +18,6 @@ class DocumentsDocument(models.Model):
     _inherit = "documents.document"
 
     located_on_the_server = fields.Boolean("This object (folder or file) is located on the Server", default=False)
-    has_children = fields.Boolean("Does it have child folders?", default=False)
-    fetch_dt = fields.Datetime()
 
     def _register_hook(self):
         super()._register_hook()
@@ -28,7 +26,82 @@ class DocumentsDocument(models.Model):
         def search_panel_select_range_patch(self, field_name, **kwargs):
             return self.search_panel_select_range_patched(field_name, **kwargs)
 
+        Document_for_patching.search_panel_select_range_origin = Document_for_patching.search_panel_select_range
         Document_for_patching.search_panel_select_range = search_panel_select_range_patch
+
+    def _unregister_hook(self):
+        super()._unregister_hook()
+        Document_for_patching.search_panel_select_range = Document_for_patching.search_panel_select_range_origin
+        Document_for_patching.search_panel_select_range_origin = None
+
+    @api.depends_context('uid')
+    @api.depends('folder_id', 'folder_id.user_permission', 'owner_id', 'active')
+    def _compute_user_folder_id(self):
+        super()._compute_user_folder_id()
+        self.filtered(lambda d: d.located_on_the_server).user_folder_id = "SERVER_FOLDER"
+
+    # Rok todo: check
+    def _search_user_folder_id(self, operator, operand):
+        """Search domain for user_folder_id virtual folder_id.
+
+        Note that searching in "RECENT" is allowed for practicality w.r.t. webclient
+        even though no record will have "RECENT" as computed `user_folder_id`
+        """
+        if operator not in ('in', 'child_of'):
+            return NotImplemented
+        values = {operand} if isinstance(operand, str) else set(operand)
+        if 'TRASH' in values:
+            # Would need `active_test=False` in context
+            raise UserError(_("Searching on TRASH is not supported."))
+        domain_parts = []
+        folder_ids = []
+        for value in values:
+            if isinstance(value, int):
+                value = str(value)
+            elif not isinstance(value, str):
+                raise UserError(_("Invalid search operand."))
+            if not value and self.env.user.share:
+                domain_parts.append(Domain("folder_id", "=", False) | Domain('folder_id', 'not any', []))
+            elif not value:
+                domain_parts.append(Domain.FALSE)
+            elif value == "COMPANY":
+                domain_parts.append(Domain('folder_id', '=', False) & Domain('owner_id', '=', False) & Domain('located_on_the_server', '=', False))
+            elif value == "MY":
+                domain_parts.append(Domain('folder_id', '=', False) & Domain('owner_id', '=', self.env.user.id) & Domain('located_on_the_server', '=', False))
+            elif value == "SERVER_FOLDER":
+                domain_parts.append(Domain('located_on_the_server', '=', True))
+            elif value == "RECENT":
+                domain_parts.append(Domain(
+                    'access_ids', 'any',
+                    Domain('partner_id', '=', self.env.user.partner_id.id) & Domain('last_access_date', '!=', False)))
+            elif value == "SHARED":
+                # Find records without permission on folder_id as directly searching on user_permission = 'none' is not allowed.
+                domain_parts.append(
+                    Domain('folder_id', '!=', False) & Domain('folder_id', 'not any', [])
+                    | Domain("folder_id", "=", False) & Domain("owner_id", "not in", [self.env.user.id, False])
+                )
+            elif value.isnumeric():
+                folder_ids.append(int(value))
+            else:
+                raise UserError(_("Unknown searched value %s", value))
+
+        if folder_ids:
+            domain_parts.append(Domain('folder_id', 'in', folder_ids))
+
+        domain = Domain.OR(domain_parts)
+
+        if operator == 'child_of':
+            # as ('id', 'child_of', domain') doesn't work, and for performance reasons.
+            # (rules will be applied on final domain)
+            top_level = self.with_context(active_test=False).sudo().search_fetch(domain, ['type'])
+            top_level_folders = top_level.filtered(lambda d: d.type == 'folder')
+            return Domain('id', 'in', top_level.ids) | Domain('folder_id', 'child_of', top_level_folders.ids)
+        return domain
+
+    # Rok todo: check
+    @api.model
+    def _clean_vals_for_user_folder_id(self, vals):
+        super()._clean_vals_for_user_folder_id(vals)
 
     def _get_search_panel_fields(self):
         """Return the list of fields used by the search panel."""
@@ -37,18 +110,26 @@ class DocumentsDocument(models.Model):
             search_panel_fields += ['located_on_the_server']
         return search_panel_fields
 
+    # Rok todo: check
     @api.model
-    def search_panel_select_range(self, field_name, **kwargs):
+    def search_panel_select_range_patched(self, field_name, **kwargs):
         def convert_user_folder_ids_to_int(vals):
             """Convert user_folder_id to int where applicable to construct categoryTree matching on id of parent."""
             if (user_folder_id := vals['user_folder_id']) and user_folder_id.isnumeric():
                 vals['user_folder_id'] = int(user_folder_id)
 
         if field_name == 'user_folder_id':
+            if self.root_path:
+                domain = Domain('type', '=', 'folder') & Domain('located_on_the_server', '=', True) & Domain('owner_id', '=', self.env.user.id)
+                records_count = self.env['documents.document'].search_count(domain)
+                if not records_count:
+                    self.populate_folder(recursive=True)
+
             enable_counters = kwargs.get('enable_counters', False)
             search_panel_fields = self._get_search_panel_fields()
-            domain = Domain('located_on_the_server', '=', False) & Domain('owner_id', '=', self.env.user.id)
-            domain = Domain.OR([domain, Domain("type", "=", "folder")])
+            domain = Domain('type', '=', 'folder') & Domain('located_on_the_server', '=', False)
+            if self.root_path:
+                domain = Domain.OR([domain, Domain('type', '=', 'folder') & Domain('located_on_the_server', '=', True) & Domain('owner_id', '=', self.env.user.id)])
 
             if unique_folder_id := self.env.context.get('documents_unique_folder_id'):
                 values = self.env['documents.document'].search_read(
@@ -91,15 +172,6 @@ class DocumentsDocument(models.Model):
             targets_user_permission = {t.id: t.user_permission for t in targets}
 
             values_range = OrderedDict()
-            # server_folder = self.env["documents.document"].search(
-            #     [
-            #         ("located_on_the_server", "=", True),
-            #         ("folder_id", "=", False),
-            #         ("name", "=", "SERVER_FOLDER"),
-            #     ]
-            # )
-            # if not server_folder:
-            #     server_folder = self.create_folder(False, "SERVER_FOLDER")
             for record in records:
                 record_id = record['id']
                 convert_user_folder_ids_to_int(record)
@@ -143,7 +215,7 @@ class DocumentsDocument(models.Model):
                             'display_name': _("Recent"),
                             'id': 'RECENT',
                             'description': _("Recently accessed documents."),
-                        }]
+                        }] if values["id"] != "SERVER_FOLDER" or self.root_path
                     ]
                 if not self.env.context.get('documents_search_panel_no_trash'):
                     special_roots.append({
@@ -167,6 +239,8 @@ class DocumentsDocument(models.Model):
 
     @api.model
     def check_has_children(self, path=""):
+        if not self.root_path:
+            return False
         entry_full_path = os.path.join(self.root_path, path)
         if os.path.isdir(entry_full_path):
             has_children = any(
@@ -193,7 +267,6 @@ class DocumentsDocument(models.Model):
             "folder_id": folder_id,
             "name": folder_name,
             "owner_id": self.env.user.id,
-            "has_children": self.check_has_children(""),
         })
 
     @api.model
@@ -220,30 +293,33 @@ class DocumentsDocument(models.Model):
             "mimetype": mimetype or "application/octet-stream",
         })
 
-    def populate_folder(self):
-        self.ensure_one()
-        if self.type != "folder" or not self.located_on_the_server:
-            return
+    @api.model
+    def populate_folder(self, parent_folder=False, recursive=False):
         if not self.root_path:
             return
-        if self.name == "SERVER_FOLDER":
-            self.has_children = self.check_has_children()
-        if not self.has_children or self.fetch_dt:
+        if parent_folder and (parent_folder.type != "folder" or not parent_folder.located_on_the_server):
             return
-        children = self.env["documents.document"].with_context(active_test=False).search([("id", "child_of", self.id)])
-        # (children - self).unlink()
-        for child in (children - self):
+        parent_id = False
+        folder_path = ""
+        if parent_folder:
+            parent_id = parent_folder.id
+            folder_path = parent_folder.get_path()
+
+        domain = Domain("located_on_the_server", "=", True) & Domain("folder_id", "=", parent_id)
+        children = self.env["documents.document"].with_context(active_test=False).search(domain)
+        for child in children:
             if not child._exist_on_the_server() and not child.spreadsheet_data:
                 child.unlink()
-        folder_path = self.get_path()
+
         folder_full_path = os.path.join(self.root_path, folder_path)
         if os.path.isdir(folder_full_path):
             for child in os.listdir(folder_full_path):
                 if os.path.isdir(os.path.join(folder_full_path, child)):
-                    self.create_folder(self.id, child)
-                elif os.path.isfile(os.path.join(folder_full_path, child)):
-                    self.create_file(self.id, folder_full_path, child)
-        self.fetch_dt = fields.Datetime.now()
+                    folder = self.create_folder(parent_id, child)
+                    if recursive:
+                        self.populate_folder(folder, recursive)
+                elif not recursive and os.path.isfile(os.path.join(folder_full_path, child)):
+                    self.create_file(parent_id, folder_full_path, child)
 
     @api.model
     @api.readonly
@@ -254,9 +330,12 @@ class DocumentsDocument(models.Model):
                 doc = self.env["documents.document"].search([("name", "=", folder_id)])
             elif isinstance(folder_id, int):
                 doc = self.env["documents.document"].search([("id", "=", folder_id)])
-            if doc.type == "folder" and doc.located_on_the_server:
-                doc.populate_folder()
-                domain += [('owner_id', '=', self.env.user.id)]
+            if folder_id == "SERVER_FOLDER" or (doc.type == "folder" and doc.located_on_the_server):
+                self.populate_folder(doc)
+                if folder_id == "SERVER_FOLDER":
+                    domain =[['located_on_the_server', '=', True], ['folder_id', '=', False], ['owner_id', '=', self.env.user.id]]
+                else:
+                    domain += [['owner_id', '=', self.env.user.id]]
         if (len(domain) == 3 and len(domain[0]) == 1 and domain[0] == "&" and len(domain[1]) == 3 and domain[1][0] == "folder_id" and
             domain[1][1] == "=" and len(domain[2]) == 3 and domain[2][0] == "owner_id" and domain[2][1] == "="):
             filter = ["located_on_the_server", "=", False]
@@ -267,7 +346,7 @@ class DocumentsDocument(models.Model):
     def get_path(self):
         self.ensure_one()
         names = []
-        parent_path_list = self.parent_path.split("/")[1:-1]
+        parent_path_list = self.parent_path.split("/")[:-1]
         for folder_id in parent_path_list:
             doc = self.env["documents.document"].browse(int(folder_id))
             names.append(doc.name)
@@ -289,6 +368,7 @@ class DocumentsDocument(models.Model):
             return None
         return full_path
 
+    # Rok todo: check
     @api.model_create_multi
     def create(self, vals_list):
         folder_id = self.env.context.get("default_folder_id")
@@ -306,6 +386,7 @@ class DocumentsDocument(models.Model):
                         os.makedirs(path)
         return documents
 
+    # Rok todo: check
     def write(self, vals):
         name = vals.get("name")
         if name and self.located_on_the_server:
@@ -316,6 +397,7 @@ class DocumentsDocument(models.Model):
                 os.rename(old_path, new_path)
         return super().write(vals)
 
+    # Rok todo: check
     def toggle_active(self):
         server_items = self.filtered("located_on_the_server")
         active_items = server_items.filtered(self._active_name)
@@ -333,6 +415,7 @@ class DocumentsDocument(models.Model):
             os.makedirs(path)
         super().toggle_active()
 
+    # Rok todo: check
     def copy(self, default=None):
         server_items = self.filtered("located_on_the_server")
         server_files = server_items.filtered(lambda x: x.type != "folder")
@@ -342,6 +425,7 @@ class DocumentsDocument(models.Model):
             shutil.copyfile(old_path, new_path)
         return super().copy(default)
 
+    # Rok todo: check
     @api.depends("checksum", "shortcut_document_id.thumbnail", "shortcut_document_id.thumbnail_status", "shortcut_document_id.user_permission")
     def _compute_thumbnail(self):
         for document in self:
@@ -367,6 +451,7 @@ class DocumentsDocument(models.Model):
                 document.thumbnail = False
                 document.thumbnail_status = False
 
+    # Rok todo: check
     def get_raw(self):
         self.ensure_one()
         if not self.located_on_the_server:
@@ -375,11 +460,13 @@ class DocumentsDocument(models.Model):
         with open(path, "rb") as file:
             return file.read()
 
+    # Rok todo: check
     def _get_is_multipage(self):
         if self.located_on_the_server:
             return None
         return super()._get_is_multipage()
 
+    # Rok todo: check
     def _exist_on_the_server(self):
         try:
             self.get_full_path()
@@ -387,6 +474,7 @@ class DocumentsDocument(models.Model):
         except FileNotFoundError:
             return False
 
+    # Rok todo: check
     def refresh_server_folder(self):
         self.ensure_one()
         items_to_unlink = self.env["documents.document"]
@@ -403,17 +491,17 @@ class DocumentsDocument(models.Model):
         items_to_unlink.unlink()
         if not self.children_ids and not self._exist_on_the_server():
             self.unlink()
-        else:
-            self.fetch_dt = False
 
         return {"type": "ir.actions.client", "tag": "reload"}
 
+    # Rok todo: check
     def _extract_pdf_from_xml(self):
         self.ensure_one()
         if self.located_on_the_server:
             return False
         return super()._extract_pdf_from_xml()
 
+    # Rok todo: check
     def _unzip_xlsx(self):
         if not self.located_on_the_server:
             return super()._unzip_xlsx()

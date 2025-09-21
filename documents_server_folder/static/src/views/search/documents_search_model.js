@@ -5,6 +5,7 @@ import { DocumentsSearchModel } from "@documents/views/search/documents_search_m
 import { browser } from "@web/core/browser/browser";
 
 patch(DocumentsSearchModel.prototype, {
+    // Rok todo: check
     _ensureCategoryValue(category, valueIds) {
         if (
             valueIds.includes(category.activeValueId) &&

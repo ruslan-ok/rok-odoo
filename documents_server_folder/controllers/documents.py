@@ -18,14 +18,17 @@ class DsfShareRoute(ShareRoute):
         self,
         ufile,
         access_token='',
+        user_folder_id='',
         owner_id='',
         partner_id='',
         res_id='',
-        res_model='',
+        res_model=False,
         allowed_company_ids='',
     ):
         if allowed_company_ids:
             request.update_context(allowed_company_ids=json.loads(allowed_company_ids))
+        if access_token and user_folder_id or not access_token and user_folder_id not in {'COMPANY', 'MY'}:
+            raise BadRequest("Incorrect token/user_folder_id values")
         is_internal_user = request.env.user._is_internal()
         if is_internal_user and not access_token:
             document_sudo = request.env['documents.document'].sudo()
@@ -38,8 +41,6 @@ class DsfShareRoute(ShareRoute):
                 or document_sudo.type not in ('binary', 'folder')
             ):
                 raise request.not_found()
-        if not document_sudo.located_on_the_server:
-            return super().documents_upload(ufile, access_token, owner_id, partner_id, res_id, res_model, allowed_company_ids)
 
         files = request.httprequest.files.getlist('ufile')
         if not files:
@@ -47,32 +48,37 @@ class DsfShareRoute(ShareRoute):
         if len(files) > 1 and document_sudo.type not in (False, 'folder'):
             raise BadRequest("cannot save multiple files inside a single document")
 
+        if not document_sudo.located_on_the_server:
+            return super().documents_upload(ufile, access_token, user_folder_id, owner_id, partner_id, res_id, res_model, allowed_company_ids)
+
         if is_internal_user:
             with replace_exceptions(ValueError, by=BadRequest):
-                owner_id = int(owner_id) if owner_id else request.env.user.id
-                partner_id = int(partner_id) if partner_id else False
-                res_model = res_model or 'documents.document'
+                owner_id = int(owner_id) if owner_id else request.env.user.id if not user_folder_id else None
+                partner_id = int(partner_id) if partner_id else None
                 res_id = int(res_id) if res_id else False
         elif owner_id or partner_id or res_id or res_model:
-            raise Forbidden("only internal users can upload files")
+            raise Forbidden("only internal users can provide field values")
         else:
             owner_id = document_sudo.owner_id.id if request.env.user.is_public else request.env.user.id
-            partner_id = False
-            res_model = 'documents.document'
-            res_id = False  # replaced by the document's id
+            partner_id = None
+            res_model = False
+            res_id = False
 
+        previous_attachment_id = document_sudo.attachment_id
         document_ids = self._documents_upload_to_the_server(
-            document_sudo, files, owner_id, partner_id, res_id, res_model)
-        if len(document_ids) == 1:
+            document_sudo, files, owner_id, user_folder_id, partner_id, res_id, res_model)
+        if document_sudo.type != 'folder' and len(document_ids) == 1:
             document_sudo = document_sudo.browse(document_ids)
 
         if request.env.user._is_public():
-            return request.redirect(document_sudo.access_url)
+            if document_sudo.type == 'folder' or previous_attachment_id:
+                return request.redirect(document_sudo.access_url)
+            return request.redirect('/documents/upload/success')
         else:
             return request.make_json_response(document_ids)
 
     def _documents_upload_to_the_server(self,
-            document_sudo, files, owner_id, partner_id, res_id, res_model):
+            document_sudo, files, owner_id, user_folder_id, partner_id, res_id, res_model):
         """ Replace an existing document or upload a new one. """
 
         document_ids = []
@@ -82,17 +88,19 @@ class DsfShareRoute(ShareRoute):
             document_ids.append(document_sudo.id)
         else:
             folder_sudo = document_sudo
+            location = {'user_folder_id': user_folder_id} if user_folder_id else {'folder_id': folder_sudo.id}
             for file in files:
                 document_sudo = self._documents_upload_to_the_server_create_write(folder_sudo, {
                     'file': file,
                     'type': 'binary',
                     'access_via_link': 'none' if folder_sudo.access_via_link in (False, 'none') else 'view',
-                    'folder_id': folder_sudo.id,
+                    **location,
                     'owner_id': owner_id,
-                    'partner_id': partner_id,
-                    'res_model': res_model,
+                    'res_model': res_model or False,
                     'res_id': res_id,
-                })
+                } | (
+                    {'partner_id': partner_id} if partner_id is not None else {}
+                ))
                 document_ids.append(document_sudo.id)
 
             # Make sure uploader can access documents in "Company"
@@ -120,13 +128,6 @@ class DsfShareRoute(ShareRoute):
                 f.write(vals['file'].read())
             document_sudo = document_sudo.create_file(document_sudo.id, folder_path, file_name)
 
-        if not document_sudo.res_model:
-            document_sudo.res_model = 'documents.document'
-        if (
-            document_sudo.res_model == 'documents.document'
-            and not document_sudo.res_id
-        ):
-            document_sudo.res_id = document_sudo.id
         if (any(field_name in vals for field_name in [
                 'raw', 'datas', 'attachment_id'])):
             document_sudo.message_post(body=_(

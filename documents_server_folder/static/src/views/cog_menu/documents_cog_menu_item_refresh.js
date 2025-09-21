@@ -9,6 +9,7 @@ export class DocumentsCogMenuItemRefresh extends DocumentsCogMenuItem {
         super.setup();
     }
 
+    // Rok todo: check
     async refreshServerFolder(resIds) {
         const action = await this.env.model.orm.call(
             "documents.document",
@@ -20,12 +21,14 @@ export class DocumentsCogMenuItemRefresh extends DocumentsCogMenuItem {
         }
     }
 
+    // Rok todo: check
     async doActionOnFolder(folder) {
         await this.refreshServerFolder(folder.id);
         await this.reload();
     }
 }
 
+// Rok todo: check
 export const documentsCogMenuItemRefresh = {
     Component: DocumentsCogMenuItemRefresh,
     groupNumber: STATIC_COG_GROUP_ACTION_BASIC,

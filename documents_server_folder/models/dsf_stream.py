@@ -50,11 +50,13 @@ class DsfStream:
     size = None
     public = False
 
+    # Rok todo: check
     def __init__(self, **kwargs):
         # Remove class methods from the instances
         self.from_path = self.from_attachment = self.from_binary_field = None
         self.__dict__.update(kwargs)
 
+    # Rok todo: check
     @classmethod
     def from_path(cls, path):
         is_abs = os.path.isabs(path)
@@ -76,6 +78,7 @@ class DsfStream:
             public=False,
         )
 
+    # Rok todo: check
     @classmethod
     def from_binary_field(cls, record, field_name):
         """ Create a :class:`~Stream`: from a binary field. """
@@ -103,6 +106,7 @@ class DsfStream:
             public=record.env.user._is_public()  # good enough
         )
 
+    # Rok todo: check
     def read(self):
         """ Get the stream content as bytes. """
         if self.type == 'url':
@@ -114,6 +118,7 @@ class DsfStream:
         with open(self.path, 'rb') as file:
             return file.read()
 
+    # Rok todo: check
     def get_response(
         self,
         as_attachment=None,
