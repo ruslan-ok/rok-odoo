@@ -37,10 +37,28 @@ class DocumentsDocument(models.Model):
     @api.depends_context('uid')
     @api.depends('folder_id', 'folder_id.user_permission', 'owner_id', 'active')
     def _compute_user_folder_id(self):
-        super()._compute_user_folder_id()
-        self.filtered(lambda d: d.located_on_the_server).user_folder_id = "SERVER_FOLDER"
+        SHARED = 'SHARED' if not self.env.user.share else False
+        self.user_folder_id = False  # Inaccessible
+        active_documents = self.filtered('active')
+        (self - active_documents).user_folder_id = "TRASH"
+        for document in active_documents.filtered(lambda d: d.user_permission != 'none'):
+            if document.folder_id:
+                if document.folder_id.user_permission != 'none':
+                    document.user_folder_id = str(document.folder_id.id)
+                else:
+                    document.user_folder_id = SHARED
+            elif self.env.user.share:
+                document.user_folder_id = False
+            elif not document.owner_id:
+                document.user_folder_id = 'COMPANY'
+            elif document.owner_id == self.env.user:
+                if document.located_on_the_server:
+                    document.user_folder_id = 'SERVER_FOLDER'  # Root of user's server space
+                else:
+                    document.user_folder_id = 'MY'  # Root of user's drive
+            else:
+                document.user_folder_id = SHARED  # Root of another user's drive
 
-    # Rok todo: check
     def _search_user_folder_id(self, operator, operand):
         """Search domain for user_folder_id virtual folder_id.
 
@@ -98,9 +116,24 @@ class DocumentsDocument(models.Model):
             return Domain('id', 'in', top_level.ids) | Domain('folder_id', 'child_of', top_level_folders.ids)
         return domain
 
-    # Rok todo: check
     @api.model
     def _clean_vals_for_user_folder_id(self, vals):
+        user_folder_id = vals.get('user_folder_id')
+        if not user_folder_id:
+            if (
+                (default_user_folder_id := self.env.context.get('default_user_folder_id'))
+                and 'folder_id' not in vals
+                and 'owner_id' not in vals
+                and 'default_folder_id' not in self.env.context
+                and 'default_owner_id' not in self.env.context
+            ):
+                user_folder_id = default_user_folder_id
+            else:
+                return
+
+        if user_folder_id == "SERVER_FOLDER":
+            new_vals = {'located_on_the_server': True, 'owner_id': False, 'folder_id': False}
+            vals.update(new_vals)
         super()._clean_vals_for_user_folder_id(vals)
 
     def _get_search_panel_fields(self):
@@ -110,7 +143,6 @@ class DocumentsDocument(models.Model):
             search_panel_fields += ['located_on_the_server']
         return search_panel_fields
 
-    # Rok todo: check
     @api.model
     def search_panel_select_range_patched(self, field_name, **kwargs):
         def convert_user_folder_ids_to_int(vals):
@@ -408,8 +440,7 @@ class DocumentsDocument(models.Model):
                 os.rename(old_path, new_path)
         return super().write(vals)
 
-    # Rok todo: check
-    def toggle_active(self):
+    def action_archive(self):
         server_items = self.filtered("located_on_the_server")
         active_items = server_items.filtered(self._active_name)
         for item in active_items:
@@ -419,24 +450,22 @@ class DocumentsDocument(models.Model):
                     shutil.rmtree(path)
                 else:
                     os.remove(path)
-        inactive_items = self.filtered("located_on_the_server") - active_items
-        folders_to_restore = inactive_items.filtered(lambda x: x.type == "folder")
-        for folder in folders_to_restore:
-            path = folder.get_full_path()
-            os.makedirs(path)
-        super().toggle_active()
+        super(DocumentsDocument, self - server_items).action_archive()
 
-    # Rok todo: check
     def copy(self, default=None):
         server_items = self.filtered("located_on_the_server")
         server_files = server_items.filtered(lambda x: x.type != "folder")
-        for file in server_files:
-            old_path = file.get_full_path()
-            new_path = old_path + " (copy)"
-            shutil.copyfile(old_path, new_path)
-        return super().copy(default)
+        user_folder_id = default.get("user_folder_id")
+        if server_files and isinstance(user_folder_id, str):
+            folder = self.env["documents.document"].search([("id", "=", user_folder_id)])
+            if folder.located_on_the_server:
+                new_folder_path = folder.get_full_path()
+                for file in server_files:
+                    old_path = file.get_full_path()
+                    new_path = os.path.join(new_folder_path, file.name)
+                    shutil.copyfile(old_path, new_path)
+        return super(DocumentsDocument, self - server_items).copy(default)
 
-    # Rok todo: check
     @api.depends("checksum", "shortcut_document_id.thumbnail", "shortcut_document_id.thumbnail_status", "shortcut_document_id.user_permission")
     def _compute_thumbnail(self):
         for document in self:
@@ -462,7 +491,6 @@ class DocumentsDocument(models.Model):
                 document.thumbnail = False
                 document.thumbnail_status = False
 
-    # Rok todo: check
     def get_raw(self):
         self.ensure_one()
         if not self.located_on_the_server:
@@ -471,13 +499,11 @@ class DocumentsDocument(models.Model):
         with open(path, "rb") as file:
             return file.read()
 
-    # Rok todo: check
     def _get_is_multipage(self):
         if self.located_on_the_server:
             return None
         return super()._get_is_multipage()
 
-    # Rok todo: check
     def _exist_on_the_server(self):
         try:
             self.get_full_path()
@@ -485,27 +511,6 @@ class DocumentsDocument(models.Model):
         except FileNotFoundError:
             return False
 
-    # Rok todo: check
-    def refresh_server_folder(self):
-        self.ensure_one()
-        items_to_unlink = self.env["documents.document"]
-
-        child_folders = self.children_ids.filtered(lambda x: x.type =="folder")
-        for folder in child_folders:
-            folder.refresh_server_folder()
-
-        child_files = self.children_ids - child_folders
-        for file in child_files:
-            if file.type == "binary" and not file._exist_on_the_server() and not file.spreadsheet_data:
-                items_to_unlink += file
-
-        items_to_unlink.unlink()
-        if not self.children_ids and not self._exist_on_the_server():
-            self.unlink()
-
-        return {"type": "ir.actions.client", "tag": "reload"}
-
-    # Rok todo: check
     def _extract_pdf_from_xml(self):
         self.ensure_one()
         if self.located_on_the_server:

@@ -1,8 +1,9 @@
 {
     "name": "Server Folder for Documents",
-    "version": "1.0.0",
+    "version": "1.0",
     "depends": [
         "documents",
+        "documents_account",
         "documents_spreadsheet",
     ],
     "category": "Productivity/Documents",
@@ -20,8 +21,6 @@ Manage document files on the server, but not as attachments.
     "license": "LGPL-3",
     "assets": {
         "web.assets_backend": [
-            "documents_server_folder/static/src/views/cog_menu/documents_cog_menu_item_refresh.js",
-            "documents_server_folder/static/src/views/cog_menu/documents_cog_menu.js",
             "documents_server_folder/static/src/views/search/documents_search_model.js",
             "documents_server_folder/static/src/views/search/documents_search_panel.js",
         ],
