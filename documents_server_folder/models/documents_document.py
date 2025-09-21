@@ -308,7 +308,18 @@ class DocumentsDocument(models.Model):
         domain = Domain("located_on_the_server", "=", True) & Domain("folder_id", "=", parent_id)
         children = self.env["documents.document"].with_context(active_test=False).search(domain)
         for child in children:
-            if not child._exist_on_the_server() and not child.spreadsheet_data:
+            if not child._exist_on_the_server():
+                # Do not delete the record if it is a spreadsheet itself
+                if child.spreadsheet_data:
+                    continue
+                # Do not delete a folder that still contains spreadsheets inside
+                if child.type == "folder":
+                    has_spreadsheets_inside = bool(self.env["documents.document"].with_context(active_test=False).search_count([
+                        ("folder_id", "child_of", child.id),
+                        ("handler", "=", "spreadsheet"),
+                    ]))
+                    if has_spreadsheets_inside:
+                        continue
                 child.unlink()
 
         folder_full_path = os.path.join(self.root_path, folder_path)
