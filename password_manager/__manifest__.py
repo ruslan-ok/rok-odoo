@@ -3,7 +3,6 @@
     "version": "2.0",
     "summary": "Password Manager",
     "sequence": 46,
-    "description": "Password Manager",
     "category": "Productivity",
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "depends": ["base", "mail"],
