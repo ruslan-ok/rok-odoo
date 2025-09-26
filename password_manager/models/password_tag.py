@@ -1,5 +1,6 @@
 from random import randint
 from odoo import fields, models
+from odoo.models import Constraint
 
 class PasswordTag(models.Model):
     _name = "password.tag"
@@ -8,7 +9,6 @@ class PasswordTag(models.Model):
 
     def _get_default_password_id(self):
         return self.env["passwords"].browse(self.env.context.get("password_id"))
-
 
     def _get_default_color(self):
         return randint(1, 11)
@@ -24,13 +24,15 @@ class PasswordTag(models.Model):
     )
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [
-        ("name_uniq", "unique (name)", "Tag name already exists!"),
-    ]
-
     def copy_data(self, default=None):
         vals_list = super().copy_data(default=default)
         return [dict(vals, name=self.env._("%s (copy)", tag.name)) for tag, vals in zip(self, vals_list)]
 
     def _search_password_ids(self, operator, operand):
         return [("password_ids.product_variant_ids", operator, operand)]
+
+    class NameUniqueConstraint(Constraint):
+        _name = "name_unique"
+        _model = "password.tag"
+        _sql = "UNIQUE(name)"
+        _message = "Tag name already exists!"
