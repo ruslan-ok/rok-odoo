@@ -8,6 +8,8 @@
     "application": False,
     "category": "Tools",
     "depends": [
+        "project_todo",
+        "accountant",
         "documents_server_folder",
         "odoo_google_contact_integration",
         "password_manager",
