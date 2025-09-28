@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, tools
+from odoo.tools import SQL
 from decimal import Decimal
 import requests
 from datetime import datetime, timezone, timedelta
@@ -77,6 +78,25 @@ class RokFinanceBtcPrice(models.Model):
         chart_points = approximate(src_data, 100, 'timestamp:day', 'price')
         return chart_points
 
+    def init(self):
+        """Create an empty SQL view so the model has a backing relation.
+
+        This model is virtual and serves data from an external API via read_group.
+        Creating an empty view prevents registry errors about missing tables.
+        """
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute(SQL(
+            """
+            CREATE OR REPLACE VIEW %s AS (
+                SELECT
+                    NULL::timestamp without time zone AS timestamp,
+                    NULL::double precision AS price
+                WHERE false
+            )
+            """,
+            SQL.identifier(self._table)
+        ))
+
 
 class RokFinanceBtcKpi(models.Model):
     _name = 'rok.finance.btc_kpi'
@@ -134,3 +154,23 @@ class RokFinanceBtcKpi(models.Model):
             'length': len(records),
             'records': records
         }
+
+    def init(self):
+        """Create an empty SQL view so the model has a backing relation.
+
+        This model is virtual and serves data from an external API via search_read.
+        Creating an empty view prevents registry errors about missing tables.
+        """
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute(SQL(
+            """
+            CREATE OR REPLACE VIEW %s AS (
+                SELECT
+                    NULL::double precision AS current_price,
+                    NULL::double precision AS period_start_price,
+                    NULL::double precision AS price_change_percent
+                WHERE false
+            )
+            """,
+            SQL.identifier(self._table)
+        ))

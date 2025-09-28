@@ -10,6 +10,7 @@
     "depends": [
         "project_todo",
         "accountant",
+        "l10n_pl",
         "documents_server_folder",
         "odoo_google_contact_integration",
         "password_manager",

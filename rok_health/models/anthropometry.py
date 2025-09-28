@@ -42,15 +42,57 @@ class Anthropometry(models.Model):
         data = super(Anthropometry, self).read_group(domain, fields, groupby, offset, limit, orderby, lazy)
         return data
 
-class AnthropometryKPI(models.Model):
+class AnthropometryKPI(models.AbstractModel):
     _name = 'rok.health.anthropometry_kpi'
     _description = 'Anthropometry KPI'
     _order = 'current_weight desc'
-    _auto = False  # virtual, no table
 
     current_weight = fields.Float(aggregator='avg')
     period_start_weight = fields.Float(aggregator='avg')
     weight_change_percent = fields.Float(aggregator='avg')
+
+    @api.model
+    def search(self, domain, offset=0, limit=None, order=None, count=False):
+        """Override search to prevent database access."""
+        if count:
+            return 1
+        # Return a virtual recordset with ID 1
+        return self.browse([1])
+
+    @api.model
+    def read(self, ids, fields=None, load='_classic_read'):
+        """Override read to provide virtual record data."""
+        if isinstance(ids, int):
+            ids = [ids]
+        
+        # Get KPI data
+        domain = [('measurement', '>=', fields_api.Datetime.now() - timedelta(days=7)), ("weight", "!=", 0)]
+        data = self.env['rok.health.anthropometry'].search(domain)
+        current_weight = period_start_weight = weight_change_percent = 0
+        if data:
+            current_weight = data[0].weight
+            period_start_weight = data[-1].weight
+            weight_change_percent = ((current_weight - period_start_weight) / period_start_weight * 100) if period_start_weight > 0 else 0
+
+        record = {'id': 1}
+        if not fields or 'current_weight' in fields:
+            record['current_weight'] = current_weight
+        if not fields or 'period_start_weight' in fields:
+            record['period_start_weight'] = period_start_weight
+        if not fields or 'weight_change_percent' in fields:
+            record['weight_change_percent'] = weight_change_percent
+        
+        return [record] if ids else []
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Override name_search to prevent database access."""
+        return [(1, 'Anthropometry KPI')]
+
+    @api.model
+    def search_count(self, domain):
+        """Override search_count to prevent database access."""
+        return 1
 
     @api.model
     def search_read(self, domain, fields, offset=0, limit=None, order=None):
