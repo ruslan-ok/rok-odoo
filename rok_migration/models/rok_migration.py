@@ -3,7 +3,8 @@ import csv
 import json
 import base64
 from collections import defaultdict
-from odoo import models, api, Command
+from odoo import models, api, Command, _
+from odoo.exceptions import UserError
 
 CSV_PATH = '/opt/project/csv'
 
@@ -17,11 +18,6 @@ class RokMigration(models.AbstractModel):
     def run_migration(self):
         self.unlink_old_data()
         data = self.load_data()
-        self.migrate_partners(data)
-        self.migrate_product_category(data)
-        self.migrate_products(data)
-        self.migrate_banks(data)
-        self.migrate_partner_banks(data)
         self.migrate_account_move_lines(data)
 
     @api.model
@@ -34,11 +30,18 @@ class RokMigration(models.AbstractModel):
         old_category = self.env["product.category"].search([("id", "not in", standard_ids)])
         old_category.unlink()
 
+        old_account_moves = self.env["account.move"].search([])
+        old_account_moves.button_draft()
+        old_account_moves.unlink()
+
+        old_payment = self.env["account.payment"].search([])
+        old_payment.unlink()
+
+        old_payment_reg = self.env["account.payment.register"].search([])
+        old_payment_reg.unlink()
+
         old_partners = self.env["res.partner"].search([("ref", "!=", False)])
         old_partners.unlink()
-
-        old_account_moves = self.env["account.move"].search([])
-        old_account_moves.unlink()
 
         std_journal_codes = ("BNK1","CABA","EXCH","MISC","TAX","BILL","INV")
         old_journals = self.env["account.journal"].search([("code", "not in", std_journal_codes)])
@@ -47,33 +50,22 @@ class RokMigration(models.AbstractModel):
     @api.model
     def load_data(self):
         data = {}
-        data["account_account"] = self.load_table("account_account")
-        data["account_batch_payment"] = self.load_table("account_batch_payment")
-        data["account_incoterms"] = self.load_table("account_incoterms")
-        data["account_journal"] = self.load_table("account_journal")
-        data["account_move"] = self.load_table("account_move")
-        data["account_move_line"] = self.load_table("account_move_line")
-        data["account_payment"] = self.load_table("account_payment")
-        data["account_payment_method"] = self.load_table("account_payment_method")
-        data["account_payment_method_line"] = self.load_table("account_payment_method_line")
-        data["account_payment_term"] = self.load_table("account_payment_term")
-        data["account_tax"] = self.load_table("account_tax")
-        data["account_tax_group"] = self.load_table("account_tax_group")
-        data["ir_attachment"] = self.load_attachments()
-        data["product_category"] = self.load_table("product_category")
-        data["product_product"] = self.load_table("product_product")
-        data["product_template"] = self.load_table("product_template")
-        data["res_bank"] = self.load_table("res_bank")
-        data["res_country"] = self.load_table("res_country")
-        data["res_country_state"] = self.load_table("res_country_state")
-        data["res_currency"] = self.load_table("res_currency")
-        data["res_partner"] = self.load_table("res_partner")
-        data["res_partner_bank"] = self.load_table("res_partner_bank")
-        data["res_country_group"] = self.load_table("res_country_group")
-        data["account_fiscal_position"] = self.load_table("account_fiscal_position")
-        data["account_bank_statement_line"] = self.load_table("account_bank_statement_line")
-        data["account_bank_statement"] = self.load_table("account_bank_statement")
-        data["account_move__account_payment"] = self.load_table("account_move__account_payment")
+
+        # Get all CSV files from the CSV_PATH directory
+        csv_files = []
+        for filename in os.listdir(CSV_PATH):
+            if filename.endswith('.csv'):
+                csv_files.append(filename[:-4])  # Remove .csv extension
+
+        # Load data from all CSV files
+        for file_name in csv_files:
+            match file_name:
+                case 'ir_attachment':
+                    data[file_name] = self.load_attachments()
+                case 'account_move__account_payment':
+                    data[file_name] = self.load_account_move_account_payment()
+                case _:
+                    data[file_name] = self.load_table(file_name)
         return data
 
     @staticmethod
@@ -101,6 +93,13 @@ class RokMigration(models.AbstractModel):
             key = (row["res_model"], row["res_id"])
             attachments[key].append(row)
         return attachments
+
+    @api.model
+    def load_account_move_account_payment(self):
+        table_data = []
+        for row in self.get_file_data("account_move__account_payment"):
+            table_data.append(row)
+        return table_data
 
     @api.model
     def copy_attachments(self, data, res_model, res_id, new_object):
@@ -140,6 +139,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_state_id(self, data, state_id):
+        if not state_id:
+            return False
         row_data = data["res_country_state"].get(state_id, {})
         state_code = row_data.get("code", False)
         state = self.env["res.country.state"].search([("code", "=", state_code)], limit=1)
@@ -147,6 +148,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_country_id(self, data, country_id):
+        if not country_id:
+            return False
         row_data = data["res_country"].get(country_id, {})
         country_code = row_data.get("code", False)
         country = self.env["res.country"].search([("code", "=", country_code)], limit=1)
@@ -154,6 +157,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_country_group_id(self, data, country_group_id):
+        if not country_group_id:
+            return False
         row_data = data["res_country_group"].get(country_group_id, {})
         country_group_name = row_data.get("name", False)
         country_group = self.env["res.country.group"].search([("name", "=", country_group_name)], limit=1)
@@ -167,6 +172,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_currency_id(self, data, currency_id):
+        if not currency_id:
+            return False
         row_data = data["res_currency"].get(currency_id, {})
         currency_name = row_data.get("name", False)
         currency = self.env["res.currency"].search([("name", "=", currency_name)], limit=1)
@@ -174,6 +181,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_partner_id(self, data, old_partner_id):
+        if not old_partner_id:
+            return False
         row_data = data["res_partner"].get(old_partner_id, {})
         old_parent_id = row_data.get("parent_id", False)
         parent_id = self.get_partner_id(data, old_parent_id)
@@ -223,11 +232,15 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def fetch_from_json(self, json_data):
+        if not json_data:
+            return False
         json_data = json.loads(json_data)
         return json_data.get("en_US", json_data.get("en_GB"))
 
     @api.model
     def get_bank_id(self, data, old_bank_id):
+        if not old_bank_id:
+            return False
         row_data = data["res_bank"].get(old_bank_id, {})
         name = row_data.get("name", False)
         bank = self.env["res.bank"].search([
@@ -235,8 +248,8 @@ class RokMigration(models.AbstractModel):
         ], limit=1)
         if not bank:
             vals = {
-                "state_id": self.get_state_id(data, row_data.get("state", False)),
-                "country_id": self.get_country_id(data, row_data.get("country", False)),
+                "state": self.get_state_id(data, row_data.get("state", False)),
+                "country": self.get_country_id(data, row_data.get("country", False)),
                 "name": name,
                 "street": row_data.get("street", False),
                 "street2": row_data.get("street2", False),
@@ -251,9 +264,11 @@ class RokMigration(models.AbstractModel):
         return bank.id
 
     @api.model
-    def get_partner_bank_id(self, data, old_partner_bank_id):
+    def get_partner_bank_id(self, data, old_partner_bank_id, company_partner_id=False):
+        if not old_partner_bank_id:
+            return False
         row_data = data["res_partner_bank"].get(old_partner_bank_id, {})
-        partner_id = self.get_partner_id(data, row_data.get("partner_id", False))
+        partner_id = self.get_partner_id(data, row_data.get("partner_id", False)) if not company_partner_id else company_partner_id
         bank_id = self.get_bank_id(data, row_data.get("bank_id", False))
         currency_id = self.get_currency_id(data, row_data.get("currency_id", False))
         acc_number = row_data.get("acc_number", False)
@@ -276,14 +291,64 @@ class RokMigration(models.AbstractModel):
         return partner_bank.id
 
     @api.model
+    def get_acc_code(self, name):
+        acc_code_mapping = {
+            "PKO KONTO ZA ZERO": "161001",
+            "RACH.POMOCNICZY MSP": "161002",
+            "RACHUNEK FIRMOWY": "161003",
+            "RACHUNEK OSZCZĘDNOŚCIOWY PLUS": "161004",
+            "RACHUNEK WALUTOWY EUR": "161005",
+            "RACHUNEK WALUTOWY USD": "161006",
+            "Extraordinary profits": "361001",
+            "Extraordinary losses": "361002",
+            "Settlements with suppliers": "361003",
+            "Cost of sales of products to the country": "361004",
+            'Settlement of input VAT 23%': "361005",
+            'VAT settlements with the tax authorities': "361006",
+            'Other remaining operating expenses': "361007",
+            'Settlement of input VAT 8%': "361008",
+            'Settlement of due VAT 23%': "361009",
+            'Settlements with customers': "361010",
+            'Bulk sales of goods': "361011",
+        }
+        code = acc_code_mapping.get(name, False)
+        if not code:
+            raise UserError(_("Account code not found for %s" % name))
+        return code
+
+    @api.model
     def get_account_id(self, data, old_account_id):
+        if not old_account_id:
+            return False
         row_data = data["account_account"].get(old_account_id, {})
-        account_name = row_data.get("name", False)
-        account = self.env["account.account"].search([("name", "=", account_name)], limit=1)
+        account_name = self.fetch_from_json(row_data.get("name", False))
+        account_type = row_data.get("account_type", False)
+        currency_id = self.get_currency_id(data, row_data.get("currency_id", False))
+        account = self.env["account.account"].search([
+            ("name", "=", account_name),
+            ("account_type", "=", account_type),
+            ("currency_id", "=", currency_id),
+        ], limit=1)
+        if not account:
+            vals = {
+                "name": account_name,
+                "currency_id": currency_id,
+                "code_store": self.get_acc_code(account_name),
+                "account_type": account_type,
+                "reconcile": row_data.get("reconcile", False),
+                "non_trade": row_data.get("non_trade", False),
+                "note": row_data.get("note", False),
+                "create_asset": row_data.get("create_asset", False),
+                "multiple_assets_per_line": row_data.get("multiple_assets_per_line", False),
+                # "disallowed_expenses_category_id": self.get_product_category_id(data, row_data.get("disallowed_expenses_category_id", False)),
+            }
+            account = self.env["account.account"].create(vals)
         return account.id if account else False
 
     @api.model
     def get_journal_id(self, data, old_journal_id):
+        if not old_journal_id:
+            return False
         row_data = data["account_journal"].get(old_journal_id, {})
         code = row_data.get("code", False)
         type = row_data.get("type", False)
@@ -292,6 +357,7 @@ class RokMigration(models.AbstractModel):
             ("type", "=", type),
         ], limit=1)
         if not journal:
+            bank_account_partner_id = self.env.company.partner_id.id if type == "bank" else False
             vals = {
                 "default_account_id": self.get_account_id(data, row_data.get("default_account_id", False)),
                 "suspense_account_id": self.get_account_id(data, row_data.get("suspense_account_id", False)),
@@ -299,12 +365,12 @@ class RokMigration(models.AbstractModel):
                 "company_id": self.env.company.id,
                 "profit_account_id": self.get_account_id(data, row_data.get("profit_account_id", False)),
                 "loss_account_id": self.get_account_id(data, row_data.get("loss_account_id", False)),
-                "bank_account_id": self.get_partner_bank_id(data, row_data.get("bank_account_id", False)),
+                "bank_account_id": self.get_partner_bank_id(data, row_data.get("bank_account_id", False), bank_account_partner_id),
                 "code": code,
                 "type": type,
                 "invoice_reference_type": row_data.get("invoice_reference_type", False),
                 "invoice_reference_model": row_data.get("invoice_reference_model", False),
-                "bank_statement_source": row_data.get("bank_statement_source", False),
+                "bank_statements_source": row_data.get("bank_statements_source", False),
                 "name": self.fetch_from_json(row_data.get("name", False)),
                 "renewal_contact_email": row_data.get("renewal_contact_email", False),
             }
@@ -313,6 +379,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_statement_id(self, data, old_statement_id):
+        if not old_statement_id:
+            return False
         row_data = data["account_bank_statement"].get(old_statement_id, {})
         journal_id = self.get_journal_id(data, row_data.get("journal_id", False))
         company_id = self.env.company.id
@@ -341,6 +409,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_statement_line_id(self, data, old_statement_line_id):
+        if not old_statement_line_id:
+            return False
         row_data = data["account_bank_statement_line"].get(old_statement_line_id, {})
         journal_id = self.get_journal_id(data, row_data.get("journal_id", False))
         company_id = self.env.company.id
@@ -381,13 +451,15 @@ class RokMigration(models.AbstractModel):
                 "amount_currency": amount_currency,
                 "is_reconciled": row_data.get("is_reconciled", False),
                 "amount_residual": row_data.get("amount_residual", False),
-                "cron_last_check": row_data.get("cron_last_check", False),
+                "cron_last_check": row_data.get("cron_last_check", False)[:19],
             }
             statement_line = self.env["account.bank.statement.line"].create(vals)
         return statement_line.id
 
     @api.model
     def get_fiscal_position_id(self, data, old_fiscal_position_id):
+        if not old_fiscal_position_id:
+            return False
         row_data = data["account_fiscal_position"].get(old_fiscal_position_id, {})
         company_id = self.env.company.id
         country_id = self.get_country_id(data, row_data.get("country_id", False))
@@ -412,6 +484,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_tax_group_id(self, data, old_tax_group_id):
+        if not old_tax_group_id:
+            return False
         row_data = data["account_tax_group"].get(old_tax_group_id, {})
         name = self.fetch_from_json(row_data.get("name", False))
         tax_group = self.env["account.tax.group"].search([("name", "=", name)], limit=1)
@@ -429,6 +503,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_tax_line_id(self, data, old_tax_line_id):
+        if not old_tax_line_id:
+            return False
         row_data = data["account_tax"].get(old_tax_line_id, {})
         amount = row_data.get("amount", False)
         type_tax_use = row_data.get("type_tax_use", False)
@@ -456,6 +532,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_product_category_id(self, data, old_product_category_id):
+        if not old_product_category_id:
+            return False
         row_data = data["product_category"].get(old_product_category_id, {})
         name = self.fetch_from_json(row_data.get("name", False))
 
@@ -490,6 +568,8 @@ class RokMigration(models.AbstractModel):
 
     @api.model
     def get_product_id(self, data, old_product_id):
+        if not old_product_id:
+            return False
         row_data = data["product_product"].get(old_product_id, {})
         template_data = data["product_template"].get(row_data.get("product_tmpl_id", False), {})
         name = self.fetch_from_json(template_data.get("name", False))
@@ -543,7 +623,10 @@ class RokMigration(models.AbstractModel):
         for move_id, move_vals in am_vals.items():
             move_vals["line_ids"] = [Command.create(line_vals) for line_vals in move_vals["line_ids"]]
         move_vals_list = [move_vals for move_vals in am_vals.values()]
-        moves = self.env["account.move"].create(move_vals_list)
+
+        moves = self.env["account.move"]
+        for move_vals in move_vals_list:
+            moves |= self.env["account.move"].create(move_vals)
         moves.action_post()
 
     @api.model
