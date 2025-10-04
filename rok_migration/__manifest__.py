@@ -5,6 +5,7 @@
     'category': 'Tools',
     'description': 'Migrator',
     'data': [
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'author': 'Ruslan Akunevich',
