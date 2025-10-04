@@ -3,6 +3,8 @@ import csv
 import json
 import base64
 import logging
+import psycopg2
+import dotenv
 from collections import defaultdict
 from itertools import groupby
 from odoo import models, api, Command, _
@@ -14,6 +16,30 @@ _logger = logging.getLogger(__name__)
 class RokMigration(models.AbstractModel):
     _name = 'rok.migration'
     _description = 'Rok Migration'
+
+    @api.model
+    def test_connection(self):
+        dotenv.load_dotenv()
+        try:
+            conn = psycopg2.connect(
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT"),
+                dbname=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                connect_timeout=5,
+            )
+        except Exception as e:
+            _logger.info("Error: ", e)
+            raise
+        try:
+            with conn.cursor() as cr:
+                cr.execute("SELECT * from res_company;")
+                data = cr.fetchall()
+                _logger.info("Data from Database: ", data)
+            return data
+        finally:
+            conn.close()
 
     @api.model
     def run_migration(self):
