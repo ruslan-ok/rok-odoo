@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="menu_rok_migration"
-        name="Migration"
-        parent="base.menu_administration"
-        sequence="100"/>
-
-    <menuitem id="menu_rok_migration_actions"
-        name="Migration Actions"
-        parent="menu_rok_migration"
-        sequence="10"/>
-
-    <!-- <menuitem id="menu_run_migration"
-        name="Migration Tool"
-        parent="menu_rok_migration_actions"
-        action="action_rok_migration_form"
-        sequence="10"/> -->
-
     <!-- Migration Root Views -->
     <record id="view_rok_migration_root_list" model="ir.ui.view">
         <field name="name">rok.migration.root.list</field>
@@ -47,23 +31,10 @@
         </field>
     </record>
 
-    <!-- Server Action for Clear -->
-    <record id="action_server_clear" model="ir.actions.server">
-        <field name="name">Clear</field>
-        <field name="sequence">10</field>
-        <field name="model_id" ref="model_rok_migration_root"/>
-        <field name="binding_model_id" ref="model_rok_migration_root"/>
-        <field name="state">code</field>
-        <field name="code">
-if records:
-    action = records.action_clear()
-        </field>
-    </record>
-
     <!-- Server Action for Load -->
     <record id="action_server_load" model="ir.actions.server">
         <field name="name">Load</field>
-        <field name="sequence">20</field>
+        <field name="sequence">10</field>
         <field name="model_id" ref="model_rok_migration_root"/>
         <field name="binding_model_id" ref="model_rok_migration_root"/>
         <field name="state">code</field>
@@ -76,7 +47,7 @@ if records:
     <!-- Server Action for Migrate -->
     <record id="action_server_migrate" model="ir.actions.server">
         <field name="name">Migrate</field>
-        <field name="sequence">30</field>
+        <field name="sequence">20</field>
         <field name="model_id" ref="model_rok_migration_root"/>
         <field name="binding_model_id" ref="model_rok_migration_root"/>
         <field name="state">code</field>
@@ -86,8 +57,34 @@ if records:
         </field>
     </record>
 
+    <!-- Server Action for Delete migrated items -->
+    <record id="action_server_delete_migrated_items" model="ir.actions.server">
+        <field name="name">Delete migrated items</field>
+        <field name="sequence">30</field>
+        <field name="model_id" ref="model_rok_migration_root"/>
+        <field name="binding_model_id" ref="model_rok_migration_root"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_delete_migrated_items()
+        </field>
+    </record>
+
+    <!-- Server Action for Delete all -->
+    <record id="action_server_delete_all" model="ir.actions.server">
+        <field name="name">Delete all</field>
+        <field name="sequence">40</field>
+        <field name="model_id" ref="model_rok_migration_root"/>
+        <field name="binding_model_id" ref="model_rok_migration_root"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_delete_all()
+        </field>
+    </record>
+
     <record id="action_rok_migration_root" model="ir.actions.act_window">
-        <field name="name">Migration Roots</field>
+        <field name="name">Migration</field>
         <field name="res_model">rok.migration.root</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -101,8 +98,8 @@ if records:
     </record>
 
     <menuitem id="menu_migration_roots"
-        name="Migration Roots"
-        parent="menu_rok_migration_actions"
+        name="Migration"
+        parent="base.menu_administration"
         action="action_rok_migration_root"
         sequence="20"/>
 

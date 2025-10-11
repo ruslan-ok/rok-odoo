@@ -16,7 +16,7 @@ LOOKUPS = {
     "res.country": "code",
     "res.country.state": "code",
     "res.currency": "name",
-    "res.user": "login",
+    "res.users": "login",
 }
 
 class RokMigrationData(models.Model):
@@ -29,8 +29,13 @@ class RokMigrationData(models.Model):
     data = fields.Json(string='Data', help='Data from source database')
     target_id = fields.Integer(string='Target ID', help='Target ID in target database')
 
-    def clear_data(self, models):
-        migration_data = self.search([("model", "in", models)])
+    def delete_all(self):
+        models = self.search([("target_id", "!=", False)]).mapped("model")
+        self.delete_migrated_items(models)
+        self.search([]).unlink()
+
+    def delete_migrated_items(self, models):
+        migration_data = self.search([("model", "in", models), ("target_id", "!=", False)])
         migrated_models = set(migration_data.mapped("model"))
         for model in migrated_models:
             migrated_data = self.search([("model", "=", model), ("target_id", "!=", False)])
@@ -187,7 +192,7 @@ class RokMigrationData(models.Model):
         new_item = self.env[self.model].create(item_vals)
         self.write({"target_id": new_item.id})
         if fix_in_log:
-            _logger.info("Migrated record %s: %s", self.model, new_item.get("name", new_item.get("id")))
+            _logger.info("Migrated record %s: %s", self.model, new_item.name if self.model == "res.partner" else new_item.id)
         return new_item.id
 
     def _fetch_from_json(self, json_data, extra_key=None):
@@ -203,7 +208,12 @@ class RokMigrationData(models.Model):
         return True
 
     def integrity_transform(self, field, value):
-        if self.model == "res.partner" and field == "peppol_endpoint":
-            if value == "PL: NIP 526-00-03-819":
-                return "PL5260003819"
+        match self.model:
+            case "res.partner":
+                if field == "peppol_endpoint":
+                    if value == "PL: NIP 526-00-03-819":
+                        return "PL5260003819"
+            case "knowledge.article":
+                if field == "parent_path":
+                    return False
         return value

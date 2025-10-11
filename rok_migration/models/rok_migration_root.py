@@ -15,9 +15,12 @@ class RokMigrationRoot(models.Model):
             record.loaded_count = self.env["rok.migration.data"].search_count([("model", "=", record.model)])
             record.migrated_count = self.env["rok.migration.data"].search_count([("model", "=", record.model), ("target_id", "!=", False)])
 
-    def action_clear(self):
-        models = self.get_models_for_root()
-        self.env["rok.migration.data"].clear_data(models)
+    def action_delete_all(self):
+        self.env["rok.migration.data"].delete_all()
+
+    def action_delete_migrated_items(self):
+        models = self.mapped("model")
+        self.env["rok.migration.data"].delete_migrated_items(models)
 
     def action_load(self):
         models = self.get_models_for_root()
