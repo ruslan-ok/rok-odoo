@@ -2,3 +2,4 @@ python-telegram-bot
 dotenv
 pg8000
 pdfminer.six
+phonenumbers

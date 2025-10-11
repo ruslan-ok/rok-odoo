@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rok_migration_root_res_partner" model="rok.migration.root">
+        <field name="model_id" ref="base.model_res_partner"/>
+    </record>
+
+    <record id="rok_migration_root_knowledge_article" model="rok.migration.root">
+        <field name="model_id" ref="knowledge.model_knowledge_article"/>
+    </record>
+
+    <record id="rok_migration_root_project_project" model="rok.migration.root">
+        <field name="model_id" ref="project.model_project_project"/>
+    </record>
+
+    <record id="rok_migration_root_documents_document" model="rok.migration.root">
+        <field name="model_id" ref="documents.model_documents_document"/>
+    </record>
+
+    <record id="rok_migration_root_calendar_event" model="rok.migration.root">
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+    </record>
+
+    <record id="rok_migration_root_account_move" model="rok.migration.root">
+        <field name="model_id" ref="account.model_account_move"/>
+    </record>
+
+    <record id="rok_migration_root_passwords" model="rok.migration.root">
+        <field name="model_id" ref="password_manager.model_passwords"/>
+    </record>
+
+    <record id="rok_migration_root_rok_history_event" model="rok.migration.root">
+        <field name="model_id" ref="rok_history.model_rok_history_event"/>
+    </record>
+
+    <record id="rok_migration_root_rok_health_anthropometry" model="rok.migration.root">
+        <field name="model_id" ref="rok_health.model_rok_health_anthropometry"/>
+    </record>
+</odoo>
