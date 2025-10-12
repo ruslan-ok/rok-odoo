@@ -11,14 +11,6 @@ from odoo import models, fields, _
 from odoo.models import LOG_ACCESS_COLUMNS
 from odoo import Command, api
 
-LOOKUPS = {
-    "res.company": "id",
-    "res.country": "code",
-    "res.country.state": "code",
-    "res.currency": "name",
-    "res.users": "login",
-}
-
 class RokMigrationData(models.Model):
     _name = 'rok.migration.data'
     _description = 'Rok Migration Data  '
@@ -110,22 +102,31 @@ class RokMigrationData(models.Model):
             except Exception as e:
                 _logger.warning("Could not create rok.migration.data for %s: %s", model, e)
                 raise e
-        _logger.info("Loading data from relation %s: relation", model)
+        _logger.info("Loading data from relation %s: end", relation)
 
     @api.model
-    def get_many2one(self, relation, source_id, field_types):
+    def get_many2one(self, owner, relation, source_id):
         if isinstance(source_id, dict):
             source_id = int(list(source_id.keys())[0])
         migration_rec = self.env["rok.migration.data"].search([("model", "=", relation), ("source_id", "=", source_id)])
+        LOOKUPS = {
+            "res.company": "id",
+            "res.country": "code",
+            "res.country.state": "code",
+            "res.currency": "name",
+            "res.users": "login",
+        }
         lookup_key = LOOKUPS.get(relation)
         if lookup_key:
             item = self.env[relation].with_context(active_test=False).search([(lookup_key, "=", migration_rec.data.get(lookup_key))])
             if item and migration_rec.data.get("active"):
                 item.active = True
             return item.id if item else False
-        return migration_rec.migrate_one(field_types)
+        if len(migration_rec) != 1:
+            raise ValueError("DEBUG: Multiple records found for model %s, source_id %s", relation, source_id)
+        return migration_rec.migrate_one(owner)
 
-    def get_one2many(self, source_id, field_name, field_types):
+    def get_one2many(self, owner, source_id, field_name):
         o2m_field_def = self.env["ir.model.fields"].search([("model", "=", self.model), ("name", "=", field_name)])
         related_model = o2m_field_def.relation
         relation_field = o2m_field_def.relation_field
@@ -144,12 +145,12 @@ class RokMigrationData(models.Model):
         ids_to_link = []
         for rec in migration_recs:
             if rec.data.get(relation_field) == source_id:
-                new_id = rec.migrate_one(field_types)
+                new_id = rec.migrate_one(owner)
                 if new_id:
                     ids_to_link.append(new_id)
         return Command.set(ids_to_link) if ids_to_link else False
 
-    def get_many2many(self, source_id, field_name, field_types):
+    def get_many2many(self, owner, source_id, field_name):
         m2m_field_def = self.env["ir.model.fields"].search([("model", "=", self.model), ("name", "=", field_name)])
         relation_table = m2m_field_def.relation_table
         column1 = m2m_field_def.column1
@@ -161,7 +162,7 @@ class RokMigrationData(models.Model):
             for rec in migration_recs:
                 if rec.data.get(column1) == source_id:
                     item_data = self.env["rok.migration.data"].search([("model", "=", related_model), ("source_id", "=", rec.data.get(column2))])
-                    new_id = item_data.migrate_one(field_types)
+                    new_id = item_data.migrate_one(owner)
                     if new_id:
                         ids_to_link.append(new_id)
         return Command.set(ids_to_link) if ids_to_link else False
@@ -171,15 +172,16 @@ class RokMigrationData(models.Model):
 
     def migrate_model(self, model):
         _logger.info("Migrating model %s: start", model)
-        field_types = set()
+        dotenv.load_dotenv()
+        owner_name = os.getenv("APP_OWNER_NAME")
+        owner = self.env["res.users"].search([("login", "=", owner_name)], limit=1)
         actual_fields = self.get_model_fields_info(model)
         records = self.env["rok.migration.data"].search([("model", "=", model)])
         for record in records:
-            record.migrate_one(field_types, actual_fields, fix_in_log=True)
-        print(field_types)
+            record.migrate_one(owner, actual_fields, fix_in_log=True)
         _logger.info("Migrating model %s: end", model)
 
-    def migrate_one(self, field_types, actual_fields=None, fix_in_log=False):
+    def migrate_one(self, owner, actual_fields=None, fix_in_log=False):
         self.ensure_one()
         if self.target_id:
             item = self.env[self.model].browse(self.target_id)
@@ -196,10 +198,9 @@ class RokMigrationData(models.Model):
         item_vals = {}
         for actual_field, actual_field_info in actual_fields.items():
             relation = actual_field_info.get("relation")
-            if actual_field == "id" or (not self.data.get(actual_field) and not relation):
-                continue
             field_type = actual_field_info.get("type")
-            field_types.add(field_type)
+            if actual_field == "id" or (not self.data.get(actual_field) and not relation and field_type != "boolean"):
+                continue
             match actual_field_info.get("type"):
                 case "many2one":
                     source_id = self.data.get(actual_field)
@@ -207,18 +208,18 @@ class RokMigrationData(models.Model):
                         continue
                     if relation == self.model and source_id == self.data.get("id"):
                         continue
-                    item_vals[actual_field] = self.get_many2one(relation, source_id, field_types)
+                    item_vals[actual_field] = self.get_many2one(owner, relation, source_id)
                 case "one2many":
                     continue
                     # source_id = self.source_id
-                    # value = self.get_one2many(source_id, actual_field, field_types)
+                    # value = self.get_one2many(owner, source_id, actual_field)
                     # if not value:
                     #     continue
                     # item_vals[actual_field] = value
                 case "many2many":
                     continue
                     # source_id = self.source_id
-                    # value = self.get_many2many(source_id, actual_field, field_types)
+                    # value = self.get_many2many(owner, source_id, actual_field)
                     # if not value:
                     #     continue
                     # item_vals[actual_field] = value
@@ -230,14 +231,20 @@ class RokMigrationData(models.Model):
                         value = keys[0]
                     item_vals[actual_field] = value
                 case _:
-                    value = self.integrity_transform(actual_field, self.data[actual_field])
+                    value = self.integrity_transform(actual_field, self.data.get(actual_field))
                     if isinstance(value, dict):
                         value = self._fetch_from_json(value)
                     item_vals[actual_field] = value
+        if self.model == "knowledge.article":
+            if not item_vals.get("parent_id"):
+                item_vals["article_member_ids"] = [Command.create({
+                    "partner_id": owner.partner_id.id,
+                    "permission": "write",
+                })]
         new_item = self.env[self.model].create(item_vals)
         self.write({"target_id": new_item.id})
         if fix_in_log:
-            _logger.info("Migrated record %s: %s", self.model, new_item.name if self.model == "res.partner" else new_item.id)
+            _logger.info("Migrated record %s: %s", self.model, new_item.name if self.model in ["res.partner", "knowledge.article"] else new_item.id)
         return new_item.id
 
     def _fetch_from_json(self, json_data, extra_key=None):

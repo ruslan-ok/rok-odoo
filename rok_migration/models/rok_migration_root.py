@@ -44,7 +44,7 @@ class RokMigrationRoot(models.Model):
                 continue
             Model = self.env[model]
             fields = Model.fields_get(attributes=['type', 'relation_field', 'relation', 'relation_table'])
-            child_models = [x.get("relation") for x in fields.values() if x.get("relation") and not x.get("relation").startswith("ir.")]
+            child_models = [x.get("relation") for x in fields.values() if x.get("relation") and (not x.get("relation").startswith("ir.") or x.get("relation") == "ir.attachment")]
             child_models = list(set(child_models))
             for child_model in child_models:
                 child_model_relation = child_model.replace(".", "_")
