@@ -24,8 +24,8 @@ class RokMigrationData(models.Model):
     _description = 'Rok Migration Data  '
 
     model = fields.Char(string='Model')
+    relation = fields.Char(string='Relation (Table)')
     source_id = fields.Integer(string='Source ID', help='Original ID from source database')
-    search_key = fields.Char(string='Search Key')
     data = fields.Json(string='Data', help='Data from source database')
     target_id = fields.Integer(string='Target ID', help='Target ID in target database')
 
@@ -46,14 +46,19 @@ class RokMigrationData(models.Model):
 
         migration_data.unlink()
 
-    def load_data(self, models):
+    def load_data(self, relations):
+        relation_model_map = {}
+        for model_name, model in self.env.items():
+            table_name = getattr(model, '_table', None)
+            if table_name and table_name in relations:
+                relation_model_map[table_name] = model_name
         conn = self.get_source_connection()
         try:
             with conn.cursor() as cr:
-                for model in models:
-                    if self.search_count([("model", "=", model)]):
+                for relation in relations:
+                    if self.search_count([("relation", "=", relation)]):
                         continue
-                    self.load_model_data(model, cr)
+                    self.load_relation_data(relation, relation_model_map.get(relation), cr)
         finally:
             conn.close()
         _logger.info("Loading data from source database: end")
@@ -75,14 +80,13 @@ class RokMigrationData(models.Model):
             _logger.error("Database connection error: %s", e)
             raise e
 
-    def load_model_data(self, model, cr):
-        _logger.info("Loading data for the model %s ...", model)
-        table_name = "ir_act_report_xml" if model == "ir.actions.report" else model.replace(".", "_")
-        cr.execute(f"SELECT COUNT(1) FROM information_schema.tables WHERE table_name = '{table_name}' AND table_schema = 'public'")
+    def load_relation_data(self, relation, model, cr):
+        _logger.info("Loading data for the relation %s ...", relation)
+        cr.execute(f"SELECT COUNT(1) FROM information_schema.tables WHERE table_name = '{relation}' AND table_schema = 'public'")
         if cr.fetchone()[0] == 0:
-            _logger.warning("Table %s does not exist", table_name)
+            _logger.warning("Table %s does not exist", relation)
             return
-        cr.execute(f"SELECT * FROM {table_name}")
+        cr.execute(f"SELECT * FROM {relation}")
         columns = [desc[0] for desc in cr.description]
         rows = cr.fetchall()
         for row in rows:
@@ -101,16 +105,15 @@ class RokMigrationData(models.Model):
                 self.env["rok.migration.data"].create({
                     "model": model,
                     "source_id": data.get("id"),
-                    "search_key": "",
                     "data": data
                 })
             except Exception as e:
                 _logger.warning("Could not create rok.migration.data for %s: %s", model, e)
                 raise e
-        _logger.info("Loading data from model %s: end", model)
+        _logger.info("Loading data from relation %s: relation", model)
 
     @api.model
-    def get_many2one(self, relation, source_id):
+    def get_many2one(self, relation, source_id, field_types):
         if isinstance(source_id, dict):
             source_id = int(list(source_id.keys())[0])
         migration_rec = self.env["rok.migration.data"].search([("model", "=", relation), ("source_id", "=", source_id)])
@@ -120,32 +123,63 @@ class RokMigrationData(models.Model):
             if item and migration_rec.data.get("active"):
                 item.active = True
             return item.id if item else False
-        return migration_rec.migrate_one()
+        return migration_rec.migrate_one(field_types)
 
-    def get_one2many(self, relation, relation_field, source_id):
-        migration_recs = self.env["rok.migration.data"].search([("model", "=", relation), (relation_field, "=", source_id)])
-        return Command.Set(migration_recs.mapped("target_id"))
+    def get_one2many(self, source_id, field_name, field_types):
+        o2m_field_def = self.env["ir.model.fields"].search([("model", "=", self.model), ("name", "=", field_name)])
+        related_model = o2m_field_def.relation
+        relation_field = o2m_field_def.relation_field
+        migration_recs = self.env["rok.migration.data"].search([("model", "=", related_model)])
+        FILTER_MAP = {
+            "res.partner": {
+                "message_follower_ids": lambda x: x.data.get("res_model") == self.model and x.data.get(relation_field) == source_id,
+                "message_ids": lambda x: x.data.get("model") == self.model and x.data.get(relation_field) == source_id,
+            },
+        }
+        filter_func = FILTER_MAP.get(self.model, {}).get(field_name)
+        if filter_func:
+            migration_recs = migration_recs.filtered(filter_func)
+        else:
+            migration_recs = migration_recs.filtered(lambda x: x.data.get(relation_field) == source_id)
+        ids_to_link = []
+        for rec in migration_recs:
+            if rec.data.get(relation_field) == source_id:
+                new_id = rec.migrate_one(field_types)
+                if new_id:
+                    ids_to_link.append(new_id)
+        return Command.set(ids_to_link) if ids_to_link else False
 
-    def get_many2many(self, relation, source_id):
-        return Command.Set([])
+    def get_many2many(self, source_id, field_name, field_types):
+        m2m_field_def = self.env["ir.model.fields"].search([("model", "=", self.model), ("name", "=", field_name)])
+        relation_table = m2m_field_def.relation_table
+        column1 = m2m_field_def.column1
+        column2 = m2m_field_def.column2
+        related_model = m2m_field_def.relation
+        ids_to_link = []
+        if relation_table:
+            migration_recs = self.env["rok.migration.data"].search([("relation", "=", relation_table)])
+            for rec in migration_recs:
+                if rec.data.get(column1) == source_id:
+                    item_data = self.env["rok.migration.data"].search([("model", "=", related_model), ("source_id", "=", rec.data.get(column2))])
+                    new_id = item_data.migrate_one(field_types)
+                    if new_id:
+                        ids_to_link.append(new_id)
+        return Command.set(ids_to_link) if ids_to_link else False
 
     def get_model_fields_info(self, model):
-        return self.env[model].fields_get(
-            attributes=[
-                'type', 'string', 'required', 'relation_field', 'default_export_compatible',
-                'relation', 'definition_record', 'definition_record_field', 'exportable', 'readonly',
-            ],
-        )
+        return self.env[model].fields_get(attributes=['type', 'comodel_name', 'base_field', 'relation_field', 'relation', 'relation_table', 'related_field', 'inverse', 'inverse_name', 'model_name', 'compute'])
 
     def migrate_model(self, model):
         _logger.info("Migrating model %s: start", model)
+        field_types = set()
         actual_fields = self.get_model_fields_info(model)
         records = self.env["rok.migration.data"].search([("model", "=", model)])
         for record in records:
-            record.migrate_one(actual_fields, fix_in_log=True)
+            record.migrate_one(field_types, actual_fields, fix_in_log=True)
+        print(field_types)
         _logger.info("Migrating model %s: end", model)
 
-    def migrate_one(self, actual_fields=None, fix_in_log=False):
+    def migrate_one(self, field_types, actual_fields=None, fix_in_log=False):
         self.ensure_one()
         if self.target_id:
             item = self.env[self.model].browse(self.target_id)
@@ -161,22 +195,33 @@ class RokMigrationData(models.Model):
             actual_fields = self.get_model_fields_info(self.model)
         item_vals = {}
         for actual_field, actual_field_info in actual_fields.items():
-            if actual_field == "id" or not self.data.get(actual_field):
+            relation = actual_field_info.get("relation")
+            if actual_field == "id" or (not self.data.get(actual_field) and not relation):
                 continue
+            field_type = actual_field_info.get("type")
+            field_types.add(field_type)
             match actual_field_info.get("type"):
                 case "many2one":
-                    relation = actual_field_info.get("relation")
-                    source_id = self.data[actual_field]
+                    source_id = self.data.get(actual_field)
+                    if not source_id:
+                        continue
                     if relation == self.model and source_id == self.data.get("id"):
                         continue
-                    item_vals[actual_field] = self.get_many2one(relation, source_id)
+                    item_vals[actual_field] = self.get_many2one(relation, source_id, field_types)
                 case "one2many":
-                    relation = actual_field_info.get("relation")
-                    relation_field = actual_field_info.get("relation_field")
-                    item_vals[actual_field] = self.get_one2many(relation, relation_field, self.source_id)
+                    continue
+                    # source_id = self.source_id
+                    # value = self.get_one2many(source_id, actual_field, field_types)
+                    # if not value:
+                    #     continue
+                    # item_vals[actual_field] = value
                 case "many2many":
-                    relation = actual_field_info.get("relation")
-                    item_vals[actual_field] = self.get_many2many(relation, self.source_id)
+                    continue
+                    # source_id = self.source_id
+                    # value = self.get_many2many(source_id, actual_field, field_types)
+                    # if not value:
+                    #     continue
+                    # item_vals[actual_field] = value
                 case "selection":
                     value = self.data[actual_field]
                     field_def = self.env["ir.model.fields"].search([("model", "=", self.model), ("name", "=", actual_field)])
