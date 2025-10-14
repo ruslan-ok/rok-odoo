@@ -21,6 +21,11 @@ class RokMigrationData(models.Model):
     data = fields.Json(string='Data', help='Data from source database')
     target_id = fields.Integer(string='Target ID', help='Target ID in target database')
 
+    _source_id_uniq = models.Constraint(
+        'unique(model, source_id)',
+        'A record with the same model and source ID already exists.',
+    )
+
     def delete_all(self):
         models = self.search([("target_id", "!=", False)]).mapped("model")
         self.delete_migrated_items(models)

@@ -34,7 +34,7 @@ class RokMigrationRoot(models.Model):
         root_models = self.search([]).mapped("model")
         relations = []
         self.scan_relations(root_models, relations)
-        return relations
+        return list(set(relations))
 
     def scan_relations(self, models_to_scan, relations_to_load):
         to_scan_child = []
