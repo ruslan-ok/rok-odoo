@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="cat_food" model="product.category">
+        <field name="parent_id" ref="product.product_category_all"/>
+        <field name="name">Food</field>
+    </record>
+</odoo>

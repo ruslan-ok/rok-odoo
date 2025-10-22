@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_rok_health_calories_tree" model="ir.ui.view">
+        <field name="name">rok.health.calories.tree</field>
+        <field name="model">calories</field>
+        <field name="arch" type="xml">
+            <list string="Calories" default_order="event_dt desc">
+                <field name="event_dt"/>
+                <field name="product_id"/>
+                <field name="consumed_kcal"/>
+                <field name="info"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rok_health_calories_form" model="ir.ui.view">
+        <field name="name">rok.health.calories.form</field>
+        <field name="model">calories</field>
+        <field name="arch" type="xml">
+            <form string="Calories">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_dt"/>
+                            <field name="product_id" domain="[('categ_id', '=', context.get('food_category_id'))]"/>
+                            <field name="consumed_g" string="Consumed grams"/>
+                            <field name="consumed_pcs" string="Consumed pieces"/>
+                            <field name="consumed_kcal" string="Consumed kcal"/>
+                        </group>
+                        <group>
+                            <field name="pack_g" string="Pack grams"/>
+                            <field name="pack_pcs" string="Pack pieces"/>
+                            <field name="kcal_100g" string="Energy"/>
+                        </group>
+                        <group>
+                            <field name="info"/>
+                        </group>
+                        <field name="user_id" invisible="1" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rok_health_calories_search" model="ir.ui.view">
+        <field name="name">rok.health.calories.search</field>
+        <field name="model">calories</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="event_dt"/>
+                <field name="product_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rok_health_calories" model="ir.actions.act_window">
+        <field name="name">Calories</field>
+        <field name="res_model">calories</field>
+        <field name="view_mode">list,form</field>
+        <field name="views" eval="[(ref('view_rok_health_calories_tree'), 'list'), (ref('view_rok_health_calories_form'), 'form')]"/>
+        <field name="search_view_id" ref="view_rok_health_calories_search"/>
+        <field name="context" eval="{'food_category_id': ref('rok_health.cat_food')}"/>
+    </record>
+
+    <menuitem
+        id="menu_rok_health_calories"
+        name="Calories"
+        parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_configuration"
+        action="action_rok_health_calories"
+        sequence="10"
+        groups="base.group_user"/>
+
+</odoo>
