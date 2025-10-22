@@ -6,12 +6,18 @@
     'depends': [
         'base',
         'rok_spreadsheet',
+        'spreadsheet_dashboard',
+        'account',
     ],
     'data': [
+        'data/product_category.xml',
         'security/ir.model.access.csv',
         'security/rok_health_rules.xml',
+        'views/account_move_line.xml',
         'views/anthropometry_views.xml',
+        'views/calories_views.xml',
         'views/dashboard_anthropometry.xml',
+        'views/product_product.xml',
     ],
     'installable': True,
     'application': False,

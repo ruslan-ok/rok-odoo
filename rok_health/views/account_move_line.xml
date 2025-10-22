@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_account_move_line_form_rok_health" model="ir.ui.view">
+        <field name="name">account.move.line.form.rok.health</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='invoice_tab']/field[@name='invoice_line_ids']/list/field[@name='price_total']" position="after">
+                <field name="weight_g" optional="show" string="Weight"/>
+                <field name="pack_pcs" optional="show" string="Pieces"/>
+                <field name="kcal_100g" optional="show" string="Energy"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
