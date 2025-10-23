@@ -7,7 +7,7 @@
             <list string="Calories" default_order="event_dt desc">
                 <field name="event_dt"/>
                 <field name="product_id"/>
-                <field name="consumed_kcal"/>
+                <field name="consumed_kcal" sum="Total kcal"/>
                 <field name="info"/>
             </list>
         </field>
@@ -49,6 +49,7 @@
             <search>
                 <field name="event_dt"/>
                 <field name="product_id"/>
+                <filter name="groupby_event_dt_day" string="Group by Day" context="{'group_by': 'event_dt:day'}"/>
             </search>
         </field>
     </record>
@@ -59,7 +60,7 @@
         <field name="view_mode">list,form</field>
         <field name="views" eval="[(ref('view_rok_health_calories_tree'), 'list'), (ref('view_rok_health_calories_form'), 'form')]"/>
         <field name="search_view_id" ref="view_rok_health_calories_search"/>
-        <field name="context" eval="{'food_category_id': ref('rok_health.cat_food')}"/>
+        <field name="context" eval="{'food_category_id': ref('rok_health.cat_food'), 'search_default_groupby_event_dt_day': 1}"/>
     </record>
 
     <menuitem
