@@ -21,13 +21,13 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="event_dt"/>
                             <field name="product_id" domain="[('categ_id', '=', context.get('food_category_id'))]"/>
                             <field name="consumed_g" string="Consumed grams"/>
                             <field name="consumed_pcs" string="Consumed pieces"/>
                             <field name="consumed_kcal" string="Consumed kcal"/>
                         </group>
                         <group>
+                            <field name="event_dt"/>
                             <field name="pack_g" string="Pack grams"/>
                             <field name="pack_pcs" string="Pack pieces"/>
                             <field name="kcal_100g" string="Energy"/>
