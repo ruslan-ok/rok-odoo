@@ -23,16 +23,22 @@ class Calories(models.Model):
     pack_g = fields.Integer(string="Pack Weight, grams")
     pack_pcs = fields.Float(string="Pack Volume, pieces")
     kcal_100g = fields.Integer(string='Calories in 100 grams')
-    consumed_kcal = fields.Integer(compute='_compute_calories_consumed')
+    consumed_kcal = fields.Integer(compute='_compute_calories_consumed', store=True)
     info = fields.Html()
 
     @api.depends('kcal_100g', 'consumed_g', 'consumed_pcs', 'pack_g', 'pack_pcs')
     def _compute_calories_consumed(self):
         for record in self:
-            if record.kcal_100g * record.consumed_g:
-                record.consumed_kcal = record.kcal_100g * record.consumed_g / 100
-            elif record.consumed_pcs * record.pack_g * record.pack_pcs * record.kcal_100g:
-                record.consumed_kcal = record.pack_g / 100 * record.kcal_100g / record.pack_pcs * record.consumed_pcs
+            kcal_100g = record.kcal_100g or 0
+            consumed_g = record.consumed_g or 0
+            consumed_pcs = record.consumed_pcs or 0
+            pack_g = record.pack_g or 0
+            pack_pcs = record.pack_pcs or 0
+
+            if kcal_100g and consumed_g:
+                record.consumed_kcal = kcal_100g * consumed_g / 100
+            elif consumed_pcs and pack_g and pack_pcs and kcal_100g:
+                record.consumed_kcal = pack_g / 100 * kcal_100g / pack_pcs * consumed_pcs
             else:
                 record.consumed_kcal = 0
 
