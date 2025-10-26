@@ -17,6 +17,10 @@ class Calories(models.Model):
         index=True,
         default=lambda self: fields.Datetime.now(),
     )
+    direction = fields.Selection([
+        ('consumed', 'Consumed'),
+        ('burned', 'Burned'),
+    ], required=True, default='consumed')
     product_id = fields.Many2one('product.product', string='Product')
     consumed_g = fields.Integer(string="Consumed grams")
     consumed_pcs = fields.Float(string="Consumed pieces")
@@ -24,23 +28,34 @@ class Calories(models.Model):
     pack_pcs = fields.Float(string="Pack Volume, pieces")
     kcal_100g = fields.Integer(string='Calories in 100 grams')
     consumed_kcal = fields.Integer(compute='_compute_calories_consumed', store=True)
+    burned_kcal = fields.Integer(string='Burned calories')
+    activity = fields.Selection([
+        ('cycling', 'Cycling'),
+        ('walking', 'Walking'),
+        ('other', 'Other'),
+    ], required=True, default='cycling')
+    distance = fields.Float(string='Distance, km')
     info = fields.Html()
 
-    @api.depends('kcal_100g', 'consumed_g', 'consumed_pcs', 'pack_g', 'pack_pcs')
+    @api.depends('direction', 'kcal_100g', 'consumed_g', 'consumed_pcs', 'pack_g', 'pack_pcs', 'burned_kcal')
     def _compute_calories_consumed(self):
         for record in self:
-            kcal_100g = record.kcal_100g or 0
-            consumed_g = record.consumed_g or 0
-            consumed_pcs = record.consumed_pcs or 0
-            pack_g = record.pack_g or 0
-            pack_pcs = record.pack_pcs or 0
+            match record.direction:
+                case 'burned':
+                    record.consumed_kcal = -record.burned_kcal or 0
+                case 'consumed':
+                    kcal_100g = record.kcal_100g or 0
+                    consumed_g = record.consumed_g or 0
+                    consumed_pcs = record.consumed_pcs or 0
+                    pack_g = record.pack_g or 0
+                    pack_pcs = record.pack_pcs or 0
 
-            if kcal_100g and consumed_g:
-                record.consumed_kcal = kcal_100g * consumed_g / 100
-            elif consumed_pcs and pack_g and pack_pcs and kcal_100g:
-                record.consumed_kcal = pack_g / 100 * kcal_100g / pack_pcs * consumed_pcs
-            else:
-                record.consumed_kcal = 0
+                    if kcal_100g and consumed_g:
+                        record.consumed_kcal = kcal_100g * consumed_g / 100
+                    elif consumed_pcs and pack_g and pack_pcs and kcal_100g:
+                        record.consumed_kcal = pack_g / 100 * kcal_100g / pack_pcs * consumed_pcs
+                    else:
+                        record.consumed_kcal = 0
 
     @api.onchange('product_id')
     def _onchange_product_id(self):

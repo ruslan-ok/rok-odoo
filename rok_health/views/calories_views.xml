@@ -21,6 +21,10 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="direction"/>
+                            <field name="activity"/>
+                            <field name="distance"/>
+                            <field name="burned_kcal" string="Burned kcal"/>
                             <field name="product_id" domain="[('categ_id', '=', context.get('food_category_id'))]"/>
                             <field name="consumed_g" string="Consumed grams"/>
                             <field name="consumed_pcs" string="Consumed pieces"/>
