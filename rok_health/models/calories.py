@@ -36,6 +36,7 @@ class Calories(models.Model):
     ], required=True, default='cycling')
     distance = fields.Float(string='Distance, km')
     info = fields.Html()
+    product_or_activity = fields.Char(compute='_compute_product_or_activity', store=True)
 
     @api.depends('direction', 'kcal_100g', 'consumed_g', 'consumed_pcs', 'pack_g', 'pack_pcs', 'burned_kcal')
     def _compute_calories_consumed(self):
@@ -56,6 +57,15 @@ class Calories(models.Model):
                         record.consumed_kcal = pack_g / 100 * kcal_100g / pack_pcs * consumed_pcs
                     else:
                         record.consumed_kcal = 0
+
+    @api.depends('product_id', 'activity')
+    def _compute_product_or_activity(self):
+        for record in self:
+            match record.direction:
+                case 'burned':
+                    record.product_or_activity = record.activity
+                case 'consumed':
+                    record.product_or_activity = record.product_id.name
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
