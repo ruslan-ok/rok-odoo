@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- Actions must be defined before views that reference them -->
+    <record id="action_rok_health_calories_consumed" model="ir.actions.act_window">
+        <field name="name">New Consumption</field>
+        <field name="res_model">calories</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context" eval="{'default_direction': 'consumed', 'food_category_id': ref('rok_health.cat_food')}"/>
+    </record>
+
+    <record id="action_rok_health_calories_burned" model="ir.actions.act_window">
+        <field name="name">New Burning</field>
+        <field name="res_model">calories</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'default_direction': 'burned'}</field>
+    </record>
+
     <record id="view_rok_health_calories_tree" model="ir.ui.view">
         <field name="name">rok.health.calories.tree</field>
         <field name="model">calories</field>
         <field name="arch" type="xml">
-            <list string="Calories" default_order="event_dt desc">
+            <list string="Calories" default_order="event_dt desc" create="0">
+                <header>
+                    <button name="%(action_rok_health_calories_consumed)d" string="New consumption" type="action" display="always" class="btn-primary"/>
+                    <button name="%(action_rok_health_calories_burned)d" string="New burning" type="action" display="always" class="btn-secondary"/>
+                </header>
                 <field name="event_dt"/>
-                <field name="product_id"/>
+                <field name="product_or_activity"/>
                 <field name="consumed_kcal" sum="Total kcal"/>
                 <field name="info"/>
             </list>
@@ -17,20 +38,28 @@
         <field name="name">rok.health.calories.form</field>
         <field name="model">calories</field>
         <field name="arch" type="xml">
-            <form string="Calories">
+            <form string="Calories" create="0">
+                <header>
+                    <button name="%(action_rok_health_calories_consumed)d" string="New consumption" type="action" class="btn-primary"/>
+                    <button name="%(action_rok_health_calories_burned)d" string="New burning" type="action" class="btn-secondary"/>
+                </header>
                 <sheet>
                     <group>
                         <group>
-                            <field name="product_id" domain="[('categ_id', '=', context.get('food_category_id'))]"/>
-                            <field name="consumed_g" string="Consumed grams"/>
-                            <field name="consumed_pcs" string="Consumed pieces"/>
+                            <field name="direction" invisible="1"/>
+                            <field name="activity" invisible="direction != 'burned'" required="direction == 'burned'"/>
+                            <field name="distance" invisible="direction != 'burned'"/>
+                            <field name="burned_kcal" string="Burned kcal" invisible="direction != 'burned'"/>
+                            <field name="product_id" domain="[('categ_id', '=', context.get('food_category_id'))]" invisible="direction != 'consumed'"/>
+                            <field name="consumed_g" string="Consumed grams" invisible="direction != 'consumed'"/>
+                            <field name="consumed_pcs" string="Consumed pieces" invisible="direction != 'consumed'"/>
                             <field name="consumed_kcal" string="Consumed kcal"/>
                         </group>
                         <group>
-                            <field name="event_dt"/>
-                            <field name="pack_g" string="Pack grams"/>
-                            <field name="pack_pcs" string="Pack pieces"/>
-                            <field name="kcal_100g" string="Energy"/>
+                            <field name="event_dt" invisible="direction != 'consumed'"/>
+                            <field name="pack_g" string="Pack grams" invisible="direction != 'consumed'"/>
+                            <field name="pack_pcs" string="Pack pieces" invisible="direction != 'consumed'"/>
+                            <field name="kcal_100g" string="Energy" invisible="direction != 'consumed'"/>
                         </group>
                         <group>
                             <field name="info"/>
