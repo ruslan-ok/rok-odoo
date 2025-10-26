@@ -53,8 +53,11 @@ class Calories(models.Model):
 
                     if kcal_100g and consumed_g:
                         record.consumed_kcal = kcal_100g * consumed_g / 100
-                    elif consumed_pcs and pack_g and pack_pcs and kcal_100g:
-                        record.consumed_kcal = pack_g / 100 * kcal_100g / pack_pcs * consumed_pcs
+                    elif consumed_pcs and pack_g and kcal_100g:
+                        if pack_pcs:
+                            record.consumed_kcal = pack_g / 100 * kcal_100g / pack_pcs * consumed_pcs
+                        else:
+                            record.consumed_kcal = pack_g / 100 * kcal_100g * consumed_pcs
                     else:
                         record.consumed_kcal = 0
 
@@ -63,7 +66,7 @@ class Calories(models.Model):
         for record in self:
             match record.direction:
                 case 'burned':
-                    record.product_or_activity = record.activity
+                    record.product_or_activity = dict(record._fields['activity'].selection).get(record.activity, record.activity)
                 case 'consumed':
                     record.product_or_activity = record.product_id.name
 
