@@ -76,3 +76,4 @@ class Calories(models.Model):
             self.pack_g = self.product_id.weight
             self.pack_pcs = self.product_id.volume
             self.kcal_100g = self.product_id.kcal_100g
+            self.consumed_pcs = 1
