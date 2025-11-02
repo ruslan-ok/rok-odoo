@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='last_name']" position="after">
                 <field name="birthday"/>
+                <field name="age"/>
             </xpath>
         </field>
     </record>
@@ -18,6 +19,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='complete_name']" position="after">
                 <field name="birthday" optional="hide"/>
+                <field name="age" optional="hide"/>
             </xpath>
         </field>
     </record>
