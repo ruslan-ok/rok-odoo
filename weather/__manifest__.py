@@ -1,0 +1,32 @@
+{
+    "name": "Weather",
+    "version": "1.0",
+    "summary": "Weather module",
+    "author": "Ruslan Akunevich",
+    "license": "LGPL-3",
+    "website": "https://github.com/ruslan-ok/rok-odoo",
+    "application": False,
+    "category": "Productivity/Weather",
+    "depends": ["base", "web"],
+    "data": [
+        "security/ir.model.access.csv",
+        "views/weather_dashboard_view.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "weather/static/src/components/weather.js",
+            "weather/static/src/components/weather.xml",
+            "weather/static/src/components/weather.scss",
+            "weather/static/src/components/form_location/form_location.js",
+            "weather/static/src/components/form_location/form_location.xml",
+            "weather/static/src/components/weather_for_the_day/weather_for_the_day.js",
+            "weather/static/src/components/weather_for_the_day/weather_for_the_day.xml",
+            "weather/static/src/components/weather_for_the_week/weather_for_the_week.js",
+            "weather/static/src/components/weather_for_the_week/weather_for_the_week.xml",
+            "weather/static/src/components/weather_message/weather_message.js",
+            "weather/static/src/components/weather_message/weather_message.xml",
+            "weather/static/src/components/weather_now/weather_now.js",
+            "weather/static/src/components/weather_now/weather_now.xml",
+        ],
+    },
+}

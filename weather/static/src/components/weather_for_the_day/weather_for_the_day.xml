@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="weather.WeatherForTheDay">
+        <div class="weather-for-the-day">
+            <h2>Weather for the day</h2>
+        </div>
+    </t>
+</templates>
+

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_weather_astro_user,weather astro user,model_weather_astro,base.group_user,1,1,1,0
+access_weather_forecast_user,weather forecast user,model_weather_forecast,base.group_user,1,1,1,0
+access_weather_place_user,weather place user,model_weather_place,base.group_user,1,1,1,0
