@@ -24,26 +24,42 @@
                             </div>
                         </td>
                     </tr>
-                    <!-- 
-                    
                     <tr>
-                        {titleTemp}
+                        <td t-foreach="titlesTemp" t-as="title" t-key="title.key" t-att-class="title.class">
+                            <span t-if="title.name" class="subtitle-backgr" t-out="title.name" />
+                        </td>
                     </tr>
                     <tr>
-                        {tempBars}
+                        <td t-foreach="tempBars" t-as="tempBar" t-key="tempBar.key" t-att-class="tempBar.class">
+                            <div class='top' t-att-style="tempBar.topStyle" />
+                            <div class='mid' t-att-style="tempBar.midStyle" />
+                            <div class='bot overflow-td' t-att-style="tempBar.botStyle" t-out="tempBar.avgTemp" />
+                        </td>
                     </tr>
                     <tr>
-                        {titleWind}
+                        <td t-foreach="titlesWind" t-as="title" t-key="title.key" t-att-class="title.class">
+                            <span t-if="title.name" class="subtitle-backgr" t-out="title.name" />
+                        </td>
                     </tr>
                     <tr>
-                        {wind}
+                        <td t-foreach="winds" t-as="wind" t-key="wind.key" t-att-class="wind.class" t-att-style="wind.valueStyle">
+                            <t t-out="wind.value" />
+                            <i class="fa fa-arrow-up wind-icon" t-att-style="wind.directionStyle" />
+                        </td>
                     </tr>
                     <tr>
-                        {titlePreci}
+                        <td t-foreach="titlesPreci" t-as="title" t-key="title.key" t-att-class="title.class">
+                            <span t-if="title.name" class="subtitle-backgr" t-out="title.name" />
+                        </td>
                     </tr>
                     <tr>
-                        {precipitation}
-                    </tr> -->
+                        <td t-foreach="precipitation" t-as="preci" t-key="preci.key" t-att-class="preci.class">
+                            <div class='hour-preci'>
+                                <div class='value' t-att-style="preci.valueStyle" t-out="preci.value" />
+                                <div class='bar' t-att-style="preci.heightStyle" />
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
