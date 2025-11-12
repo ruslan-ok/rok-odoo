@@ -27,9 +27,9 @@ export class Weather extends Component {
             location: this.getLocationOption(),
             useBrowserLocation: this.getBrowserLocationOption(),
         });
-        this.label_now = "Сейчас";
-        this.label_day = "Сутки";
-        this.label_week = "Неделя";
+        this.label_now = "Now";
+        this.label_day = "Day";
+        this.label_week = "Week";
         this.cr_url = "https://www.meteosource.com";
         this.cr_info = "Powered by Meteosource";
         this.ms_href = "/weather/static/src/img/7.svg";

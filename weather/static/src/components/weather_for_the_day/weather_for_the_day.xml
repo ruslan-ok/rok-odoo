@@ -1,8 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="weather.WeatherForTheDay">
-        <div class="weather-for-the-day">
-            <h2>Weather for the day</h2>
+        <div class='weather-day period-container'>
+            <div class='week-row widget-title'>
+                <span class='location' t-out="props.values.place" />
+                <span class='period' t-out="label_day" />
+            </div>
+            <table class="table table-borderles">
+                <tbody>
+                    <tr>
+                        <td t-foreach="days" t-as="day" t-key="day.key" t-att-class="day.class" t-out="day.name" />
+                    </tr>
+                    <tr>
+                        <td t-foreach="hours" t-as="hour" t-key="hour.key" t-att-class="hour.class">
+                            <t t-out="hour.name" />
+                            <sup t-if="hour.name" class="time-sup">00</sup>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td t-foreach="icons" t-as="icon" t-key="icon.key" t-att-class="icon.class">
+                            <div t-if="icon.href" class='hours-icon'>
+                                <img class="weather-icon" t-att-src="icon.href" alt="Weather icon"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- 
+                    
+                    <tr>
+                        {titleTemp}
+                    </tr>
+                    <tr>
+                        {tempBars}
+                    </tr>
+                    <tr>
+                        {titleWind}
+                    </tr>
+                    <tr>
+                        {wind}
+                    </tr>
+                    <tr>
+                        {titlePreci}
+                    </tr>
+                    <tr>
+                        {precipitation}
+                    </tr> -->
+                </tbody>
+            </table>
         </div>
     </t>
 </templates>

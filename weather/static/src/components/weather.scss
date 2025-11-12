@@ -193,12 +193,12 @@
             font-family: Arial,Helvetica,sans-serif;
             background-size: cover;
             color: var(--weather-now-color);
-    
+
             .date-time {
                 font-weight: 400;
                 font-size: 17px;
                 line-height: 20px;
-                padding-top: 22px;    
+                padding-top: 22px;
                 margin: 0 auto;
             }
 
@@ -223,7 +223,7 @@
                         left: -5px;
                         position: relative;
                         top: -10px;
-                        font-size: 90px;    
+                        font-size: 90px;
                     }
                 }
             }
@@ -306,7 +306,7 @@
                 &.blue {
                     color: var(--week-day-work-color);
                 }
-                
+
                 &.red {
                     color: var(--week-end-day-color);
                 }

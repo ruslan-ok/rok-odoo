@@ -8,7 +8,7 @@ export class WeatherNow extends Component {
         values: Object,
     };
     setup() {
-        this.label_now = ": погода сейчас";
+        this.label_now = ": weather right now";
         this.image = `background-image: ${this.pickUpImage(this.props.values.current.event, this.props.values.sunrise, this.props.values.sunset, this.props.values.current.cloud_cover)}`;
         const dt = new Date(this.props.values.current.event);
         const options = {
