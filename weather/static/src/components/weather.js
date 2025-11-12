@@ -2,6 +2,7 @@
 
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { rpc } from "@web/core/network/rpc";
 import { FormLocation } from "./form_location/form_location";
 import { WeatherMessage } from "./weather_message/weather_message";
 import { WeatherNow } from "./weather_now/weather_now";
@@ -23,46 +24,67 @@ export class Weather extends Component {
             loading: true,
             error: null,
             period: 'now',
-            values: {},
+            location: this.getLocationOption(),
+            useBrowserLocation: this.getBrowserLocationOption(),
         });
         this.label_now = "Сейчас";
         this.label_day = "Сутки";
         this.label_week = "Неделя";
         this.cr_url = "https://www.meteosource.com";
         this.cr_info = "Powered by Meteosource";
-        this.ms_href = "/static/widgets/weather/7.svg";
+        this.ms_href = "/weather/static/src/img/7.svg";
+
         onWillStart(async () => {
-            try {
-                const response = await fetch("/weather/data", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        jsonrpc: "2.0",
-                        method: "call",
-                        params: {},
-                        id: Date.now(),
-                    }),
-                    credentials: "same-origin",
+            async function getCoord() {
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject);
                 });
-                if (!response.ok) {
-                    this.state.error = `HTTP ${response.status}`;
+
+                return {
+                    lat: pos.coords.latitude,
+                    lon: pos.coords.longitude,
+                };
+            }
+            try {
+                let lat = "";
+                let lon = "";
+                if (this.state.useBrowserLocation) {
+                    const coord = await getCoord();
+                    lat = coord.lat;
+                    lon = coord.lon;
+                }
+                const response = await rpc("/weather/data", {
+                    location: this.state.location,
+                    lat: lat,
+                    lon: lon,
+                });
+                if (response.result != "ok") {
+                    this.state.error = response.info;
+                    this.state.period = "";
                     throw new Error(this.state.error);
                 }
-                const payload = await response.json();
-                const response_data = payload.result;
-                if (response_data.result === "error") {
-                    this.state.error = response_data.info;
-                    throw new Error(this.state.error);
-                }
-                this.state.data = response_data.data;
+                this.state.data = response.data;
+                this.state.period = "now";
             } catch (error) {
                 this.state.error = error.message || error;
             } finally {
                 this.state.loading = false;
             }
         });
+    }
+
+    getLocationOption() {
+        const location = localStorage.getItem('weather-location');
+        if (location === undefined)
+            return "";
+        return location;
+    }
+
+    getBrowserLocationOption() {
+        const ubl = localStorage.getItem('weather-use-browser-location');
+        if (ubl === undefined)
+            return true;
+        return (ubl === 'true');
     }
 
     setPeriodOption(period) {

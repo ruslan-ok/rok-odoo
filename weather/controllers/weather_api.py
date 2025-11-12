@@ -18,7 +18,7 @@ class WeatherError(Exception):
 
 
 class WeatherController(http.Controller):
-    @http.route('/weather/data', type='json', auth='user')
+    @http.route('/weather/data', type='json', auth="public", methods=['POST'])
     def get_weather(self, location: str=None, lat: str=None, lon: str=None) -> dict:
         try:
             ret = self.get_db_chart_data(location, lat, lon)

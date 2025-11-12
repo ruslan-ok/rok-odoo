@@ -1,8 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="weather.WeatherNow">
-        <div class="weather-now">
-            <h2>Weather now</h2>
+        <div class='weather-now period-container' t-att-style="image">
+            <div class='week-row widget-title'>
+                <span class='location' t-out="props.values.place" />
+                <span class='period' t-out="label_now" />
+            </div>
+            <div class='date-time' t-out="dateTime" />
+            <div class='temp-and-icon'>
+                <div class=''>
+                    <img class="weather-now-icon" t-att-src="href" alt="Weather Now icon"/>
+                </div>
+                <span class="unit unit_temperature_c">
+                    <span class="sign" t-out="sign" /><t t-out="value" />
+                </span>
+            </div>
+            <div class='summary' t-out="props.values.current.summary" />
+            <div class='kpi-list'>
+                <div class='kpi wind'>
+                    <div class='title'>Wind</div>
+                    <div class='description'>
+                        <div class='value'>
+                            <div class='number' t-out="windValue" />
+                            <div class='unit'>m/s</div>
+                        </div>
+                        <div class='info'><i class='bi-arrow-up wind-icon' t-att-style="windDirStyle" /></div>
+                    </div>
+                </div>
+                <div class='kpi sunrise'>
+                    <div class='title'>Sunrise</div>
+                    <div class='description'>
+                        <div class='value'>
+                            <div class='number' t-out="sunrise" />
+                            <div class='unit'></div>
+                        </div>
+                        <div class='info'><i class='bi-sunrise'></i></div>
+                    </div>
+                </div>
+                <div class='kpi sunset'>
+                    <div class='title'>Sunset</div>
+                    <div class='description'>
+                        <div class='value'>
+                            <div class='number' t-out="sunset" />
+                            <div class='unit'></div>
+                        </div>
+                        <div class='info'><i class='bi-sunset'></i></div>
+                    </div>
+                </div>
+                <div class='kpi clouds'>
+                    <div class='title'>Clouds</div>
+                    <div class='description'>
+                        <div class='value'>
+                            <div class='number' t-out="props.values.current.cloud_cover" />
+                            <div class='unit'>%</div>
+                        </div>
+                        <div class='info'></div>
+                    </div>
+                </div>
+                <div t-att-class="props.values.current.prec_type === 'none' ? 'd-none' : 'kpi precipitation'">
+                    <div class='title'>Precipitation</div>
+                    <div class='description'>
+                        <div class='value'>
+                            <div class='number' t-out="props.values.current.prec_total" />
+                            <div class='unit'>mm</div>
+                        </div>
+                        <div class='info' t-out="props.values.current.prec_type" />
+                    </div>
+                </div>
+            </div>
         </div>
     </t>
 </templates>

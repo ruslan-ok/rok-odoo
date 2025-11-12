@@ -1,15 +1,16 @@
 /** @odoo-module **/
 
-import { Component, useState } from "@odoo/owl";
+import { Component, useRef } from "@odoo/owl";
 
 export class FormLocation extends Component {
     static template = "weather.FormLocation";
+    static props = {
+        location: String,
+        useBrowserLocation: Boolean,
+    };
 
     setup() {
-        this.state = useState({
-            brsrLoc: this.getBrsrLocOption(),
-            location: this.getLocationOption(),
-        });
+        this.locationInput = useRef("locationInput");
     }
 
     getBrsrLocOption() {
@@ -26,18 +27,14 @@ export class FormLocation extends Component {
         return lctn;
     }
 
-    async onChangeBrsrLoc(e) {
-        this.state.brsrLoc = e.target.checked;
-        await localStorage.setItem('weather-use-browser-location', e.target.checked.toString());
+    async toggleBrowserLocation() {
+        this.props.useBrowserLocation = !this.props.useBrowserLocation;
+        await localStorage.setItem('weather-use-browser-location', this.props.useBrowserLocation.toString());
     }
 
-    async save(e) {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const formJson = Object.fromEntries(formData.entries());
-        const newLocation = formJson.location.toString();
-        this.state.location = newLocation;
+    async save() {
+        const newLocation = this.locationInput.el.value;
+        this.props.location = newLocation;
         await localStorage.setItem('weather-location', newLocation);
     }
 }

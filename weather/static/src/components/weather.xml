@@ -33,12 +33,12 @@
                             <button type='button' t-att-class="'option-link' + (state.period === 'day' ?  ' active' : '')" t-on-click="() => this.setPeriodOption('day')" t-out="label_day"/>
                             <button type='button' t-att-class="'option-link' + (state.period === 'week' ? ' active' : '')" t-on-click="() => this.setPeriodOption('week')" t-out="label_week"/>
                         </div>
-                        <FormLocation/>
+                        <FormLocation location="state.location" useBrowserLocation="state.useBrowserLocation" />
                     </div>
                     <WeatherMessage    t-if="state.error" message="state.error" />
-                    <WeatherNow        t-if="state.period === 'now'"  values="values" />
-                    <WeatherForTheDay  t-if="state.period === 'day'"  values="values" />
-                    <WeatherForTheWeek t-if="state.period === 'week'" values="values" />
+                    <WeatherNow        t-if="state.period === 'now'"  values="state.data" />
+                    <WeatherForTheDay  t-if="state.period === 'day'"  values="state.data" />
+                    <WeatherForTheWeek t-if="state.period === 'week'" values="state.data" />
                 </div>
             </div>
         </t>
