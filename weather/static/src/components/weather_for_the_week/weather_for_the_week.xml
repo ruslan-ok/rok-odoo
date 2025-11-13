@@ -2,7 +2,40 @@
 <templates xml:space="preserve">
     <t t-name="weather.WeatherForTheWeek">
         <div class="weather-for-the-week">
-            <h2>Weather for the week</h2>
+            <div class='weather-week period-container'>
+                <div class='week-row widget-title'>
+                    <span class='location' t-out="props.values.place" />
+                    <span class='period' t-out="label_week" />
+                </div>
+                <table class="table table-borderles">
+                    <tbody>
+                        <!-- <tr class='week-row days'>
+                            {days}
+                        </tr>
+                        <tr class='week-row icons'>
+                            {icons}
+                        </tr>
+                        <tr class='week-row subtitle'>
+                            {titleTemp}
+                        </tr>
+                        <tr class='week-row temperature'>
+                            {tempBars}
+                        </tr>
+                        <tr class='week-row subtitle'>
+                            {titleWind}
+                        </tr>
+                        <tr class='week-row week-wind'>
+                            {wind}
+                        </tr>
+                        <tr class='week-row subtitle'>
+                            {titlePreci}
+                        </tr>
+                        <tr class='week-row week-precipitation'>
+                            {precipitation}
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </t>
 </templates>

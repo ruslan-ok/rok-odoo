@@ -7,4 +7,7 @@ export class WeatherForTheWeek extends Component {
     static props = {
         values: Object,
     };
+    setup() {
+        this.label_week = ": weather for the week";
+    }
 }
