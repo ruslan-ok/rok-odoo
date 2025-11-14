@@ -3,6 +3,7 @@
 import { Component, onWillStart, useState } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
+import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 import { FormLocation } from "./form_location/form_location";
 import { WeatherMessage } from "./weather_message/weather_message";
 import { WeatherNow } from "./weather_now/weather_now";
@@ -11,6 +12,7 @@ import { WeatherForTheWeek } from "./weather_for_the_week/weather_for_the_week";
 
 export class Weather extends Component {
     static template = "weather.Weather";
+    static props = { ...Component.props, ...standardActionServiceProps };
     static components = {
         FormLocation,
         WeatherMessage,
@@ -20,10 +22,10 @@ export class Weather extends Component {
     };
     setup() {
         this.state = useState({
-            data: null,
+            data: {},
             loading: true,
             error: null,
-            period: 'now',
+            period: this.getPeriodOption(),
             location: this.getLocationOption(),
             useBrowserLocation: this.getBrowserLocationOption(),
         });
@@ -64,7 +66,6 @@ export class Weather extends Component {
                     throw new Error(this.state.error);
                 }
                 this.state.data = response.data;
-                this.state.period = "now";
             } catch (error) {
                 this.state.error = error.message || error;
             } finally {
@@ -73,22 +74,30 @@ export class Weather extends Component {
         });
     }
 
+    getPeriodOption() {
+        const period = localStorage.getItem('weather-period');
+        if (period === undefined || period === null)
+            return "now";
+        return period;
+    }
+
     getLocationOption() {
         const location = localStorage.getItem('weather-location');
-        if (location === undefined)
+        if (location === undefined || location === null)
             return "";
         return location;
     }
 
     getBrowserLocationOption() {
         const ubl = localStorage.getItem('weather-use-browser-location');
-        if (ubl === undefined)
+        if (ubl === undefined || ubl === null)
             return true;
         return (ubl === 'true');
     }
 
     setPeriodOption(period) {
         this.state.period = period;
+        localStorage.setItem('weather-period', period);
     }
 }
 

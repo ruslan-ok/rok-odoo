@@ -14,6 +14,7 @@
     ],
     "assets": {
         "web.assets_backend": [
+            "weather/static/lib/bootstrap_icons/bootstrap-icons.min.css",
             "weather/static/src/components/weather.scss",
             "weather/static/src/components/colors.js",
             "weather/static/src/components/weather_utils.js",

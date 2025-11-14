@@ -9,30 +9,53 @@
                 </div>
                 <table class="table table-borderles">
                     <tbody>
-                        <!-- <tr class='week-row days'>
-                            {days}
+                        <tr class='week-row days'>
+                            <td t-foreach="days" t-as="day" t-key="day.key" t-att-class="day.class">
+                                <div class='day-name' t-out="day.name" />
+                                <div class='day-date' t-out="day.date" />
+                            </td>
                         </tr>
                         <tr class='week-row icons'>
-                            {icons}
+                            <td t-foreach="icons" t-as="icon" t-key="icon.key" t-att-class="icon.class">
+                                <div class='day-icon'>
+                                    <img class="weather-icon" t-att-src="icon.href" alt="Weather icon"/>
+                                </div>
+                            </td>
                         </tr>
                         <tr class='week-row subtitle'>
-                            {titleTemp}
+                            <td t-foreach="titlesTemp" t-as="title" t-key="title.key" t-att-class="title.class">
+                                <span t-if="title.name" class="subtitle-backgr" t-out="title.name" />
+                            </td>
                         </tr>
                         <tr class='week-row temperature'>
-                            {tempBars}
+                            <td t-foreach="tempBars" t-as="tempBar" t-key="tempBar.key" t-att-class="tempBar.class">
+                                <div class='top' t-att-style="tempBar.topStyle" t-out="tempBar.maxTemp" />
+                                <div class='mid' t-att-style="tempBar.midStyle" />
+                                <div class='bot' t-att-style="tempBar.botStyle" t-out="tempBar.minTemp" />
+                            </td>
                         </tr>
                         <tr class='week-row subtitle'>
-                            {titleWind}
+                            <td t-foreach="titlesWind" t-as="title" t-key="title.key" t-att-class="title.class">
+                                <span t-if="title.name" class="subtitle-backgr" t-out="title.name" />
+                            </td>
                         </tr>
                         <tr class='week-row week-wind'>
-                            {wind}
+                            <td t-foreach="winds" t-as="wind" t-key="wind.key" t-att-class="wind.class" t-att-style="wind.valueStyle">
+                                <t t-out="wind.value" />
+                                <i class="bi bi-arrow-up wind-icon" t-att-style="wind.directionStyle" />
+                            </td>
                         </tr>
                         <tr class='week-row subtitle'>
-                            {titlePreci}
+                            <td t-foreach="titlesPreci" t-as="title" t-key="title.key" t-att-class="title.class">
+                                <span t-if="title.name" class="subtitle-backgr" t-out="title.name" />
+                            </td>
                         </tr>
                         <tr class='week-row week-precipitation'>
-                            {precipitation}
-                        </tr> -->
+                            <td t-foreach="precipitation" t-as="preci" t-key="preci.key" t-att-class="preci.class">
+                                <div class='value' t-att-style="preci.valueStyle" t-out="preci.value" />
+                                <div class='bar' t-att-style="preci.heightStyle" />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

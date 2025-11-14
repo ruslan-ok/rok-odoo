@@ -80,14 +80,14 @@ class WeatherController(http.Controller):
         if not lat or not lon:
             raise WeatherError('get_place', 'Empty parameters "location", "lat", "lon".')
 
-        lat_cut = lat[:5] + '00000'
-        lon_cut = lon[:5] + '00000'
+        lat_cut = str(lat)[:5] + '00000'
+        lon_cut = str(lon)[:5] + '00000'
         place = env["weather.place"].search([('lat_cut', '=', lat_cut), ('lon_cut', '=', lon_cut)], limit=1)
         if place:
             return place
         headers = {'accept': 'application/json'}
         token = API_WEATHER_KEY
-        url = nearest_place_api.replace('{lat}', lat).replace('{lon}', lon).replace('{key}', token)
+        url = nearest_place_api.replace('{lat}', str(lat)).replace('{lon}', str(lon)).replace('{key}', token)
         resp = requests.get(url, headers=headers)
         if resp.status_code != 200:
             raise WeatherError('get_place', f'(2) Bad response status code: {resp.status_code}')

@@ -44,7 +44,7 @@
                     <tr>
                         <td t-foreach="winds" t-as="wind" t-key="wind.key" t-att-class="wind.class" t-att-style="wind.valueStyle">
                             <t t-out="wind.value" />
-                            <i class="fa fa-arrow-up wind-icon" t-att-style="wind.directionStyle" />
+                            <i class="bi bi-arrow-up wind-icon" t-att-style="wind.directionStyle" />
                         </td>
                     </tr>
                     <tr>
