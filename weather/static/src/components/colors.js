@@ -1,4 +1,4 @@
-/** @odoo-module alias=@weather/components/colors **/
+/** @odoo-module **/
 
 // Copyright (C) https://meteosource.com/static/files/colormaps.zip
 

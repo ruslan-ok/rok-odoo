@@ -1,17 +1,13 @@
 <odoo>
-    <record id="action_weather_dashboard" model="ir.actions.client">
-        <field name="name">Weather Dashboard</field>
-        <field name="tag">weather.action</field>
-    </record>
 
-    <record id="action_weather_forecast_test" model="ir.actions.act_window">
-        <field name="name">Weather Forecast</field>
+    <record id="action_weather" model="ir.actions.act_window">
+        <field name="name">Weather</field>
         <field name="res_model">weather.forecast</field>
         <field name="view_mode">graph,list</field>
     </record>
 
     <record id="weather_forecast_view_list" model="ir.ui.view">
-        <field name="name">Weather Forecast</field>
+        <field name="name">Weather</field>
         <field name="model">weather.forecast</field>
         <field name="arch" type="xml">
             <list>
@@ -27,11 +23,11 @@
     </record>
 
     <record id="weather_forecast_view_graph" model="ir.ui.view">
-        <field name="name">Weather Forecast Graph</field>
+        <field name="name">Weather Graph</field>
         <field name="model">weather.forecast</field>
         <field name="arch" type="xml">
-            <graph string="Weather Forecast Graph" type="line">
-                <field name="event" type="row" widget="float_time"/>
+            <graph string="Weather Graph" js_class="weather_graph">
+                <field name="event" type="row"/>
                 <field name="temperature" type="measure"/>
                 <field name="prec_total" type="measure"/>
             </graph>
@@ -39,10 +35,10 @@
     </record>
 
     <record id="weather_forecast_view_search" model="ir.ui.view">
-        <field name="name">Weather Forecast Search</field>
+        <field name="name">Weather Search</field>
         <field name="model">weather.forecast</field>
         <field name="arch" type="xml">
-            <search string="Weather Forecast Search">
+            <search string="Weather Search">
                 <field name="place_id"/>
                 <field name="summary"/>
                 <field name="event"/>
@@ -59,15 +55,9 @@
         </field>
     </record>
 
-    <menuitem
-        id="menu_weather_dashboard_root"
-        name="Weather Dashboard"
-        action="action_weather_dashboard"
-        sequence="10"/>
-
-    <menuitem id="menu_weather_dashboard_test"
-        name="Weather Test"
+    <menuitem id="menu_weather"
+        name="Weather"
         parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
-        action="action_weather_forecast_test"
+        action="action_weather"
         sequence="130"/>
 </odoo>

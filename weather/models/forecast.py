@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 from ..constants import EVENT_TYPE, CURRENT
 
 
@@ -29,3 +29,10 @@ class Forecast(models.Model):
     prec_type = fields.Char()
     cloud_cover = fields.Integer()
 
+    @api.model
+    def web_search_read(self, domain, specification, offset=0, limit=None, order=None, count_limit=None):
+        records_count = self.env["weather.place"].search_count([])
+        if not records_count:
+            place = self.env["weather.place"].create({'place_id': '1234567890', 'name': 'London'})
+            self.create({'place_id': place.id, 'fixed': fields.Datetime.now(), 'event': fields.Datetime.now()})
+        return super().web_search_read(domain, specification, offset=offset, limit=limit, order=order, count_limit=count_limit)

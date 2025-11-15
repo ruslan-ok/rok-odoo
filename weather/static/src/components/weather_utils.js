@@ -1,4 +1,4 @@
-/** @odoo-module alias=@weather/components/weather_utils **/
+/** @odoo-module **/
 
 import { windSpeedColors, temperatureColors } from './colors';
 

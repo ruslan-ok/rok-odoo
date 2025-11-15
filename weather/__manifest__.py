@@ -18,8 +18,6 @@
             "weather/static/src/components/weather.scss",
             "weather/static/src/components/colors.js",
             "weather/static/src/components/weather_utils.js",
-            "weather/static/src/components/weather.js",
-            "weather/static/src/components/weather.xml",
             "weather/static/src/components/form_location/form_location.js",
             "weather/static/src/components/form_location/form_location.xml",
             "weather/static/src/components/weather_for_the_day/weather_for_the_day.js",
@@ -30,6 +28,12 @@
             "weather/static/src/components/weather_message/weather_message.xml",
             "weather/static/src/components/weather_now/weather_now.js",
             "weather/static/src/components/weather_now/weather_now.xml",
+            "weather/static/src/components/weather.js",
+            "weather/static/src/components/weather.xml",
+        ],
+        'web.assets_backend_lazy': [
+            "weather/static/src/views/graph/weather_graph.js",
+            "weather/static/src/views/graph/weather_graph.xml",
         ],
     },
 }
