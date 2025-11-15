@@ -4,8 +4,70 @@
         <field name="tag">weather.action</field>
     </record>
 
+    <record id="action_weather_forecast_test" model="ir.actions.act_window">
+        <field name="name">Weather Forecast</field>
+        <field name="res_model">weather.forecast</field>
+        <field name="view_mode">graph,list</field>
+    </record>
+
+    <record id="weather_forecast_view_list" model="ir.ui.view">
+        <field name="name">Weather Forecast</field>
+        <field name="model">weather.forecast</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="place_id"/>
+                <field name="ev_type"/>
+                <field name="fixed" optional="hide"/>
+                <field name="event"/>
+                <field name="summary"/>
+                <field name="temperature" avg="Average" />
+                <field name="prec_total" avg="Average" />
+            </list>
+        </field>
+    </record>
+
+    <record id="weather_forecast_view_graph" model="ir.ui.view">
+        <field name="name">Weather Forecast Graph</field>
+        <field name="model">weather.forecast</field>
+        <field name="arch" type="xml">
+            <graph string="Weather Forecast Graph" type="line">
+                <field name="event" type="row" widget="float_time"/>
+                <field name="temperature" type="measure"/>
+                <field name="prec_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="weather_forecast_view_search" model="ir.ui.view">
+        <field name="name">Weather Forecast Search</field>
+        <field name="model">weather.forecast</field>
+        <field name="arch" type="xml">
+            <search string="Weather Forecast Search">
+                <field name="place_id"/>
+                <field name="summary"/>
+                <field name="event"/>
+                <separator/>
+                <filter name="ev_type_current" string="Current" domain="[('ev_type', '=', 'current')]"/>
+                <filter name="ev_type_forecasted_hourly" string="Forecasted Hourly" domain="[('ev_type', '=', 'hourly')]"/>
+                <filter name="ev_type_forecasted_daily" string="Forecasted Daily" domain="[('ev_type', '=', 'daily')]"/>
+                <separator/>
+                <filter name="date_filter" string="Date" date="event"/>
+                <separator/>
+                <filter name="group_by_place_id" context="{'group_by': 'place_id'}"/>
+                <filter name="group_by_event" context="{'group_by': 'event'}"/>
+            </search>
+        </field>
+    </record>
+
     <menuitem
-        id="menu_weather_dashboard_root" name="Weather Dashboard"
+        id="menu_weather_dashboard_root"
+        name="Weather Dashboard"
         action="action_weather_dashboard"
         sequence="10"/>
+
+    <menuitem id="menu_weather_dashboard_test"
+        name="Weather Test"
+        parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
+        action="action_weather_forecast_test"
+        sequence="130"/>
 </odoo>

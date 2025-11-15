@@ -12,13 +12,11 @@ nearest_place_api = 'https://www.meteosource.com/api/v1/free/nearest_place?lat={
 forecast_api = 'https://www.meteosource.com/api/v1/free/point?place_id={place_id}&sections=all&timezone={timezone}&language=en&units=auto&key={key}'
 
 CURRENT = 'current'
-HISTORICAL = 'hist'
 FORECASTED_HOURLY = 'hourly'
 FORECASTED_DAILY = 'daily'
 
 EVENT_TYPE = [
     (CURRENT, 'Current'),
-    (HISTORICAL, 'Historical'),
     (FORECASTED_HOURLY, 'Forecasted hourly'),
     (FORECASTED_DAILY, 'Forecasted daily'),
 ]
