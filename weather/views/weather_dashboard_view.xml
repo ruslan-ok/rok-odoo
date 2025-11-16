@@ -28,8 +28,7 @@
         <field name="arch" type="xml">
             <graph string="Weather Graph" js_class="weather_graph">
                 <field name="event" type="row"/>
-                <field name="temperature" type="measure"/>
-                <field name="prec_total" type="measure"/>
+                <field name="temperature" type="measure" avg="Average"/>
             </graph>
         </field>
     </record>

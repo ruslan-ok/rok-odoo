@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component } from "@odoo/owl";
+import { Component, onWillUpdateProps } from "@odoo/owl";
 
 export class WeatherNow extends Component {
     static template = "weather.WeatherNow";
@@ -9,8 +9,22 @@ export class WeatherNow extends Component {
     };
     setup() {
         this.label_now = ": weather right now";
-        this.image = `background-image: ${this.pickUpImage(this.props.values.current.event, this.props.values.sunrise, this.props.values.sunset, this.props.values.current.cloud_cover)}`;
-        const dt = new Date(this.props.values.current.event);
+        this.image = "";
+        this.dateTime = "";
+        this.href = "";
+        this.windValue = 0;
+        this.windDirStyle = {};
+        this.sign = "";
+        this.value = 0;
+        this.sunrise = "";
+        this.sunset = "";
+        onWillUpdateProps((nextProps) => this.onWillUpdateProps(nextProps));
+        this.onWillUpdateProps(this.props);
+    }
+
+    onWillUpdateProps(nextProps) {
+        this.image = `background-image: ${this.pickUpImage(nextProps.values.current.event, nextProps.values.sunrise, nextProps.values.sunset, nextProps.values.current.cloud_cover)}`;
+        const dt = new Date(nextProps.values.current.event);
         const options = {
             weekday: "short",
             day: "numeric",
@@ -20,13 +34,13 @@ export class WeatherNow extends Component {
             minute: "numeric",
         };
         this.dateTime = dt.toLocaleDateString(undefined, options);
-        this.href = `/weather/static/src/img/${this.props.values.current.icon_num}.svg`;
-        this.windValue = Math.round(+this.props.values.current.wind_speed);
-        this.windDirStyle = {transform: `rotate(${this.props.values.current.wind_angle}deg)`};
-        this.sign = this.props.values.current.temperature === 0 ? '' : this.props.values.current.temperature > 0 ? '+' : '-';
-        this.value = Math.abs(this.props.values.current.temperature);
-        this.sunrise = this.props.values.sunrise.split(' ')[1];
-        this.sunset = this.props.values.sunset.split(' ')[1];
+        this.href = `/weather/static/src/img/${nextProps.values.current.icon_num}.svg`;
+        this.windValue = Math.round(+nextProps.values.current.wind_speed);
+        this.windDirStyle = {transform: `rotate(${nextProps.values.current.wind_angle}deg)`};
+        this.sign = nextProps.values.current.temperature === 0 ? '' : nextProps.values.current.temperature > 0 ? '+' : '-';
+        this.value = Math.abs(nextProps.values.current.temperature);
+        this.sunrise = nextProps.values.sunrise.split(' ')[1];
+        this.sunset = nextProps.values.sunset.split(' ')[1];
     }
 
     pickUpImage(event, sunrise, sunset, cloud_cover) {

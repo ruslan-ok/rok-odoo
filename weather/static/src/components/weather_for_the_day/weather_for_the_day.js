@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component } from "@odoo/owl";
+import { Component, onWillUpdateProps } from "@odoo/owl";
 import { getDayName, getDayDate, getDayColor, getIconHref, getHourNum, getTempBarsInfo, checkNight, getWindColor } from '../weather_utils';
 
 export class WeatherForTheDay extends Component {
@@ -10,7 +10,20 @@ export class WeatherForTheDay extends Component {
     };
     setup() {
         this.label_day = ": weather for the day";
+        this.days = [];
+        this.hours = [];
+        this.icons = [];
+        this.titlesTemp = [];
+        this.tempBars = [];
+        this.titlesWind = [];
+        this.winds = [];
+        this.titlesPreci = [];
+        this.precipitation = [];
+        onWillUpdateProps((nextProps) => this.onWillUpdateProps(nextProps));
+        this.onWillUpdateProps(this.props);
+    }
 
+    onWillUpdateProps(nextProps) {
         let d1_day;
         let d2_day;
         let d1_day_str;
@@ -18,8 +31,8 @@ export class WeatherForTheDay extends Component {
         let d1_span = 0;
         let d1_span_correct = 0;
         let d2_span_correct = 0;
-        for (let i = 0; i < this.props.values.for_day.length; i++) {
-            const dt = new Date(this.props.values.for_day[i].event);
+        for (let i = 0; i < nextProps.values.for_day.length; i++) {
+            const dt = new Date(nextProps.values.for_day[i].event);
             if (i === 0) {
                 d1_day = dt.getDate();
                 d1_day_str = dt.toString();
@@ -46,7 +59,7 @@ export class WeatherForTheDay extends Component {
 
         let aggs = [];
         let curr = [];
-        for (let i = 0; i < this.props.values.for_day.length; i++) {
+        for (let i = 0; i < nextProps.values.for_day.length; i++) {
             curr.push(i);
             if (curr.length === 3 || (aggs.length === 0 && curr.length === 2 && d1_span_correct === 1)) {
                 aggs.push(curr);
@@ -58,12 +71,12 @@ export class WeatherForTheDay extends Component {
         if (curr.length > 1)
             aggs.push(curr);
 
-        const sunrise_dt = new Date(this.props.values.sunrise);
-        const sunset_dt = new Date(this.props.values.sunset);
+        const sunrise_dt = new Date(nextProps.values.sunrise);
+        const sunset_dt = new Date(nextProps.values.sunset);
         const sunrise = sunrise_dt.getHours();
         const sunset = sunset_dt.getHours();
 
-        this.days = this.props.values.for_day.map((hour, index) => {
+        this.days = nextProps.values.for_day.map((hour, index) => {
             let cellClass = [];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
 
@@ -81,7 +94,7 @@ export class WeatherForTheDay extends Component {
             return {key: hour.event, class: cellClass.join(' '), name: name};
         });
 
-        this.hours = this.props.values.for_day.map((hour, index) => {
+        this.hours = nextProps.values.for_day.map((hour, index) => {
             let cellClass = ['hour-name'];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             const hourNum = getHourNum(hour.event, d1_span_correct);
@@ -92,20 +105,20 @@ export class WeatherForTheDay extends Component {
             return {key: hour.event, class: cellClass.join(' '), name: name};
         });
 
-        this.icons = this.props.values.for_day.map((hour, index) => {
+        this.icons = nextProps.values.for_day.map((hour, index) => {
             let cellClass = [];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             let href = '';
             const ndx = index - d1_span_correct;
             if (ndx >= 0 && index % 3 === 1) {
-                const icon_num = this.props.values.for_day[ndx].icon_num;
+                const icon_num = nextProps.values.for_day[ndx].icon_num;
                 href = getIconHref(icon_num);
             }
             cellClass.push('icon-td');
             return {key: hour.event, class: cellClass.join(' '), href: href};
         });
 
-        this.titlesTemp = this.props.values.for_day.map((hour, index) => {
+        this.titlesTemp = nextProps.values.for_day.map((hour, index) => {
             let cellClass = [];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             let name = '';
@@ -116,8 +129,8 @@ export class WeatherForTheDay extends Component {
             return {key: hour.event, class: cellClass.join(' '), name: name};
         });
 
-        const tempBarHeights = getTempBarsInfo(this.props.values.for_day, false);
-        this.tempBars = this.props.values.for_day.map((hour, index) => {
+        const tempBarHeights = getTempBarsInfo(nextProps.values.for_day, false);
+        this.tempBars = nextProps.values.for_day.map((hour, index) => {
             let cellClass = ['bar day-column'];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             let topStyle = '';
@@ -140,7 +153,7 @@ export class WeatherForTheDay extends Component {
             };
         });
 
-        this.titlesWind = this.props.values.for_day.map((hour, index) => {
+        this.titlesWind = nextProps.values.for_day.map((hour, index) => {
             let cellClass = [];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             let name = '';
@@ -151,7 +164,7 @@ export class WeatherForTheDay extends Component {
             return {key: hour.event, class: cellClass.join(' '), name: name};
         });
 
-        this.winds = this.props.values.for_day.map((hour) => {
+        this.winds = nextProps.values.for_day.map((hour) => {
             let cellClass = ['day-column hour-wind'];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             const value = Math.round(+hour.wind_speed);
@@ -166,7 +179,7 @@ export class WeatherForTheDay extends Component {
             };
         });
 
-        this.titlesPreci = this.props.values.for_day.map((hour, index) => {
+        this.titlesPreci = nextProps.values.for_day.map((hour, index) => {
             let cellClass = [];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             let name = '';
@@ -178,7 +191,7 @@ export class WeatherForTheDay extends Component {
         });
 
         const maxPreci = tempBarHeights.map(x => x.precipitation).reduce(function(prev, curr) { return prev > curr ? prev : curr; });
-        this.precipitation = this.props.values.for_day.map((hour) => {
+        this.precipitation = nextProps.values.for_day.map((hour) => {
             let cellClass = ['day-column hour-perci-td'];
             checkNight(cellClass, hour.event, d1_span_correct, sunrise, sunset);
             const maxHeight = 20;
@@ -195,6 +208,5 @@ export class WeatherForTheDay extends Component {
                 heightStyle: heightStyle,
             };
         });
-
     }
 }

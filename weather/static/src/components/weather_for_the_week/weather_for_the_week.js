@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component } from "@odoo/owl";
+import { Component, onWillUpdateProps } from "@odoo/owl";
 import { getTempBarsInfo, getDayColor, getDayName, getDayDate, getIconHref, checkWeekend, getWindColor } from '../weather_utils';
 
 export class WeatherForTheWeek extends Component {
@@ -10,8 +10,20 @@ export class WeatherForTheWeek extends Component {
     };
     setup() {
         this.label_week = ": weather for the week";
+        this.days = [];
+        this.icons = [];
+        this.titlesTemp = [];
+        this.tempBars = [];
+        this.titlesWind = [];
+        this.winds = [];
+        this.titlesPreci = [];
+        this.precipitation = [];
+        onWillUpdateProps((nextProps) => this.onWillUpdateProps(nextProps));
+        this.onWillUpdateProps(this.props);
+    }
 
-        this.days = this.props.values.for_week.map((day, index) => {
+    onWillUpdateProps(nextProps) {
+        this.days = nextProps.values.for_week.map((day, index) => {
             let cellClass = ['week-column'];
             checkWeekend(cellClass, day.event);
             cellClass.push(getDayColor(day.event));
@@ -20,14 +32,14 @@ export class WeatherForTheWeek extends Component {
             return {key: day.event, class: cellClass.join(' '), name: name, date: date};
         });
 
-        this.icons = this.props.values.for_week.map((day) => {
+        this.icons = nextProps.values.for_week.map((day) => {
             let cellClass = ['week-column'];
             checkWeekend(cellClass, day.event);
             const href = getIconHref(day.icon_num);
             return {key: day.event, class: cellClass.join(' '), href: href};
         });
 
-        this.titlesTemp = this.props.values.for_week.map((day, index) => {
+        this.titlesTemp = nextProps.values.for_week.map((day, index) => {
             let cellClass = ['week-column'];
             checkWeekend(cellClass, day.event);
             let name = '';
@@ -38,8 +50,8 @@ export class WeatherForTheWeek extends Component {
             return {key: day.event, class: cellClass.join(' '), name: name};
         });
 
-        const tempBarHeights = getTempBarsInfo(this.props.values.for_week, true);
-        this.tempBars = this.props.values.for_week.map((day, index) => {
+        const tempBarHeights = getTempBarsInfo(nextProps.values.for_week, true);
+        this.tempBars = nextProps.values.for_week.map((day, index) => {
             let cellClass = ['week-column bar'];
             checkWeekend(cellClass, day.event);
             let topStyle = '';
@@ -67,7 +79,7 @@ export class WeatherForTheWeek extends Component {
             };
         });
 
-        this.titlesWind = this.props.values.for_week.map((day, index) => {
+        this.titlesWind = nextProps.values.for_week.map((day, index) => {
             let cellClass = ['week-column'];
             checkWeekend(cellClass, day.event);
             let name = '';
@@ -78,7 +90,7 @@ export class WeatherForTheWeek extends Component {
             return {key: day.event, class: cellClass.join(' '), name: name};
         });
 
-        this.winds = this.props.values.for_week.map((day) => {
+        this.winds = nextProps.values.for_week.map((day) => {
             let cellClass = ['week-column day-wind'];
             checkWeekend(cellClass, day.event);
             const value = Math.round(+day.wind_speed);
@@ -93,7 +105,7 @@ export class WeatherForTheWeek extends Component {
             };
         });
 
-        this.titlesPreci = this.props.values.for_week.map((day, index) => {
+        this.titlesPreci = nextProps.values.for_week.map((day, index) => {
             let cellClass = ['week-column'];
             checkWeekend(cellClass, day.event);
             let name = '';
@@ -107,7 +119,7 @@ export class WeatherForTheWeek extends Component {
         this.precipitation = [];
         if (tempBarHeights.length) {
             const maxPreci = tempBarHeights.map(x => x.precipitation).reduce(function(prev, curr) { return prev > curr ? prev : curr; });
-            this.precipitation = this.props.values.for_week.map((day) => {
+            this.precipitation = nextProps.values.for_week.map((day) => {
                 let cellClass = ['week-column day-preci'];
                 checkWeekend(cellClass, day.event);
                 const maxHeight = 20;

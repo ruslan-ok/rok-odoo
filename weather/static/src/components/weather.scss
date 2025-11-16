@@ -56,11 +56,11 @@
 
 #weather {
     --title-color: black;
-    --title-backgr: rgb(235, 233, 233);
+    --title-backgr: rgb(178, 213, 236);
     --period-color: white;
-    --period-backgr: rgb(0, 153, 255);
+    --period-backgr: rgb(124, 203, 255);
     --period-active-backgr: rgba(0, 0, 0, 0.25);
-    --period-logo-backgr: #00296728;
+    --period-logo-backgr: #0459da;
     --weather-now-color: white;
     --kpi-list-backgr: rgba(0,0,0,.1);
     --rain-color: #62b2ed;
@@ -90,25 +90,6 @@
         width: 100%;
         text-align: center;
         vertical-align: middle;
-    }
-
-    .widget-title {
-        display: flex;
-        justify-content: safe;
-        font-size: 1.3rem;
-        margin: 0;
-        padding: 5px 15px;
-        background-color: var(--title-backgr);
-        color: var(--title-color);
-        .location {
-            overflow-x: auto;
-            white-space: nowrap;
-            text-align: end;
-        }
-        .period {
-            width: auto;
-            white-space: nowrap;
-        }
     }
 
     .option-links {
@@ -148,6 +129,14 @@
                     background-color: var(--period-active-backgr);
                 }
             }
+
+            .title {
+                font-size: 1.3rem;
+                margin: 0;
+                padding: 5px 15px;
+                // background-color: var(--title-backgr);
+                color: var(--title-color);
+                    }
         }
         div.right {
             width: auto;

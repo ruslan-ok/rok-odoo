@@ -3,10 +3,6 @@
     <t t-name="weather.WeatherForTheWeek">
         <div class="weather-for-the-week">
             <div class='weather-week period-container'>
-                <div class='week-row widget-title'>
-                    <span class='location' t-out="props.values.place" />
-                    <span class='period' t-out="label_week" />
-                </div>
                 <table class="table table-borderles">
                     <tbody>
                         <tr class='week-row days'>

@@ -2,10 +2,6 @@
 <templates xml:space="preserve">
     <t t-name="weather.WeatherNow">
         <div class='weather-now period-container' t-att-style="image">
-            <div class='week-row widget-title'>
-                <span class='location' t-out="props.values.place" />
-                <span class='period' t-out="label_now" />
-            </div>
             <div class='date-time' t-out="dateTime" />
             <div class='temp-and-icon'>
                 <div class=''>

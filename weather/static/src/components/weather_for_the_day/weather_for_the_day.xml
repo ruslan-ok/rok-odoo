@@ -2,10 +2,6 @@
 <templates xml:space="preserve">
     <t t-name="weather.WeatherForTheDay">
         <div class='weather-day period-container'>
-            <div class='week-row widget-title'>
-                <span class='location' t-out="props.values.place" />
-                <span class='period' t-out="label_day" />
-            </div>
             <table class="table table-borderles">
                 <tbody>
                     <tr>

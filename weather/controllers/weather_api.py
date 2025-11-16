@@ -115,7 +115,7 @@ class WeatherController(http.Controller):
         if astro:
             return astro
         headers = {'accept': 'application/json'}
-        url = astro_api.replace('{lat}', place.lat).replace('{lon}', place.lon).replace('{formatted}', '0')
+        url = astro_api.replace('{lat}', str(place.lat)).replace('{lon}', str(place.lon)).replace('{formatted}', '0')
         resp = requests.get(url, headers=headers)
         if resp.status_code != 200:
             raise WeatherError('get_astro', f'(2) Bad response status code: {resp.status_code}')

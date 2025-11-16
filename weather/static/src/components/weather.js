@@ -1,9 +1,6 @@
 /** @odoo-module **/
 
-import { Component, onWillStart, useState } from "@odoo/owl";
-import { registry } from "@web/core/registry";
-import { rpc } from "@web/core/network/rpc";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { Component } from "@odoo/owl";
 import { FormLocation } from "./form_location/form_location";
 import { WeatherMessage } from "./weather_message/weather_message";
 import { WeatherNow } from "./weather_now/weather_now";
@@ -12,7 +9,7 @@ import { WeatherForTheWeek } from "./weather_for_the_week/weather_for_the_week";
 
 export class Weather extends Component {
     static template = "weather.Weather";
-    static props = { ...Component.props, ...standardActionServiceProps };
+    static props = { period: String, error: String, title: String, data: Object };
     static components = {
         FormLocation,
         WeatherMessage,
@@ -21,84 +18,8 @@ export class Weather extends Component {
         WeatherForTheWeek,
     };
     setup() {
-        this.state = useState({
-            data: {},
-            loading: true,
-            error: null,
-            period: this.getPeriodOption(),
-            location: this.getLocationOption(),
-            useBrowserLocation: this.getBrowserLocationOption(),
-        });
-        this.label_now = "Now";
-        this.label_day = "Day";
-        this.label_week = "Week";
         this.cr_url = "https://www.meteosource.com";
         this.cr_info = "Powered by Meteosource";
         this.ms_href = "/weather/static/src/img/7.svg";
-
-        onWillStart(async () => {
-            async function getCoord() {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject);
-                });
-
-                return {
-                    lat: pos.coords.latitude,
-                    lon: pos.coords.longitude,
-                };
-            }
-            try {
-                let lat = "";
-                let lon = "";
-                if (this.state.useBrowserLocation) {
-                    const coord = await getCoord();
-                    lat = coord.lat;
-                    lon = coord.lon;
-                }
-                const response = await rpc("/weather/data", {
-                    location: this.state.location,
-                    lat: lat,
-                    lon: lon,
-                });
-                if (response.result != "ok") {
-                    this.state.error = response.info;
-                    this.state.period = "";
-                    throw new Error(this.state.error);
-                }
-                this.state.data = response.data;
-            } catch (error) {
-                this.state.error = error.message || error;
-            } finally {
-                this.state.loading = false;
-            }
-        });
-    }
-
-    getPeriodOption() {
-        const period = localStorage.getItem('weather-period');
-        if (period === undefined || period === null)
-            return "now";
-        return period;
-    }
-
-    getLocationOption() {
-        const location = localStorage.getItem('weather-location');
-        if (location === undefined || location === null)
-            return "";
-        return location;
-    }
-
-    getBrowserLocationOption() {
-        const ubl = localStorage.getItem('weather-use-browser-location');
-        if (ubl === undefined || ubl === null)
-            return true;
-        return (ubl === 'true');
-    }
-
-    setPeriodOption(period) {
-        this.state.period = period;
-        localStorage.setItem('weather-period', period);
     }
 }
-
-registry.category("actions").add("weather.action", Weather);
