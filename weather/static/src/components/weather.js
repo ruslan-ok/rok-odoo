@@ -1,7 +1,6 @@
 /** @odoo-module **/
 
 import { Component } from "@odoo/owl";
-import { FormLocation } from "./form_location/form_location";
 import { WeatherMessage } from "./weather_message/weather_message";
 import { WeatherNow } from "./weather_now/weather_now";
 import { WeatherForTheDay } from "./weather_for_the_day/weather_for_the_day";
@@ -11,7 +10,6 @@ export class Weather extends Component {
     static template = "weather.Weather";
     static props = { period: String, error: String, title: String, data: Object };
     static components = {
-        FormLocation,
         WeatherMessage,
         WeatherNow,
         WeatherForTheDay,

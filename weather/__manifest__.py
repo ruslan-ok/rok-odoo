@@ -18,8 +18,6 @@
             "weather/static/src/components/weather.scss",
             "weather/static/src/components/colors.js",
             "weather/static/src/components/weather_utils.js",
-            "weather/static/src/components/form_location/form_location.js",
-            "weather/static/src/components/form_location/form_location.xml",
             "weather/static/src/components/weather_for_the_day/weather_for_the_day.js",
             "weather/static/src/components/weather_for_the_day/weather_for_the_day.xml",
             "weather/static/src/components/weather_for_the_week/weather_for_the_week.js",
