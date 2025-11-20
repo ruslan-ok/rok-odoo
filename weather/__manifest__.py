@@ -7,10 +7,13 @@
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "application": False,
     "category": "Productivity/Weather",
-    "depends": ["base", "web"],
+    "depends": [
+        "web",
+        "rok_apps_dashboard"
+    ],
     "data": [
         "security/ir.model.access.csv",
-        "views/weather_dashboard_view.xml",
+        "views/weather_views.xml",
     ],
     "assets": {
         "web.assets_backend": [

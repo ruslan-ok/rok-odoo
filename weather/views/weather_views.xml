@@ -56,7 +56,7 @@
 
     <menuitem id="menu_weather"
         name="Weather"
-        parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
+        parent="rok_apps_dashboard.menu_rok_apps"
         action="action_weather"
-        sequence="130"/>
+        sequence="1"/>
 </odoo>

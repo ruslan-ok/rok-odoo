@@ -1,0 +1,47 @@
+<odoo>
+
+    <record id="action_crypto" model="ir.actions.act_window">
+        <field name="name">Crypto</field>
+        <field name="res_model">rok.crypto</field>
+        <field name="view_mode">graph,list</field>
+    </record>
+
+    <record id="crypto_view_list" model="ir.ui.view">
+        <field name="name">Crypto</field>
+        <field name="model">rok.crypto</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="dt"/>
+                <field name="value"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crypto_view_graph" model="ir.ui.view">
+        <field name="name">Crypto Graph</field>
+        <field name="model">rok.crypto</field>
+        <field name="arch" type="xml">
+            <graph string="Crypto Graph" js_class="crypto_graph">
+                <field name="dt" type="row"/>
+                <field name="value" type="measure" avg="Average"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="crypto_view_search" model="ir.ui.view">
+        <field name="name">Crypto Search</field>
+        <field name="model">rok.crypto</field>
+        <field name="arch" type="xml">
+            <search string="Crypto Search">
+                <field name="dt"/>
+                <field name="value"/>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_crypto"
+        name="Crypto"
+        parent="rok_apps_dashboard.menu_rok_apps"
+        action="action_crypto"
+        sequence="2"/>
+</odoo>

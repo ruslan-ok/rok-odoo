@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="crypto.Crypto">
+        <div class="widget-container">
+            <div class="widget-content" id="crypto">
+                <div class="o_graph_canvas_container flex-grow-1 position-relative px-3 pb-3" t-ref="container">
+                    <canvas t-ref="canvas" />
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+

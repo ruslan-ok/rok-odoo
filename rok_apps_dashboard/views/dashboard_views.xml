@@ -1,0 +1,6 @@
+<odoo>
+    <menuitem id="menu_rok_apps"
+        name="Rok Apps"
+        parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
+        sequence="130"/>
+</odoo>
