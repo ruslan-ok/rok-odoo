@@ -95,7 +95,7 @@ class Document(models.Model):
                     ("name", "=", "SERVER_FOLDER"),
                 ]
             )
-            if not server_folder:
+            if self.root_path and not server_folder:
                 server_folder = self.create_folder(False, "SERVER_FOLDER")
             for record in records:
                 record_id = record["id"]
@@ -308,11 +308,13 @@ class Document(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         folder_id = self.env.context.get("default_folder_id")
-        folder = self.env["documents.document"].browse(folder_id)
-        if folder.located_on_the_server:
-            self = self.with_context(default_located_on_the_server=True)
+        folder = None
+        if isinstance(folder_id, int):
+            folder = self.env["documents.document"].browse(folder_id)
+            if folder.located_on_the_server:
+                self = self.with_context(default_located_on_the_server=True)
         documents = super().create(vals_list)
-        if folder.located_on_the_server:
+        if folder and folder.located_on_the_server:
             for vals in vals_list:
                 if vals["type"] == "folder":
                     folder_name = vals["name"]
