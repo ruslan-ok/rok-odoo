@@ -13,6 +13,8 @@ export class Crypto extends Component {
 
         onWillStart(async () => {
             await loadJS("/rok_spreadsheet/static/lib/chart.js");
+            // Load date adapter for time scales
+            await loadJS("/rok_spreadsheet/static/lib/chartjs-adapter-date-fns.bundle.min.js");
         });
 
         useEffect(() => this.renderChart());
@@ -126,20 +128,20 @@ export class Crypto extends Component {
                 }
             },
             scales: {
-                xAxis: {
+                x: {
                     type: "time",
                     time: {
                         displayFormats: {
-                            datetime: "MMM D, YYYY, h:mm:ss a",
+                            datetime: "MMM d, yyyy, h:mm:ss a",
                             millisecond: "h:mm:ss.SSS a",
                             second: "h:mm:ss a",
                             minute: "h:mm a",
-                            hour: "MMM D, hA",
-                            day: "MMM D",
-                            week: "ll",
-                            month: "MMM YYYY",
-                            quarter: "[Q]Q - YYYY",
-                            year: "YYYY"
+                            hour: "MMM d, ha",
+                            day: "MMM d",
+                            week: "LLL d",
+                            month: "MMM yyyy",
+                            quarter: "'Q'Q - yyyy",
+                            year: "yyyy"
                         }
                     }
                 }
