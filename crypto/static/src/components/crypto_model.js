@@ -1,9 +1,9 @@
 /** @odoo-module **/
 
-import { Model } from "@web/model/model";
+import { GraphModel } from "@web/views/graph/graph_model";
 
 
-export class CryptoModel extends Model {
+export class CryptoModel extends GraphModel {
     /**
      * @override
      */
@@ -15,7 +15,9 @@ export class CryptoModel extends Model {
     }
 
     async load(searchParams) {
-        this.searchParams = searchParams;
-        await this._fetchDataPoints(this.metaData);
+        // debugger;
+        // this.searchParams = searchParams;
+        // await this._fetchDataPoints(this.metaData);
+        await super.load(searchParams);
     }
 }

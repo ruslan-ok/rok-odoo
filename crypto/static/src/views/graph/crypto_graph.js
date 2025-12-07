@@ -78,7 +78,7 @@ export class CryptoGraphRenderer extends GraphRenderer {
 
 export const CryptoGraphView = {
     ...graphView,
-    model: CryptoModel,
+    Model: CryptoModel,
     Renderer: CryptoGraphRenderer,
     buttonTemplate: "crypto.CryptoGraphView.Buttons",
 };

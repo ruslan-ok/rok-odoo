@@ -55,8 +55,8 @@ class CryptoController(http.Controller):
 
         chart_config = build_chart_config('BTC/USD', chart_points, '111, 184, 71')
         create_vals = [{"dt": fields.Datetime.from_string(point["x"]), "value": point["y"]} for point in chart_points]
-        http.request.env['rok.crypto'].search([]).unlink()
-        http.request.env['rok.crypto'].create(create_vals)
+        http.request.env['rok.crypto'].sudo().search([]).unlink()
+        http.request.env['rok.crypto'].sudo().create(create_vals)
         widget_data = {
             'chart': chart_config,
             'current': current,
