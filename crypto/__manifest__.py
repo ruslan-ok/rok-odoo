@@ -20,7 +20,7 @@
             "crypto/static/src/components/crypto.js",
             "crypto/static/src/components/crypto.xml",
         ],
-        'web.assets_backend_lazy': [
+        "web.assets_backend_lazy": [
             "crypto/static/src/views/graph/crypto_graph.js",
             "crypto/static/src/views/graph/crypto_graph.xml",
         ],
