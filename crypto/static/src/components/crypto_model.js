@@ -1,3 +1,5 @@
+/** @odoo-module **/
+
 import { Model } from "@web/model/model";
 
 
@@ -14,6 +16,6 @@ export class CryptoModel extends Model {
 
     async load(searchParams) {
         this.searchParams = searchParams;
-        await this._fetchDataPoints(metaData);
+        await this._fetchDataPoints(this.metaData);
     }
 }
