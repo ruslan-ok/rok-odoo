@@ -7,10 +7,14 @@
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "application": False,
     "category": "Productivity/Crypto",
-    "depends": ["rok_apps_dashboard"],
+    "depends": [
+        "spreadsheet_dashboard",
+        "rok_apps_dashboard"
+    ],
     "data": [
         "security/ir.model.access.csv",
         "views/crypto_view.xml",
+        "data/dashboards.xml",
     ],
     "assets": {
         "web.assets_backend": [

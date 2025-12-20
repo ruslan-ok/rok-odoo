@@ -54,7 +54,7 @@ def approximate(data: list[SourceData], goal: int) -> list:
 def build_chart_config(label: str, chart_points, rgb: str):
     dataset = {
         'label': label,
-        'data': chart_points,
+        'data': [], # chart_points,
         'backgroundColor': f'rgba({rgb}, 0.2)',
         'borderColor': f'rgba({rgb}, 1)',
         'borderWidth': 1,
