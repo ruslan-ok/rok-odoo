@@ -4,8 +4,10 @@ from odoo import models, fields
 class RokApps(models.Model):
     _name = "rok.apps"
     _description = "Rok Apps"
+    _order = "sequence asc"
 
-    name = fields.Char(string="Name")
-    description = fields.Text(string="Description")
-    icon = fields.Char(string="Icon")
-    active = fields.Boolean(string="Active")
+    name = fields.Char(required=True)
+    description = fields.Text()
+    icon = fields.Char()
+    active = fields.Boolean(default=True)
+    sequence = fields.Integer()

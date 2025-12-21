@@ -8,13 +8,13 @@
     "application": False,
     "category": "Productivity/Crypto",
     "depends": [
-        "spreadsheet_dashboard",
-        "rok_apps_dashboard"
+        # "spreadsheet_dashboard",
+        "rok_apps"
     ],
     "data": [
         "security/ir.model.access.csv",
         "views/crypto_view.xml",
-        "data/dashboards.xml",
+        "data/rok_apps.xml",
     ],
     "assets": {
         "web.assets_backend": [

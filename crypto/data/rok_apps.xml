@@ -1,0 +1,8 @@
+<odoo>
+    <record id="rok_apps_crypto" model="rok.apps">
+        <field name="name">Crypto</field>
+        <field name="description">Crypto module</field>
+        <field name="icon">crypto</field>
+        <field name="sequence">20</field>
+    </record>
+</odoo>

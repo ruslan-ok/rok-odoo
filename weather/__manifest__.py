@@ -7,13 +7,11 @@
     "website": "https://github.com/ruslan-ok/rok-odoo",
     "application": False,
     "category": "Productivity/Weather",
-    "depends": [
-        "web",
-        "rok_apps_dashboard"
-    ],
+    "depends": ["web", "rok_apps"],
     "data": [
         "security/ir.model.access.csv",
         "views/weather_views.xml",
+        "data/rok_apps.xml",
     ],
     "assets": {
         "web.assets_backend": [
@@ -32,7 +30,7 @@
             "weather/static/src/components/weather.js",
             "weather/static/src/components/weather.xml",
         ],
-        'web.assets_backend_lazy': [
+        "web.assets_backend_lazy": [
             "weather/static/src/views/graph/weather_graph.js",
             "weather/static/src/views/graph/weather_graph.xml",
         ],

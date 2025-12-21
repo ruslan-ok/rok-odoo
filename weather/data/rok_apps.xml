@@ -1,0 +1,8 @@
+<odoo>
+    <record id="rok_apps_weather" model="rok.apps">
+        <field name="name">Weather</field>
+        <field name="description">Weather module</field>
+        <field name="icon">weather</field>
+        <field name="sequence">10</field>
+    </record>
+</odoo>

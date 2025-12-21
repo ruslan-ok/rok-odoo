@@ -56,7 +56,7 @@
 
     <menuitem id="menu_weather"
         name="Weather"
-        parent="rok_apps_dashboard.menu_rok_apps"
+        parent="rok_apps.rok_apps_menu_root"
         action="action_weather"
         sequence="1"/>
 </odoo>

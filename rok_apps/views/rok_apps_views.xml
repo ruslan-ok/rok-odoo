@@ -44,7 +44,7 @@
 
     <menuitem
         id="rok_apps_menu_home"
-        name="Rok Apps"
+        name="Dashboard"
         parent="rok_apps_menu_root"
         action="rok_apps.rok_apps_action"
         sequence="1"/>

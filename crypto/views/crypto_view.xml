@@ -41,7 +41,7 @@
 
     <menuitem id="menu_crypto"
         name="Crypto"
-        parent="rok_apps_dashboard.menu_rok_apps"
+        parent="rok_apps.rok_apps_menu_root"
         action="action_crypto"
         sequence="2"/>
 </odoo>
