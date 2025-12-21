@@ -1,0 +1,51 @@
+<odoo>
+
+    <record id="rok_apps_list_view" model="ir.ui.view">
+        <field name="name">rok.apps.menu.root</field>
+        <field name="model">rok.apps</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rok_apps_kanban_view" model="ir.ui.view">
+        <field name="name">rok.apps.menu.root</field>
+        <field name="model">rok.apps</field>
+        <field name="arch" type="xml">
+            <kanban create="false">
+                <field name="name"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_card">
+                            <div class="o_kanban_card_header">
+                                <field name="name"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="rok_apps_action" model="ir.actions.act_window">
+        <field name="name">Rok Apps</field>
+        <field name="res_model">rok.apps</field>
+        <field name="view_mode">kanban,list</field>
+        <field name="view_id" ref="rok_apps_kanban_view"/>
+    </record>
+
+    <menuitem
+        id="rok_apps_menu_root"
+        name="Rok Apps"
+        web_icon="rok_apps,static/description/icon.png"
+        sequence="301"/>
+
+    <menuitem
+        id="rok_apps_menu_home"
+        name="Rok Apps"
+        parent="rok_apps_menu_root"
+        action="rok_apps.rok_apps_action"
+        sequence="1"/>
+</odoo>
