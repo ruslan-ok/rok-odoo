@@ -23,6 +23,10 @@ export class WeatherNow extends Component {
     }
 
     onWillUpdateProps(nextProps) {
+        // Guard against undefined values
+        if (!nextProps.values || !nextProps.values.current) {
+            return;
+        }
         this.image = `background-image: ${this.pickUpImage(nextProps.values.current.event, nextProps.values.sunrise, nextProps.values.sunset, nextProps.values.current.cloud_cover)}`;
         const dt = new Date(nextProps.values.current.event);
         const options = {
@@ -39,8 +43,12 @@ export class WeatherNow extends Component {
         this.windDirStyle = {transform: `rotate(${nextProps.values.current.wind_angle}deg)`};
         this.sign = nextProps.values.current.temperature === 0 ? '' : nextProps.values.current.temperature > 0 ? '+' : '-';
         this.value = Math.abs(nextProps.values.current.temperature);
-        this.sunrise = nextProps.values.sunrise.split(' ')[1];
-        this.sunset = nextProps.values.sunset.split(' ')[1];
+        if (nextProps.values.sunrise) {
+            this.sunrise = nextProps.values.sunrise.split(' ')[1];
+        }
+        if (nextProps.values.sunset) {
+            this.sunset = nextProps.values.sunset.split(' ')[1];
+        }
     }
 
     pickUpImage(event, sunrise, sunset, cloud_cover) {

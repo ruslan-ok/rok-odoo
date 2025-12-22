@@ -24,6 +24,10 @@ export class WeatherForTheDay extends Component {
     }
 
     onWillUpdateProps(nextProps) {
+        // Guard against undefined values
+        if (!nextProps.values || !nextProps.values.for_day || !Array.isArray(nextProps.values.for_day)) {
+            return;
+        }
         let d1_day;
         let d2_day;
         let d1_day_str;

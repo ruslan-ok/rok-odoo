@@ -31,6 +31,7 @@
             "weather/static/src/components/weather.xml",
             "weather/static/src/rok_apps_widget.js",
             "weather/static/src/rok_apps_widget.xml",
+            "weather/static/src/rok_apps_widget.scss",
         ],
         "web.assets_backend_lazy": [
             "weather/static/src/views/graph/weather_graph.js",

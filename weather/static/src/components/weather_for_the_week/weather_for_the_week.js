@@ -23,6 +23,10 @@ export class WeatherForTheWeek extends Component {
     }
 
     onWillUpdateProps(nextProps) {
+        // Guard against undefined values
+        if (!nextProps.values || !nextProps.values.for_week || !Array.isArray(nextProps.values.for_week)) {
+            return;
+        }
         this.days = nextProps.values.for_week.map((day, index) => {
             let cellClass = ['week-column'];
             checkWeekend(cellClass, day.event);
