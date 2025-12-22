@@ -29,6 +29,8 @@
             "weather/static/src/components/weather_now/weather_now.xml",
             "weather/static/src/components/weather.js",
             "weather/static/src/components/weather.xml",
+            "weather/static/src/rok_apps_widget.js",
+            "weather/static/src/rok_apps_widget.xml",
         ],
         "web.assets_backend_lazy": [
             "weather/static/src/views/graph/weather_graph.js",

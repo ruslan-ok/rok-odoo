@@ -1,0 +1,8 @@
+<templates>
+    <t t-name="crypto.RokAppsWidget">
+        <div class="rok_apps_widget crypto_widget">
+            <h1>Crypto Widget</h1>
+            <p>App Name: <t t-esc="recordName" /></p>
+        </div>
+    </t>
+</templates>

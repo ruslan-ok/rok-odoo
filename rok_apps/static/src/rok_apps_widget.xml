@@ -1,0 +1,12 @@
+<templates>
+    <t t-name="rok_apps.RokAppsWidget">
+        <t t-if="widgetComponent">
+            <t t-component="widgetComponent" record="props.record"/>
+        </t>
+        <t t-else="">
+            <div class="rok_apps_widget">
+                <h1><t t-esc="recordName" /></h1>
+            </div>
+        </t>
+    </t>
+</templates>
