@@ -17,11 +17,12 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "crypto/static/src/components/report_view_periods.js",
-            "crypto/static/src/components/report_view_periods.xml",
             "crypto/static/src/components/crypto.scss",
             "crypto/static/src/components/crypto.js",
             "crypto/static/src/components/crypto.xml",
+            "crypto/static/src/components/crypto_toolbar.scss",
+            "crypto/static/src/components/crypto_toolbar.js",
+            "crypto/static/src/components/crypto_toolbar.xml",
             "crypto/static/src/rok_apps_widget.js",
             "crypto/static/src/rok_apps_widget.xml",
             "crypto/static/src/rok_apps_widget.scss",

@@ -1,0 +1,42 @@
+<templates>
+    <t t-name="crypto.CryptoToolbar">
+        <div class="crypto_toolbar">
+            <div class="crypto_toolbar_item">
+                <span class="label">Period:</span>
+                <Dropdown>
+                    <button class="period-btn">
+                        <t t-out="(periods.find(p => p.id == toolbarData.period) || {}).title || ''" />
+                        <i class="fa fa-caret-down btn" />
+                    </button>
+                    <t t-set-slot="content">
+                        <t t-foreach="periods" t-as="period" t-key="period.id">
+                            <DropdownItem
+                                class="{ selected: toolbarData.period == period.id }"
+                                t-esc="period.title"
+                                onSelected="() => this.props.period_changed(period.id)"
+                            />
+                        </t>
+                    </t>
+                </Dropdown>
+            </div>
+            <div class="crypto_toolbar_item">
+                <span class="label">Price:</span>
+                <a t-att-href="toolbarData.price_url || '#'" class="value">
+                    $<t t-out="toolbarData.current || ''" />
+                </a>
+            </div>
+            <div class="crypto_toolbar_item">
+                <span class="label">Trend:</span>
+                <span class="value" t-att-class="(toolbarData.change || 0) > 0 ? 'text-success' : 'text-danger'">
+                    <t t-out="toolbarData.change || ''" />%
+                </span>
+            </div>
+            <div class="crypto_toolbar_item">
+                <span class="label">Amount:</span>
+                <a t-att-href="toolbarData.amount_url || '#'" class="value">
+                    $<t t-out="toolbarData.amount || ''" />
+                </a>
+            </div>
+        </div>
+    </t>
+</templates>

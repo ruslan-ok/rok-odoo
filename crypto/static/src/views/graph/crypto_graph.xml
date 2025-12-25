@@ -1,14 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<templates id="template" xml:space="preserve">
+<templates>
 
     <t t-name="crypto.CryptoGraphView.Buttons">
-        <div class="btn-group" role="toolbar" aria-label="Main actions">
-            <ReportViewPeriods
-                periods="model.metaData.periods"
-                period="model.metaData.period"
-                onPeriodSelected.bind="this.onPeriodSelected"
-            />
-        </div>
+        <CryptoToolbar toolbar_data="state.toolbar_data" period_changed.bind="onPeriodSelected" />
     </t>
 
     <t t-name="crypto.CryptoGraphRenderer" t-inherit="web.GraphRenderer" t-inherit-mode="primary">
