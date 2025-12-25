@@ -1,11 +1,17 @@
 .weather_buttons_container {
     margin: 0 10px;
 
+    .btn-group {
+        margin: 4px;
+    }
+
+    .label {
+        overflow: hidden;
+        // text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .locality-name {
         width: inherit;
     }
-}
-
-.o_kanban_renderer {
-    --KanbanRecord-width: 600px;
 }

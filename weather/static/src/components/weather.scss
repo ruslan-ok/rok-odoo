@@ -355,7 +355,7 @@
                     &.blue {
                         color: var(--week-day-work-color);
                     }
-                    
+
                     &.red {
                         color: var(--week-end-day-color);
                     }
@@ -368,17 +368,17 @@
                         margin: 0 auto;
                         text-align: center;
                     }
-                    
+
                     .day-date {
                         margin: 0 auto;
                         text-align: center;
                     }
-                    
+
                     .day-icon {
                         display: flex;
                         margin: 0 auto;
                         justify-content: center;
-        
+
                         img.weather-icon {
                             width: 45px;
                             height: 45px;
@@ -393,11 +393,11 @@
                             justify-content: center;
                             align-items: end;
                         }
-                        
+
                         .mid {
                             width: 100%;
                         }
-                        
+
                         .bot {
                             display: flex;
                             justify-content: center;

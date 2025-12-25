@@ -1,14 +1,15 @@
 import json
 import os
-import requests
 from datetime import datetime, timezone
 from decimal import Decimal
+
+import requests
 from dotenv import load_dotenv
 
-from odoo import http, fields
+from odoo import fields, http
 
 from ..constants import ChartPeriod
-from odoo.addons.rok_apps.tools.utils import approximate, build_chart_config, SourceData
+from odoo.addons.rok_apps.tools.utils import SourceData, approximate, build_chart_config
 
 
 class CryptoError(Exception):
@@ -34,8 +35,11 @@ class CryptoController(http.Controller):
         api_key = os.getenv("API_COIN_RATE_KEY")
         if api_url and api_key:
             headers = {"x-access-token": api_key, "User-Agent": "Mozilla/5.0"}
-            # timePeriod: 1h 3h 12h 24h 7d 30d 3m 1y 3y 5y
-            resp = requests.get(api_url + "history?timePeriod=" + period.value, headers=headers)
+            # timePeriod: 1h 3h 12h 24h 7d 30d 3m 1y 3y 5y - see https://coinranking.com/api/documentation/coins/coin-details
+            resp = requests.get(
+                api_url + "history?timePeriod=" + period.value,
+                headers=headers,
+            )
             prev = 0
             if resp.status_code == 200:
                 ret = json.loads(resp.content)
@@ -60,12 +64,11 @@ class CryptoController(http.Controller):
         ]
         http.request.env["rok.crypto"].sudo().search([]).unlink()
         http.request.env["rok.crypto"].sudo().create(create_vals)
-        widget_data = {
-            "chart": chart_config,
+        return {
+            "chart_data": chart_config,
             "current": current,
             "change": change,
             "amount": amount,
             "price_url": os.getenv("API_COIN_INFO"),
-            "amount_url": f"{os.getenv("API_WALLET")}{os.getenv("API_WALLET_KEY")}",
+            "amount_url": f"{os.getenv('API_WALLET')}{os.getenv('API_WALLET_KEY')}",
         }
-        return widget_data

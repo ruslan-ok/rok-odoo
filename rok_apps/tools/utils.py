@@ -1,26 +1,25 @@
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from dataclasses import dataclass
-
 
 TIME_AXIS_SCALES = {
     "xAxis": {
         "type": "time",
         "time": {
             "displayFormats": {
-                "datetime": "MMM D, YYYY, h:mm:ss a",
+                "datetime": "MMM d, yyyy, h:mm:ss a",
                 "millisecond": "h:mm:ss.SSS a",
                 "second": "h:mm:ss a",
                 "minute": "h:mm a",
-                "hour": "MMM D, hA",
-                "day": "MMM D",
+                "hour": "MMM d, ha",
+                "day": "MMM d",
                 "week": "ll",
-                "month": "MMM YYYY",
-                "quarter": "[Q]Q - YYYY",
-                "year": "YYYY",
-            }
+                "month": "MMM yyyy",
+                "quarter": "[Q]Q - yyyy",
+                "year": "yyyy",
+            },
         },
-    }
+    },
 }
 
 
@@ -56,7 +55,7 @@ def approximate(data: list[SourceData], goal: int) -> list:
 def build_chart_config(label: str, chart_points, rgb: str):
     dataset = {
         "label": label,
-        "data": [],  # chart_points,
+        "data": chart_points,
         "backgroundColor": f"rgba({rgb}, 0.2)",
         "borderColor": f"rgba({rgb}, 1)",
         "borderWidth": 1,
@@ -78,9 +77,8 @@ def build_chart_config(label: str, chart_points, rgb: str):
         },
         "scales": TIME_AXIS_SCALES,
     }
-    chart_config = {
+    return {
         "type": "line",
         "data": chart_data,
         "options": chart_options,
     }
-    return chart_config

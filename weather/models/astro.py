@@ -1,9 +1,9 @@
-from odoo import models, fields
+from odoo import fields, models
 
 
 class Astro(models.Model):
-    _name = 'weather.astro'
-    _description = 'Astro'
+    _name = "weather.astro"
+    _description = "Astro"
 
     place_id = fields.Many2one("weather.place", required=True)
     date = fields.Date(required=True)

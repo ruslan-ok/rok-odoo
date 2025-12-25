@@ -1,8 +1,27 @@
 <templates>
     <t t-name="crypto.RokAppsWidget">
         <div class="rok_apps_widget crypto_widget">
-            <h1>Crypto Widget</h1>
-            <p>App Name: <t t-esc="recordName" /></p>
+            <div class="weather_buttons_container">
+                <div class="btn-group" role="toolbar" aria-label="Change forecast parameters">
+                    <span class="fs-4 ms-2 me-2 pt-1 label">Period:</span>
+                    <Dropdown>
+                        <button class="period-btn">
+                            <t t-out="periods.find(p => p.id == state.period).title" />
+                            <i class="fa fa-caret-down ms-1" />
+                        </button>
+                        <t t-set-slot="content">
+                            <t t-foreach="periods" t-as="period" t-key="period.id">
+                                <DropdownItem
+                                    class="{ selected: state.period == period.id }"
+                                    t-esc="period.title"
+                                    onSelected="() => this.onPeriodSelected(period.id)"
+                                />
+                            </t>
+                        </t>
+                    </Dropdown>
+                </div>
+            </div>
+            <Crypto chart_data="state.data" />
         </div>
     </t>
 </templates>

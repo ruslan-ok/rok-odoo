@@ -1,9 +1,9 @@
-from odoo import models, fields
+from odoo import fields, models
 
 
 class Place(models.Model):
-    _name = 'weather.place'
-    _description = 'Place'
+    _name = "weather.place"
+    _description = "Place"
 
     place_id = fields.Char(required=True)
     name = fields.Char(required=True)

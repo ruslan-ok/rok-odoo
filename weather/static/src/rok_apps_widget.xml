@@ -3,7 +3,7 @@
         <div class="rok_apps_widget weather_widget">
             <div class="weather_buttons_container">
                 <div class="btn-group" role="toolbar" aria-label="Select location">
-                    <span class="fs-4 me-2 pt-1">Location:</span>
+                    <span class="fs-4 me-2 pt-1 label">Location:</span>
                     <button class="btn btn-secondary bi bi-crosshair o_graph_button" data-tooltip="Use browser location" aria-label="Use browser location" data-mode="browser"
                         t-on-click="() => this.onLocationSelected('browser')"
                         t-att-class="{ active: state.location === 'browser' }"
@@ -22,7 +22,7 @@
                     />
                 </div>
                 <div class="btn-group" role="toolbar" aria-label="Change forecast parameters">
-                    <span class="fs-4 ms-2 me-2 pt-1">Period:</span>
+                    <span class="fs-4 ms-2 me-2 pt-1 label">Period:</span>
                     <button class="btn btn-secondary bi bi-cloud-snow o_graph_button" data-tooltip="Now" aria-label="Now" data-mode="now"
                         t-on-click="() => this.onPeriodSelected('now')"
                         t-att-class="{ active: state.period === 'now' }"

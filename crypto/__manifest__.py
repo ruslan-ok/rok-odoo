@@ -8,8 +8,7 @@
     "application": False,
     "category": "Productivity/Crypto",
     "depends": [
-        # "spreadsheet_dashboard",
-        "rok_apps"
+        "rok_apps",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -25,6 +24,7 @@
             "crypto/static/src/components/crypto.xml",
             "crypto/static/src/rok_apps_widget.js",
             "crypto/static/src/rok_apps_widget.xml",
+            "crypto/static/src/rok_apps_widget.scss",
         ],
         "web.assets_backend_lazy": [
             "crypto/static/src/components/crypto_model.js",

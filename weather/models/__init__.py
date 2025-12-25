@@ -1,3 +1,1 @@
-from . import place
-from . import astro
-from . import forecast
+from . import astro, forecast, place
