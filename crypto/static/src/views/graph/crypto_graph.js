@@ -15,18 +15,6 @@ export class CryptoGraphRenderer extends GraphRenderer {
     static components = { ...GraphRenderer.components, Crypto, CryptoToolbar };
     setup() {
         super.setup();
-        this.periods = [
-            { id: "1h", title: "1 Hour" },
-            { id: "3h", title: "3 Hours" },
-            { id: "12h", title: "12 Hours" },
-            { id: "24h", title: "24 Hours" },
-            { id: "7d", title: "7 Days" },
-            { id: "30d", title: "30 Days" },
-            { id: "3m", title: "3 Months" },
-            { id: "1y", title: "1 Year" },
-            { id: "3y", title: "3 Years" },
-            { id: "5y", title: "5 Years" },
-        ];
         this.state = useState({
             error: "",
             data: {datasets: []},

@@ -6,7 +6,7 @@ import { useRef, onWillStart, useEffect, onWillUnmount } from "@odoo/owl";
 
 export class Crypto extends Component {
     static template = "crypto.Crypto";
-    static props = { chart_data: Object };
+    static props = { chart_data: Object, error: String };
     setup() {
         this.canvasRef = useRef("canvas");
         this.chart = null;

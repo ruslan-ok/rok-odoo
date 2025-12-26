@@ -19,12 +19,12 @@
                     </t>
                 </Dropdown>
             </div>
-            <div class="crypto_toolbar_item">
-                <span class="label">Price:</span>
+            <strong class="crypto_toolbar_item">
+                <span class="label">BTC/USD:</span>
                 <a t-att-href="toolbarData.price_url || '#'" class="value">
                     $<t t-out="toolbarData.current || ''" />
                 </a>
-            </div>
+            </strong>
             <div class="crypto_toolbar_item">
                 <span class="label">Trend:</span>
                 <span class="value" t-att-class="(toolbarData.change || 0) > 0 ? 'text-success' : 'text-danger'">

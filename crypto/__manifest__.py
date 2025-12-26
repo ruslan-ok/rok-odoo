@@ -17,7 +17,6 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "crypto/static/src/components/crypto.scss",
             "crypto/static/src/components/crypto.js",
             "crypto/static/src/components/crypto.xml",
             "crypto/static/src/components/crypto_toolbar.scss",

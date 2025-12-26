@@ -1,7 +1,16 @@
 <templates>
     <t t-name="crypto.Crypto">
         <div class="crypto_chart_container" t-ref="container" id="crypto">
-            <canvas t-ref="canvas" />
+            <t t-if="props.error" >
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading"><i class="fa fa-times-circle me-2"></i>Error</h4>
+                    <hr/>
+                    <p><t t-out="props.error" /></p>
+                </div>
+            </t>
+            <t t-else="">
+                <canvas t-ref="canvas" />
+            </t>
         </div>
     </t>
 </templates>

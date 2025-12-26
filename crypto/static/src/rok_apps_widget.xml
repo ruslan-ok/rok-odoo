@@ -2,7 +2,7 @@
     <t t-name="crypto.RokAppsWidget">
         <div class="rok_apps_widget crypto_widget">
             <CryptoToolbar toolbar_data="state.toolbar_data" period_changed.bind="onPeriodSelected" />
-            <Crypto chart_data="state.data" />
+            <Crypto chart_data="state.data" error="state.error" />
         </div>
     </t>
 </templates>
