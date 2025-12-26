@@ -6,6 +6,10 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
+                <field name="description"/>
+                <field name="icon"/>
+                <field name="active"/>
+                <field name="sequence"/>
             </list>
         </field>
     </record>
