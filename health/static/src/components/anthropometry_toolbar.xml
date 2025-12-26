@@ -1,0 +1,43 @@
+<templates>
+    <t t-name="health.AnthropometryToolbar">
+        <div class="anthropo_toolbar">
+            <div class="anthropo_toolbar_item">
+                <span class="label">Period:</span>
+                <Dropdown>
+                    <button class="period-btn">
+                        <t t-out="(periods.find(p => p.id == toolbarData.period) || {}).title || ''" />
+                        <i class="fa fa-caret-down btn" />
+                    </button>
+                    <t t-set-slot="content">
+                        <t t-foreach="periods" t-as="period" t-key="period.id">
+                            <DropdownItem
+                                class="{ selected: toolbarData.period == period.id }"
+                                t-esc="period.title"
+                                onSelected="() => this.props.period_changed(period.id)"
+                            />
+                        </t>
+                    </t>
+                </Dropdown>
+            </div>
+            <strong class="anthropo_toolbar_item">
+                <span class="label">Weight:</span>
+                <span class="value">
+                    <t t-out="toolbarData.current || ''" />
+                </span>
+            </strong>
+            <div class="anthropo_toolbar_item">
+                <span class="label">Trend:</span>
+                <span class="value" t-att-class="(toolbarData.trend || 0) > 0 ? 'text-success' : 'text-danger'">
+                    <t t-out="toolbarData.trend || ''" />%
+                </span>
+            </div>
+            <div class="anthropo_toolbar_item">
+                <span class="label">Add:</span>
+                <input type="number" class="value_input" name="add_value" t-ref="valueInput" step="0.01"/>
+                <button class="btn" t-on-click="() => onAddValue()">
+                    <i class="fa fa-plus" />
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>

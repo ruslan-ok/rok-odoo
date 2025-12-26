@@ -1,0 +1,38 @@
+.anthropo_toolbar {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    .anthropo_toolbar_item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-right: 8px;
+        font-size: 1.05rem !important;
+        .label {
+            overflow: hidden;
+            white-space: nowrap;
+            padding-top: 4px !important;
+            margin-right: 4px;
+        }
+        .value {
+            padding-top: 4px !important;
+        }
+        .period-btn {
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-style: solid;
+            border-width: 1px;
+            border-radius: 0;
+        }
+        .value_input {
+            width: 80px;
+            text-align: right;
+        }
+    }
+}

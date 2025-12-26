@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_anthropometry_user,anthropometry user,model_anthropometry,base.group_user,1,1,1,0
+access_anthropometry_manager,anthropometry manager,model_anthropometry,base.group_system,1,1,1,1
+access_calories_user,calories user,model_calories,base.group_user,1,1,1,1
