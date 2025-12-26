@@ -12,8 +12,8 @@ export class Crypto extends Component {
         this.chart = null;
 
         onWillStart(async () => {
-            await loadJS("/rok_spreadsheet/static/lib/chart.js");
-            await loadJS("/rok_spreadsheet/static/lib/chartjs-adapter-date-fns.bundle.min.js");
+            await loadJS("/rok_apps/static/lib/chart.js");
+            await loadJS("/rok_apps/static/lib/chartjs-adapter-date-fns.bundle.min.js");
         });
 
         useEffect(() => this.renderChart(), () => [this.props.chart_data]);

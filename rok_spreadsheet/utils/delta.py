@@ -106,8 +106,6 @@ def get_start_date(enddate: datetime, period: ChartPeriod) -> datetime:
             startdate = yeardelta(enddate, -3)
         case ChartPeriod.p5y:
             startdate = yeardelta(enddate, -5)
-        case ChartPeriod.p10y:
-            startdate = yeardelta(enddate, -10)
     return startdate
 
 
