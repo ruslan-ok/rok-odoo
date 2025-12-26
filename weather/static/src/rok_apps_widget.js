@@ -21,6 +21,7 @@ export class WeatherRokAppsWidget extends RokAppsWidget {
                 period: this.getPeriodOption(),
             },
         });
+        this.title = "";
 
         useEffect(
             () => { this.getData(); },
