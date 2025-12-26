@@ -1,0 +1,40 @@
+<templates>
+    <t t-name="weather.WeatherToolbar">
+        <div class="weather_toolbar">
+            <div class="btn-group" role="toolbar" aria-label="Select location">
+                <span class="label">Location:</span>
+                <button class="btn btn-secondary bi bi-crosshair o_graph_button" data-tooltip="Use browser location" aria-label="Use browser location" data-mode="browser"
+                    t-on-click="() => props.onLocationSelected('browser')"
+                    t-att-class="{ active: toolbarData.location === 'browser' }"
+                />
+                <button class="btn btn-secondary bi bi-geo-alt o_graph_button" data-tooltip="Use the name of the locality" aria-label="Use the name of the locality" data-mode="locality"
+                    t-on-click="() => props.onLocationSelected('locality')"
+                    t-att-class="{ active: toolbarData.location === 'locality' }"
+                />
+                <input class="locality-name" type="text" name="locality" t-ref="localityInput"
+                    t-att-value="toolbarData.locality or ''"
+                    t-if="toolbarData.location === 'locality'"
+                />
+                <button class="btn btn-secondary bi bi-search o_graph_button" data-tooltip="Search" aria-label="Search" data-mode="search"
+                    t-on-click="() => onSetLocality()"
+                    t-if="toolbarData.location === 'locality'"
+                />
+            </div>
+            <div class="btn-group" role="toolbar" aria-label="Change forecast parameters">
+                <span class="label">Period:</span>
+                <button class="btn btn-secondary bi bi-cloud-snow o_graph_button" data-tooltip="Now" aria-label="Now" data-mode="now"
+                    t-on-click="() => props.onPeriodSelected('now')"
+                    t-att-class="{ active: toolbarData.period === 'now' }"
+                />
+                <button class="btn btn-secondary bi bi-calendar4-event o_graph_button" data-tooltip="Day" aria-label="Day" data-mode="day"
+                    t-on-click="() => props.onPeriodSelected('day')"
+                    t-att-class="{ active: toolbarData.period === 'day' }"
+                />
+                <button class="btn btn-secondary bi bi-calendar4-week o_graph_button" data-tooltip="Week" aria-label="Week" data-mode="week"
+                    t-on-click="() => props.onPeriodSelected('week')"
+                    t-att-class="{ active: toolbarData.period === 'week' }"
+                />
+            </div>
+        </div>
+    </t>
+</templates>

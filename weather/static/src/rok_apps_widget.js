@@ -3,33 +3,28 @@
 import { RokAppsWidget } from "@rok_apps/rok_apps_widget";
 import { registerRokAppsWidget } from "@rok_apps/rok_apps_widget_registry";
 import { Weather } from "@weather/components/weather";
-import { useState, useRef, onWillStart, useEffect } from "@odoo/owl";
+import { useState, useEffect } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
+import { WeatherToolbar } from "./components/weather_toolbar";
 
 export class WeatherRokAppsWidget extends RokAppsWidget {
     static template = "weather.RokAppsWidget";
     static props = ["record"];
-    static components = { ...RokAppsWidget.components, Weather };
+    static components = { ...RokAppsWidget.components, Weather, WeatherToolbar };
     setup() {
         this.state = useState({
-            location: this.getLocationOption(),
-            locality: this.getLocalityOption(),
-            period: this.getPeriodOption(),
             error: "",
             data: {},
-        });
-        this.onLocationSelected = this.onLocationSelected.bind(this);
-        this.onPeriodSelected = this.onPeriodSelected.bind(this);
-        this.onSetLocality = this.onSetLocality.bind(this);
-        this.localityInput = useRef("localityInput");
-
-        onWillStart(async () => {
-            await this.getData();
+            toolbar_data: {
+                location: this.getLocationOption(),
+                locality: this.getLocalityOption(),
+                period: this.getPeriodOption(),
+            },
         });
 
         useEffect(
             () => { this.getData(); },
-            () => [this.state.location, this.state.locality],
+            () => [this.state.toolbar_data.location, this.state.toolbar_data.locality],
         );
     }
 
@@ -48,8 +43,8 @@ export class WeatherRokAppsWidget extends RokAppsWidget {
         try {
             let lat = "";
             let lon = "";
-            let locality = this.state.locality;
-            if (this.state.location === 'browser' || locality === '') {
+            let locality = this.state.toolbar_data.locality;
+            if (this.state.toolbar_data.location === 'browser' || locality === '') {
                 const coord = await this.getCoord();
                 lat = coord.lat;
                 lon = coord.lon;
@@ -62,16 +57,16 @@ export class WeatherRokAppsWidget extends RokAppsWidget {
             });
             if (response.result != "ok") {
                 this.state.error = response.info;
-                this.state.period = "error";
+                this.state.toolbar_data.period = "error";
             } else {
                 this.state.error = "";
                 this.state.data = response.data;
             }
         } catch (error) {
             this.state.error = error.message || error;
-            this.state.period = "error";
+            this.state.toolbar_data.period = "error";
         }
-        this.getTitle(this.state.period);
+        this.getTitle(this.state.toolbar_data.period);
     }
 
     getTitle(period) {
@@ -87,8 +82,7 @@ export class WeatherRokAppsWidget extends RokAppsWidget {
                 title += "for the week";
                 break;
         }
-        const locality = this.state.data.place;
-        this.title = `${locality}: ${title}`;
+        this.title = `${this.state.data.place}: ${title}`;
     }
 
     getLocationOption() {
@@ -111,17 +105,16 @@ export class WeatherRokAppsWidget extends RokAppsWidget {
     }
     onPeriodSelected(period) {
         localStorage.setItem('weather-period', period);
-        this.state.period = period;
+        this.state.toolbar_data.period = period;
         this.getTitle(period);
     }
     onLocationSelected(location) {
         localStorage.setItem('weather-location', location);
-        this.state.location = location;
+        this.state.toolbar_data.location = location;
     }
-    onSetLocality() {
-        const locality = this.localityInput.el.value;
-        this.state.locality = locality;
+    onSetLocality(locality) {
         localStorage.setItem('weather-locality', locality);
+        this.state.toolbar_data.locality = locality;
     }
 }
 

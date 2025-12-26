@@ -1,5 +1,6 @@
-.weather_buttons_container {
+.weather_toolbar {
     margin: 0 10px;
+    font-size: 1.05rem;
 
     .btn-group {
         margin: 4px;
@@ -7,9 +8,10 @@
 
     .label {
         overflow: hidden;
-        // text-overflow: ellipsis;
         white-space: nowrap;
-    }
+        padding-top: 4px !important;
+        margin-right: 4px;
+}
 
     .locality-name {
         width: inherit;

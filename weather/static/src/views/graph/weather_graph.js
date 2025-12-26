@@ -4,25 +4,29 @@ import { registry } from "@web/core/registry";
 import { GraphRenderer } from "@web/views/graph/graph_renderer";
 import { graphView } from "@web/views/graph/graph_view";
 import { Weather } from "../../components/weather";
-import { useRef, useState, useEffect, onWillStart } from "@odoo/owl";
+import { useState, useEffect, onWillStart } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
+import { WeatherToolbar } from "../../components/weather_toolbar";
 
 const viewRegistry = registry.category("views");
 
 export class WeatherGraphRenderer extends GraphRenderer {
     static template = "weather.WeatherGraphRenderer";
-    static components = { ...GraphRenderer.components, Weather };
+    static components = { ...GraphRenderer.components, Weather, WeatherToolbar };
     setup() {
         super.setup();
-        this.state = useState({data: {}});
-        this.model.metaData.location = this.getLocationOption();
-        this.model.metaData.locality = this.getLocalityOption();
-        this.model.metaData.period = this.getPeriodOption();
-        this.model.metaData.error = "";
+        this.state = useState(
+            {
+                data: {},
+                error: "",
+                toolbar_data: {
+                    location: this.getLocationOption(),
+                    locality: this.getLocalityOption(),
+                    period: this.getPeriodOption(),
+                }});
         this.onPeriodSelected = this.onPeriodSelected.bind(this);
         this.onLocationSelected = this.onLocationSelected.bind(this);
         this.onSetLocality = this.onSetLocality.bind(this);
-        this.localityInput = useRef("localityInput");
         this.title = "Weather";
 
         onWillStart(async () => {
@@ -31,7 +35,7 @@ export class WeatherGraphRenderer extends GraphRenderer {
 
         useEffect(
             () => { this.getData(); },
-            () => [this.model.metaData.location, this.model.metaData.locality],
+            () => [this.state.toolbar_data.location, this.state.toolbar_data.locality],
         );
     }
 
@@ -50,8 +54,8 @@ export class WeatherGraphRenderer extends GraphRenderer {
         try {
             let lat = "";
             let lon = "";
-            let locality = this.model.metaData.locality;
-            if (this.model.metaData.location === 'browser' || locality === '') {
+            let locality = this.state.toolbar_data.locality;
+            if (this.state.toolbar_data.location === 'browser' || locality === '') {
                 const coord = await this.getCoord();
                 lat = coord.lat;
                 lon = coord.lon;
@@ -63,19 +67,21 @@ export class WeatherGraphRenderer extends GraphRenderer {
                 lon: lon,
             });
             if (response.result != "ok") {
-                this.model.updateMetaData({ period: "error", error: response.info });
+                this.state.error = response.info;
+                this.state.toolbar_data.period = "error";
             } else {
-                this.model.updateMetaData({ error: "" });
+                this.state.error = "";
                 this.state.data = response.data;
             }
         } catch (error) {
-            this.model.updateMetaData({ period: "error", error: error.message || error });
+            this.state.error = error.message || error;
+            this.state.toolbar_data.period = "error";
         }
-        this.getTitle(this.model.metaData.period);
+        this.getTitle(this.state.toolbar_data.period);
     }
 
     getTitle(period) {
-        if (!this.model.metaData.locality) {
+        if (!this.state.toolbar_data.locality) {
             this.title = "Weather";
         } else {
             let title = "weather ";
@@ -115,17 +121,16 @@ export class WeatherGraphRenderer extends GraphRenderer {
     }
     onPeriodSelected(period) {
         localStorage.setItem('weather-period', period);
-        this.model.updateMetaData({ period });
+        this.state.toolbar_data.period = period;
         this.getTitle(period);
     }
     onLocationSelected(location) {
         localStorage.setItem('weather-location', location);
-        this.model.updateMetaData({ location });
+        this.state.toolbar_data.location = location;
     }
-    onSetLocality() {
-        const locality = this.localityInput.el.value;
-        this.model.updateMetaData({ locality });
+    onSetLocality(locality) {
         localStorage.setItem('weather-locality', locality);
+        this.state.toolbar_data.locality = locality;
     }
 };
 
