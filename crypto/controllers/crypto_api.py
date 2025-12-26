@@ -6,7 +6,7 @@ from decimal import Decimal
 import requests
 from dotenv import load_dotenv
 
-from odoo import fields, http
+from odoo import http
 
 from ..constants import ChartPeriod
 from odoo.addons.rok_apps.tools.utils import SourceData, approximate, build_chart_config
@@ -58,12 +58,6 @@ class CryptoController(http.Controller):
                     chart_points = approximate(src_data, 200)
 
         chart_config = build_chart_config("BTC/USD", chart_points, "111, 184, 71")
-        create_vals = [
-            {"dt": fields.Datetime.from_string(point["x"]), "value": point["y"]}
-            for point in chart_points
-        ]
-        http.request.env["rok.crypto"].sudo().search([]).unlink()
-        http.request.env["rok.crypto"].sudo().create(create_vals)
         return {
             "chart_data": chart_config,
             "current": current,

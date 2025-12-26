@@ -28,7 +28,6 @@
             "crypto/static/src/rok_apps_widget.scss",
         ],
         "web.assets_backend_lazy": [
-            "crypto/static/src/components/crypto_model.js",
             "crypto/static/src/views/graph/crypto_graph.js",
             "crypto/static/src/views/graph/crypto_graph.xml",
         ],

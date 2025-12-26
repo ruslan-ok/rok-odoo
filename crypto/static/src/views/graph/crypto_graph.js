@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 import { GraphRenderer } from "@web/views/graph/graph_renderer";
 import { graphView } from "@web/views/graph/graph_view";
 import { Crypto } from "../../components/crypto";
-import { CryptoModel } from "../../components/crypto_model";
 import { CryptoToolbar } from "../../components/crypto_toolbar";
 import { useState, useEffect } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
@@ -86,7 +85,6 @@ export class CryptoGraphRenderer extends GraphRenderer {
 
 export const CryptoGraphView = {
     ...graphView,
-    Model: CryptoModel,
     Renderer: CryptoGraphRenderer,
     buttonTemplate: "crypto.CryptoGraphView.Buttons",
 };
