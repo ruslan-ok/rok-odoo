@@ -5,7 +5,7 @@ import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 
 export class AnthropometryToolbar extends Component {
-    static template = "health.AnthropometryToolbar";
+    static template = "rok_health.AnthropometryToolbar";
     static props = {
         toolbar_data: { type: Object, optional: true },
         period_changed: Function,

@@ -1,5 +1,5 @@
 <templates>
-    <t t-name="health.Anthropometry">
+    <t t-name="rok_health.Anthropometry">
         <div class="anthropometry_chart_container" t-ref="container" id="anthropometry">
             <t t-if="props.error" >
                 <div class="alert alert-danger" role="alert">

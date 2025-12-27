@@ -5,7 +5,7 @@ import { Component } from "@odoo/owl";
 import { useRef, onWillStart, useEffect, onWillUnmount } from "@odoo/owl";
 
 export class Anthropometry extends Component {
-    static template = "health.Anthropometry";
+    static template = "rok_health.Anthropometry";
     static props = { chart_data: Object, error: String };
     setup() {
         this.canvasRef = useRef("canvas");

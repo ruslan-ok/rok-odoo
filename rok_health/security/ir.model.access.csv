@@ -1,6 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_rok_health_anthropometry_user,rok.health.anthropometry user,model_rok_health_anthropometry,base.group_user,1,1,1,0
 access_rok_health_anthropometry_manager,rok.health.anthropometry manager,model_rok_health_anthropometry,base.group_system,1,1,1,1
-access_rok_health_anthropometry_kpi_user,rok.health.anthropometry kpi user,model_rok_health_anthropometry_kpi,base.group_user,1,1,1,0
-access_rok_health_anthropometry_kpi_manager,rok.health.anthropometry kpi manager,model_rok_health_anthropometry_kpi,base.group_system,1,1,1,1
 access_rok_health_calories_user,calories user,model_calories,base.group_user,1,1,1,1

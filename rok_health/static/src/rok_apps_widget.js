@@ -1,20 +1,17 @@
 /** @odoo-module **/
 
-import { registry } from "@web/core/registry";
-import { GraphRenderer } from "@web/views/graph/graph_renderer";
-import { graphView } from "@web/views/graph/graph_view";
-import { Anthropometry } from "../../components/anthropometry";
-import { AnthropometryToolbar } from "../../components/anthropometry_toolbar";
-import { useState, useEffect, onWillStart } from "@odoo/owl";
+import { RokAppsWidget } from "@rok_apps/rok_apps_widget";
+import { registerRokAppsWidget } from "@rok_apps/rok_apps_widget_registry";
+import { useState, useEffect } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
+import { Anthropometry } from "./components/anthropometry";
+import { AnthropometryToolbar } from "./components/anthropometry_toolbar";
 
-const viewRegistry = registry.category("views");
-
-export class AnthropometryGraphRenderer extends GraphRenderer {
-    static template = "health.AnthropometryGraphRenderer";
-    static components = { ...GraphRenderer.components, Anthropometry, AnthropometryToolbar };
+export class HealthRokAppsWidget extends RokAppsWidget {
+    static template = "rok_health.RokAppsWidget";
+    static props = ["record"];
+    static components = { ...RokAppsWidget.components, Anthropometry, AnthropometryToolbar };
     setup() {
-        super.setup();
         this.state = useState({
             error: "",
             data: {datasets: []},
@@ -24,21 +21,19 @@ export class AnthropometryGraphRenderer extends GraphRenderer {
                 trend: "",
             },
         });
+
         this.onPeriodSelected = this.onPeriodSelected.bind(this);
-
-        onWillStart(async () => {
-            await this.getData(this.state.toolbar_data.period);
-        });
-
+        this.onValueAdded = this.onValueAdded.bind(this);
         useEffect(
-            () => { this.getData(this.state.toolbar_data.period); },
+            () => { this.getData(); },
             () => [this.state.toolbar_data.period],
         );
     }
-
-    async getData(period) {
+    async getData() {
         try {
-            const response = await rpc("/anthropometry/data", {period: period});
+            const response = await rpc("/anthropometry/data", {
+                period: this.state.toolbar_data.period,
+            });
             if (response.result != "ok") {
                 this.state.error = response.info;
             } else {
@@ -62,27 +57,23 @@ export class AnthropometryGraphRenderer extends GraphRenderer {
     async onPeriodSelected(period) {
         localStorage.setItem("anthropo-period", period);
         this.state.toolbar_data.period = period;
-        await this.getData(period);
+        await this.getData();
     }
 
-    async onAddValue(value) {
+    async onValueAdded(value) {
         try {
             const response = await rpc("/anthropometry/add", {value: value});
             if (response.result != "ok") {
                 this.state.error = response.info;
             } else {
-                await this.getData(this.state.toolbar_data.period);
+                this.state.error = "";
+                await this.getData();
             }
         } catch (error) {
             this.state.error = error.message || error;
         }
     }
-};
+}
 
-export const AnthropometryGraphView = {
-    ...graphView,
-    Renderer: AnthropometryGraphRenderer,
-    buttonTemplate: "health.AnthropometryGraphView.Buttons",
-};
-
-viewRegistry.add("anthropometry_graph", AnthropometryGraphView);
+// Register the widget for the "Health" app
+registerRokAppsWidget("Health", HealthRokAppsWidget);

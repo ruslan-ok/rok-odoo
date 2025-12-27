@@ -1,10 +1,10 @@
 <templates>
 
-    <t t-name="health.AnthropometryGraphView.Buttons">
+    <t t-name="rok_health.AnthropometryGraphView.Buttons">
         <AnthropometryToolbar toolbar_data="state.toolbar_data" period_changed.bind="onPeriodSelected" value_added.bind="onAddValue" />
     </t>
 
-    <t t-name="health.AnthropometryGraphRenderer" t-inherit="web.GraphRenderer" t-inherit-mode="primary">
+    <t t-name="rok_health.AnthropometryGraphRenderer" t-inherit="web.GraphRenderer" t-inherit-mode="primary">
         <xpath expr="//div[@t-ref='container']" position="replace">
             <Anthropometry chart_data="state.data" error="state.error" />
         </xpath>

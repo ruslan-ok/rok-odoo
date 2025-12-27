@@ -42,7 +42,7 @@ class HealthController(http.Controller):
                 domain = [
                     ("measurement", ">=", datetime.now() - timedelta(days=365 * 10)),
                 ]
-        data = env["anthropometry"].search(domain, order="measurement")
+        data = env["rok.health.anthropometry"].search(domain, order="measurement")
         if not data:
             raise HealthError(f"No data found for period {period.value}")
         src_data = [
@@ -65,7 +65,7 @@ class HealthController(http.Controller):
     def add_anthropometry(self, value: float) -> dict:
         try:
             env = http.request.env
-            env["anthropometry"].create(
+            env["rok.health.anthropometry"].create(
                 {
                     "weight": value,
                     "measurement": fields.Datetime.now(),

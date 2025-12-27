@@ -1,5 +1,5 @@
 <templates>
-    <t t-name="health.RokAppsWidget">
+    <t t-name="rok_health.RokAppsWidget">
         <div class="rok_apps_widget health_widget">
             <AnthropometryToolbar toolbar_data="state.toolbar_data" period_changed.bind="onPeriodSelected" value_added.bind="onValueAdded" />
             <Anthropometry chart_data="state.data" error="state.error" />

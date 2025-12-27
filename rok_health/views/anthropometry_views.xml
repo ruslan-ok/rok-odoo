@@ -1,7 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_rok_health_anthropometry_tree" model="ir.ui.view">
-        <field name="name">rok.health.anthropometry.tree</field>
+    <record id="anthropometry_view_graph" model="ir.ui.view">
+        <field name="name">anthropometry.view.graph</field>
+        <field name="model">rok.health.anthropometry</field>
+        <field name="arch" type="xml">
+            <graph string="Weight" js_class="anthropometry_graph">
+                <field name="measurement" type="row"/>
+                <field name="weight" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="anthropometry_view_list" model="ir.ui.view">
+        <field name="name">anthropometry.view.list</field>
         <field name="model">rok.health.anthropometry</field>
         <field name="arch" type="xml">
             <list string="Anthropometry" default_order="measurement desc">
@@ -18,8 +28,8 @@
         </field>
     </record>
 
-    <record id="view_rok_health_anthropometry_form" model="ir.ui.view">
-        <field name="name">rok.health.anthropometry.form</field>
+    <record id="anthropometry_view_form" model="ir.ui.view">
+        <field name="name">anthropometry.view.form</field>
         <field name="model">rok.health.anthropometry</field>
         <field name="arch" type="xml">
             <form string="Anthropometry">
@@ -47,19 +57,8 @@
         </field>
     </record>
 
-    <record id="view_rok_health_anthropometry_graph" model="ir.ui.view">
-        <field name="name">rok.health.anthropometry.graph</field>
-        <field name="model">rok.health.anthropometry</field>
-        <field name="arch" type="xml">
-            <graph string="Weight" type="line">
-                <field name="measurement" type="row"/>
-                <field name="weight" type="measure"/>
-            </graph>
-        </field>
-    </record>
-
-    <record id="view_rok_health_anthropometry_search" model="ir.ui.view">
-        <field name="name">rok.health.anthropometry.search</field>
+    <record id="anthropometry_view_search" model="ir.ui.view">
+        <field name="name">anthropometry.view.search</field>
         <field name="model">rok.health.anthropometry</field>
         <field name="arch" type="xml">
             <search>
@@ -73,18 +72,23 @@
         </field>
     </record>
 
-    <record id="action_rok_health_anthropometry" model="ir.actions.act_window">
+    <record id="anthropometry_action_view_graph" model="ir.actions.act_window">
         <field name="name">Anthropometry</field>
         <field name="res_model">rok.health.anthropometry</field>
         <field name="view_mode">graph,list,form</field>
-        <field name="views" eval="[(ref('view_rok_health_anthropometry_graph'), 'graph'), (ref('view_rok_health_anthropometry_tree'), 'list'), (ref('view_rok_health_anthropometry_form'), 'form')]"/>
-        <field name="search_view_id" ref="view_rok_health_anthropometry_search"/>
+        <field name="views" eval="[(ref('anthropometry_view_graph'), 'graph'), (ref('anthropometry_view_list'), 'list'), (ref('anthropometry_view_form'), 'form')]"/>
+        <field name="search_view_id" ref="anthropometry_view_search"/>
         <field name="context">{'graph_measure': 'weight', 'graph_date': 'measurement'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create your first measurement</p>
         </field>
     </record>
 
-    <!-- <menuitem id="menu_rok_health_root" name="Health" web_icon="rok_health,static/description/icon.png" action="action_rok_health_anthropometry" sequence="10" groups="base.group_user"/>
-    <menuitem id="menu_rok_health_anthropometry" name="Anthropometry" parent="menu_rok_health_root" action="action_rok_health_anthropometry" sequence="10" groups="base.group_user"/> -->
+    <menuitem
+        id="anthropometry_menu_action"
+        name="Anthropometry"
+        parent="rok_apps.rok_apps_menu_root"
+        action="anthropometry_action_view_graph"
+        sequence="40"
+        groups="base.group_user"/>
 </odoo>

@@ -1,5 +1,5 @@
 <templates>
-    <t t-name="health.AnthropometryToolbar">
+    <t t-name="rok_health.AnthropometryToolbar">
         <div class="anthropo_toolbar">
             <div class="anthropo_toolbar_item">
                 <span class="label">Period:</span>

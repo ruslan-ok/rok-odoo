@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Actions must be defined before views that reference them -->
-    <record id="action_rok_health_calories_consumed" model="ir.actions.act_window">
+    <record id="calories_action_consumed" model="ir.actions.act_window">
         <field name="name">New Consumption</field>
         <field name="res_model">calories</field>
         <field name="view_mode">form</field>
@@ -9,7 +8,7 @@
         <field name="context" eval="{'default_direction': 'consumed', 'food_category_id': ref('rok_health.cat_food')}"/>
     </record>
 
-    <record id="action_rok_health_calories_burned" model="ir.actions.act_window">
+    <record id="calories_action_burned" model="ir.actions.act_window">
         <field name="name">New Burning</field>
         <field name="res_model">calories</field>
         <field name="view_mode">form</field>
@@ -17,14 +16,14 @@
         <field name="context">{'default_direction': 'burned'}</field>
     </record>
 
-    <record id="view_rok_health_calories_tree" model="ir.ui.view">
-        <field name="name">rok.health.calories.tree</field>
+    <record id="calories_view_list" model="ir.ui.view">
+        <field name="name">calories.view.list</field>
         <field name="model">calories</field>
         <field name="arch" type="xml">
             <list string="Calories" default_order="event_dt desc" create="0">
                 <header>
-                    <button name="%(action_rok_health_calories_consumed)d" string="New consumption" type="action" display="always" class="btn-primary"/>
-                    <button name="%(action_rok_health_calories_burned)d" string="New burning" type="action" display="always" class="btn-secondary"/>
+                    <button name="%(calories_action_consumed)d" string="New consumption" type="action" display="always" class="btn-primary"/>
+                    <button name="%(calories_action_burned)d" string="New burning" type="action" display="always" class="btn-secondary"/>
                 </header>
                 <field name="event_dt"/>
                 <field name="product_or_activity"/>
@@ -34,14 +33,14 @@
         </field>
     </record>
 
-    <record id="view_rok_health_calories_form" model="ir.ui.view">
-        <field name="name">rok.health.calories.form</field>
+    <record id="calories_view_form" model="ir.ui.view">
+        <field name="name">calories.view.form</field>
         <field name="model">calories</field>
         <field name="arch" type="xml">
             <form string="Calories" create="0">
                 <header>
-                    <button name="%(action_rok_health_calories_consumed)d" string="New consumption" type="action" class="btn-primary"/>
-                    <button name="%(action_rok_health_calories_burned)d" string="New burning" type="action" class="btn-secondary"/>
+                    <button name="%(calories_action_consumed)d" string="New consumption" type="action" class="btn-primary"/>
+                    <button name="%(calories_action_burned)d" string="New burning" type="action" class="btn-secondary"/>
                 </header>
                 <sheet>
                     <group>
@@ -71,8 +70,8 @@
         </field>
     </record>
 
-    <record id="view_rok_health_calories_search" model="ir.ui.view">
-        <field name="name">rok.health.calories.search</field>
+    <record id="calories_view_search" model="ir.ui.view">
+        <field name="name">calories.view.search</field>
         <field name="model">calories</field>
         <field name="arch" type="xml">
             <search>
@@ -83,20 +82,20 @@
         </field>
     </record>
 
-    <record id="action_rok_health_calories" model="ir.actions.act_window">
+    <record id="calories_action_view_list" model="ir.actions.act_window">
         <field name="name">Calories</field>
         <field name="res_model">calories</field>
         <field name="view_mode">list,form</field>
-        <field name="views" eval="[(ref('view_rok_health_calories_tree'), 'list'), (ref('view_rok_health_calories_form'), 'form')]"/>
-        <field name="search_view_id" ref="view_rok_health_calories_search"/>
+        <field name="views" eval="[(ref('calories_view_list'), 'list'), (ref('calories_view_form'), 'form')]"/>
+        <field name="search_view_id" ref="calories_view_search"/>
         <field name="context" eval="{'food_category_id': ref('rok_health.cat_food'), 'search_default_groupby_event_dt_day': 1}"/>
     </record>
 
     <menuitem
-        id="menu_rok_health_calories"
+        id="calories_menu_action"
         name="Calories"
-        parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_configuration"
-        action="action_rok_health_calories"
+        parent="rok_apps.rok_apps_menu_root"
+        action="calories_action_view_list"
         sequence="10"
         groups="base.group_user"/>
 
