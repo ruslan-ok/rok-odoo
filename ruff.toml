@@ -46,6 +46,7 @@ ignore = [
     "C408",       # unnecessary-collection-call
     "C420",       # unnecessary-dict-comprehension-for-iterable
     "C901",       # complex-structure
+    "COM812",     # trailing-comma-missing
     "E266",       # multiple-leading-hashes-for-block-comment
     "E501",       # line-too-long
     "E713",       # not-in-test
