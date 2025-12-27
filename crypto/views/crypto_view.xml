@@ -43,5 +43,5 @@
         name="Crypto"
         parent="rok_apps.rok_apps_menu_root"
         action="action_crypto"
-        sequence="2"/>
+        sequence="20"/>
 </odoo>

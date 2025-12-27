@@ -96,7 +96,7 @@
         name="Calories"
         parent="rok_apps.rok_apps_menu_root"
         action="calories_action_view_list"
-        sequence="10"
+        sequence="30"
         groups="base.group_user"/>
 
 </odoo>
