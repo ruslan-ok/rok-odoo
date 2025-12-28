@@ -1,7 +1,7 @@
 <odoo>
 
-    <record id="rok_apps_list_view" model="ir.ui.view">
-        <field name="name">rok.apps.menu.root</field>
+    <record id="rok_apps_view_list" model="ir.ui.view">
+        <field name="name">rok.apps.view.list</field>
         <field name="model">rok.apps</field>
         <field name="arch" type="xml">
             <list>
@@ -14,11 +14,11 @@
         </field>
     </record>
 
-    <record id="rok_apps_kanban_view" model="ir.ui.view">
-        <field name="name">rok.apps.menu.root</field>
+    <record id="rok_apps_view_kanban" model="ir.ui.view">
+        <field name="name">rok.apps.view.kanban</field>
         <field name="model">rok.apps</field>
         <field name="arch" type="xml">
-            <kanban create="false">
+            <kanban create="false" class="rok_apps_kanban_2">
                 <field name="name"/>
                 <templates>
                     <t t-name="card">
@@ -33,17 +33,17 @@
         <field name="name">Rok Apps</field>
         <field name="res_model">rok.apps</field>
         <field name="view_mode">kanban,list</field>
-        <field name="view_id" ref="rok_apps_kanban_view"/>
+        <field name="view_id" ref="rok_apps_view_kanban"/>
     </record>
 
     <menuitem
         id="rok_apps_menu_root"
         name="Rok Apps"
         web_icon="rok_apps,static/description/icon.png"
-        sequence="301"/>
+        sequence="2"/>
 
     <menuitem
-        id="rok_apps_menu_home"
+        id="rok_apps_menu_dashboard"
         name="Dashboard"
         parent="rok_apps_menu_root"
         action="rok_apps.rok_apps_action"
