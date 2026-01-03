@@ -4,6 +4,7 @@
     "depends": [
         "documents",
         "documents_spreadsheet",
+        "documents_account",
     ],
     "category": "Productivity/Documents",
     "author": "Ruslan Akunevich",
