@@ -1,11 +1,12 @@
 import base64
 import contextlib
-import os
 import mimetypes
+import os
 from io import BytesIO
 from os.path import join as opj
 from pathlib import Path
 from zlib import adler32
+
 from odoo.http import Response, request
 from odoo.tools import config
 
@@ -13,6 +14,8 @@ try:
     from werkzeug.utils import send_file as _send_file
 except ImportError:
     from odoo.tools._vendor.send_file import send_file as _send_file
+
+ERR_CANNOT_READ_URL = "Cannot read an URL"
 
 # The cache duration for content where the url uniquely identifies the
 # content (usually using a hash), one year.
@@ -34,7 +37,7 @@ class DsfStream:
     dedicated constructors is discouraged.
     """
 
-    type: str = ''  # 'data' or 'path' or 'url'
+    type: str = ""  # 'data' or 'path' or 'url'
     data = None
     path = None
     url = None
@@ -66,11 +69,11 @@ class DsfStream:
         check = adler32(path.encode())
         stat = os.stat(path)
         return cls(
-            type='path',
+            type="path",
             path=path,
             mimetype=mimetypes.guess_type(path)[0],
             download_name=os.path.basename(path),
-            etag=f'{int(stat.st_mtime)}-{stat.st_size}-{check}',
+            etag=f"{int(stat.st_mtime)}-{stat.st_size}-{check}",
             last_modified=stat.st_mtime,
             size=stat.st_size,
             public=False,
@@ -78,8 +81,8 @@ class DsfStream:
 
     @classmethod
     def from_binary_field(cls, record, field_name):
-        """ Create a :class:`~Stream`: from a binary field. """
-        data = record[field_name] or b''
+        """Create a :class:`~Stream`: from a binary field."""
+        data = record[field_name] or b""
 
         # Image fields enforce base64 encoding. Binary fields don't
         # enforce anything: raw bytes are fine, expected even.
@@ -90,28 +93,28 @@ class DsfStream:
                 # Some libs add linefeed every X (where X < 79) char in
                 # the base64, for email mime. validate=True would raise
                 # an error for those linefeeds so stip them.
-                data.replace(b'\r', b'').replace(b'\n', b''),
+                data.replace(b"\r", b"").replace(b"\n", b""),
                 validate=True,
             )
 
         return cls(
-            type='data',
+            type="data",
             data=data,
-            etag=request.env['ir.attachment']._compute_checksum(data),
+            etag=request.env["ir.attachment"]._compute_checksum(data),
             last_modified=record.write_date if record._log_access else None,
             size=len(data),
-            public=record.env.user._is_public()  # good enough
+            public=record.env.user._is_public(),  # good enough
         )
 
     def read(self):
-        """ Get the stream content as bytes. """
-        if self.type == 'url':
-            raise ValueError("Cannot read an URL")
+        """Get the stream content as bytes."""
+        if self.type == "url":
+            raise ValueError(ERR_CANNOT_READ_URL)
 
-        if self.type == 'data':
+        if self.type == "data":
             return self.data
 
-        with open(self.path, 'rb') as file:
+        with open(self.path, "rb") as file:
             return file.read()
 
     def get_response(
@@ -119,7 +122,7 @@ class DsfStream:
         as_attachment=None,
         immutable=None,
         content_security_policy="default-src 'none'",
-        **send_file_kwargs
+        **send_file_kwargs,
     ):
         """
         Create the corresponding :class:`~Response` for the current stream.
@@ -139,13 +142,17 @@ class DsfStream:
             :func:`odoo.tools._vendor.send_file.send_file` instead of
             the stream sensitive values. Discouraged.
         """
-        assert self.type in ('url', 'data', 'path'), "Invalid type: {self.type!r}, should be 'url', 'data' or 'path'."
-        assert getattr(self, self.type) is not None, "There is nothing to stream, missing {self.type!r} attribute."
+        assert self.type in ("url", "data", "path"), (
+            "Invalid type: {self.type!r}, should be 'url', 'data' or 'path'."
+        )
+        assert getattr(self, self.type) is not None, (
+            "There is nothing to stream, missing {self.type!r} attribute."
+        )
 
-        if self.type == 'url':
+        if self.type == "url":
             if self.max_age is not None:
                 res = request.redirect(self.url, code=302, local=False)
-                res.headers['Cache-Control'] = f'max-age={self.max_age}'
+                res.headers["Cache-Control"] = f"max-age={self.max_age}"
                 return res
             return request.redirect(self.url, code=301, local=False)
 
@@ -155,49 +162,51 @@ class DsfStream:
             immutable = self.immutable
 
         send_file_kwargs = {
-            'mimetype': self.mimetype,
-            'as_attachment': as_attachment,
-            'download_name': self.download_name,
-            'conditional': self.conditional,
-            'etag': self.etag,
-            'last_modified': self.last_modified,
-            'max_age': STATIC_CACHE_LONG if immutable else self.max_age,
-            'environ': request.httprequest.environ,
-            'response_class': Response,
+            "mimetype": self.mimetype,
+            "as_attachment": as_attachment,
+            "download_name": self.download_name,
+            "conditional": self.conditional,
+            "etag": self.etag,
+            "last_modified": self.last_modified,
+            "max_age": STATIC_CACHE_LONG if immutable else self.max_age,
+            "environ": request.httprequest.environ,
+            "response_class": Response,
             **send_file_kwargs,
         }
 
-        if self.type == 'data':
+        if self.type == "data":
             res = _send_file(BytesIO(self.data), **send_file_kwargs)
         else:  # self.type == 'path'
-            send_file_kwargs['use_x_sendfile'] = False
-            if config['x_sendfile']:
+            send_file_kwargs["use_x_sendfile"] = False
+            if config["x_sendfile"]:
                 with contextlib.suppress(ValueError):  # outside of the filestore
-                    fspath = Path(self.path).relative_to(opj(config['data_dir'], 'filestore'))
-                    x_accel_redirect = f'/web/filestore/{fspath}'
-                    send_file_kwargs['use_x_sendfile'] = True
+                    fspath = Path(self.path).relative_to(
+                        opj(config["data_dir"], "filestore"),
+                    )
+                    x_accel_redirect = f"/web/filestore/{fspath}"
+                    send_file_kwargs["use_x_sendfile"] = True
 
             res = _send_file(self.path, **send_file_kwargs)
-            if 'X-Sendfile' in res.headers:
-                res.headers['X-Accel-Redirect'] = x_accel_redirect
+            if "X-Sendfile" in res.headers:
+                res.headers["X-Accel-Redirect"] = x_accel_redirect
 
                 # In case of X-Sendfile/X-Accel-Redirect, the body is empty,
                 # yet werkzeug gives the length of the file. This makes
                 # NGINX wait for content that'll never arrive.
-                res.headers['Content-Length'] = '0'
+                res.headers["Content-Length"] = "0"
 
-        res.headers['X-Content-Type-Options'] = 'nosniff'
+        res.headers["X-Content-Type-Options"] = "nosniff"
 
         if content_security_policy:  # see also Application.set_csp()
-            res.headers['Content-Security-Policy'] = content_security_policy
+            res.headers["Content-Security-Policy"] = content_security_policy
 
         if self.public:
             if (res.cache_control.max_age or 0) > 0:
                 res.cache_control.public = True
         else:
-            res.cache_control.pop('public', '')
+            res.cache_control.pop("public", "")
             res.cache_control.private = True
         if immutable:
-            res.cache_control['immutable'] = None  # None sets the directive
+            res.cache_control["immutable"] = None  # None sets the directive
 
         return res
