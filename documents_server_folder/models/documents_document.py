@@ -565,6 +565,7 @@ class Document(models.Model):
             self.unlink()
         else:
             self.fetch_dt = False
+            (child_files - items_to_unlink)._compute_file_size()
 
         return {"type": "ir.actions.client", "tag": "reload"}
 
