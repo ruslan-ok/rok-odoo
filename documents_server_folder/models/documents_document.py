@@ -30,6 +30,21 @@ class Document(models.Model):
     has_children = fields.Boolean("Does it have child folders?", default=False)
     fetch_dt = fields.Datetime()
 
+    @api.depends(
+        "attachment_id",
+        "shortcut_document_id.attachment_id",
+        "located_on_the_server",
+    )
+    def _compute_file_size(self):
+        server_docs = self.filtered("located_on_the_server")
+        other_docs = self - server_docs
+        files = server_docs.filtered(lambda x: x.type != "folder")
+        for document in files:
+            path = document.get_path()
+            file_path = os.path.join(document.root_path, path)
+            document.file_size = os.path.getsize(file_path)
+        super(Document, other_docs)._compute_file_size()
+
     def _register_hook(self):
         super()._register_hook()
 
@@ -295,7 +310,6 @@ class Document(models.Model):
     @api.model
     def create_file(self, folder_id, folder_full_path, file_name):
         file_full_path = os.path.join(folder_full_path, file_name)
-        file_size = os.path.getsize(file_full_path)
         mimetype, _ = mimetypes.guess_type(file_full_path)
         file = self.env["documents.document"].search(
             [
@@ -315,7 +329,6 @@ class Document(models.Model):
                 "folder_id": folder_id,
                 "name": file_name,
                 "owner_id": self.env.user.id,
-                "file_size": file_size,
                 "mimetype": mimetype or "application/octet-stream",
             },
         )
